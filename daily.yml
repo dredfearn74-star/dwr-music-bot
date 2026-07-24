@@ -1,0 +1,30 @@
+name: DWR daily post
+
+on:
+  schedule:
+    - cron: '0 15 * * *'   # 15:00 UTC = 10:00 AM US Central (CDT). Adjust the hour if you like.
+  workflow_dispatch: {}     # lets you run it manually from the Actions tab (for testing)
+
+permissions:
+  contents: write           # needed so the bot can save queue status back to the repo
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Post what's due today
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+        run: python post.py
+      - name: Save queue status back to the repo
+        run: |
+          git config user.name "dwr-music-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add content_queue.csv autopublish_log.txt 2>/dev/null || true
+          git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
+          git push || echo "nothing to push"
