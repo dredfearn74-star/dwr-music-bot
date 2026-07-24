@@ -1,0 +1,2 @@
+brand,date,platform,caption,media_url,status
+DWR Music,2026-01-01,both,"EXAMPLE — copy this row, set a real date (YYYY-MM-DD), your caption, a public media_url, and status=QUEUED. A .mp4 posts as a reel; a .jpg/.png posts as a photo.",https://raw.githubusercontent.com/USERNAME/dwr-music-bot/main/media/example.jpg,DRAFT
