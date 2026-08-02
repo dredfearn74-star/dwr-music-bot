@@ -8,3 +8,5 @@
 [2026-08-01 10:57:47] Nothing due today. Exiting cleanly.
 [2026-08-02 10:57:28] FAILED [DWR Music] 2026-08-02 both: 400 Client Error: Bad Request for url: https://graph.facebook.com/v21.0/113416904992248/photos
 [2026-08-02 10:57:28] Queue updated (1 row(s) changed).
+[2026-08-02 11:40:59] FAILED [DWR Music] 2026-08-02 both: 400 Client Error: Bad Request for url: https://graph.facebook.com/v21.0/113416904992248/photos
+[2026-08-02 11:40:59] Queue updated (1 row(s) changed).
