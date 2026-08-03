@@ -12,3 +12,4 @@
 [2026-08-02 11:40:59] Queue updated (1 row(s) changed).
 [2026-08-02 16:38:26] FAILED [DWR Music] 2026-08-02 both: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/113416904992248/photos
 [2026-08-02 16:38:26] Queue updated (1 row(s) changed).
+[2026-08-03 12:06:41] Nothing due today. Exiting cleanly.
