@@ -32,7 +32,7 @@ except Exception:
     TZ = None
 
 HERE = pathlib.Path(__file__).parent
-GRAPH_VERSION_DEFAULT = "v21.0"
+GRAPH_VERSION_DEFAULT = "v23.0"
 
 
 def now_ct():
@@ -115,6 +115,35 @@ def ig_post(ver, igid, tok, cap, media):
     return p.json().get("id")
 
 
+
+def resolve_page_token(ver, pid, tok):
+    """Exchange the account/system-user token for the PAGE's own access token.
+    Posting to a Page requires the Page token, not the top-level token — using the
+    top-level token directly is what caused the 403 Forbidden on /photos."""
+    try:
+        base = f"https://graph.facebook.com/{ver}"
+        r = requests.get(f"{base}/{pid}", params={"fields": "access_token", "access_token": tok}, timeout=60)
+        if r.ok:
+            return (r.json() or {}).get("access_token") or ""
+    except Exception:
+        pass
+    return ""
+
+
+def resolve_ig(ver, pid, tok):
+    """Look up the Instagram Business account id connected to a Facebook Page.
+    Lets brands.csv leave ig_user_id blank — the bot fills it in at runtime."""
+    try:
+        base = f"https://graph.facebook.com/{ver}"
+        r = requests.get(f"{base}/{pid}", params={"fields": "instagram_business_account", "access_token": tok}, timeout=60)
+        if r.ok:
+            iba = r.json().get("instagram_business_account") or {}
+            return iba.get("id") or ""
+    except Exception:
+        pass
+    return ""
+
+
 def main():
     env = read_env()
     brands = read_brands()
@@ -153,15 +182,20 @@ def main():
             row["status"] = "SKIPPED"; changed += 1
             log(f"SKIPPED {row.get('brand')} {due}: no token configured (set the META_TOKEN secret)")
             continue
+        # Posting to a Page needs the PAGE token (not the top-level token) — resolve it, fall back if unavailable.
+        page_tok = resolve_page_token(ver, (cfg.get("fb_page_id") or "").strip(), tok) if cfg.get("fb_page_id") else ""
+        post_tok = page_tok or tok
         plat = (row.get("platform") or "both").strip().lower()
         cap = row.get("caption", "")
         media = (row.get("media_url") or "").strip()
         res = []
         try:
             if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id"):
-                res.append("FB:" + str(fb_post(ver, cfg["fb_page_id"].strip(), tok, cap, media)))
-            if plat in ("instagram", "ig", "both") and cfg.get("ig_user_id"):
-                res.append("IG:" + str(ig_post(ver, cfg["ig_user_id"].strip(), tok, cap, media)))
+                res.append("FB:" + str(fb_post(ver, cfg["fb_page_id"].strip(), post_tok, cap, media)))
+            if plat in ("instagram", "ig", "both"):
+                igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
+                if igid:
+                    res.append("IG:" + str(ig_post(ver, igid, post_tok, cap, media)))
             row["status"] = "POSTED"; changed += 1
             log(f"POSTED [{row.get('brand')}] {due} {plat} -> {', '.join(res) or '(nothing matched platform)'}")
         except Exception as e:
