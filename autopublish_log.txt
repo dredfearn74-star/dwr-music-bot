@@ -21,3 +21,5 @@
 [2026-08-10 10:55:54] Nothing due today. Exiting cleanly.
 [2026-08-11 10:56:36] Nothing due today. Exiting cleanly.
 [2026-08-12 10:55:06] Nothing due today. Exiting cleanly.
+[2026-08-13 03:33:22] FAILED [DWR Music] 2026-08-13 both: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/113416904992248/photos
+[2026-08-13 03:33:22] Queue updated (1 row(s) changed).
