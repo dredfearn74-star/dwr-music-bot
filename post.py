@@ -27,6 +27,16 @@ Link-in-first-comment (Facebook reach protection):
     an event page), or `none` to suppress the comment on that post. Blank = use brand default.
   Instagram is excluded on purpose (links in IG comments/captions are never clickable).
 
+Safety gates (added 2026-08-14, after two live failures):
+  - CAPTION GATE  -> a row with an empty caption is REFUSED, never posted. Put the word
+                     `none` in the caption cell if a post is meant to be wordless on purpose.
+  - ASPECT GATE   -> every video is measured with ffprobe before posting. Anything that
+                     isn't vertical 9:16 (e.g. a 1920x1080 landscape export with the
+                     vertical footage pillarboxed inside it) is REFUSED, because Meta
+                     publishes it visibly squished. If ffprobe isn't available the gate
+                     logs a warning and stands down rather than blocking a good post.
+  A refused row is marked FAILED and the reason is written to autopublish_log.txt.
+
 Each run: for every QUEUED row whose date is today (US Central) or earlier, it posts to
 Facebook and/or Instagram, then marks the row POSTED. A .mp4/.mov/.m4v media file is posted
 as a reel/video; anything else is posted as a photo. A row is skipped safely if the
@@ -37,9 +47,12 @@ reachable from the Cowork sandbox, so the bot lives on GitHub).
 """
 import csv
 import datetime
+import json
 import os
 import pathlib
 import re
+import shutil
+import subprocess
 import time
 
 import requests
@@ -76,8 +89,9 @@ def read_brands():
     p = HERE / "brands.csv"
     if not p.exists():
         return d
-    for r in csv.DictReader(open(p, encoding="utf-8")):
-        d[r["brand"].strip().lower()] = r
+    with open(p, encoding="utf-8") as fh:
+        for r in csv.DictReader(fh):
+            d[r["brand"].strip().lower()] = r
     return d
 
 
@@ -234,6 +248,95 @@ def fb_comment(ver, post_id, tok, message):
     return r.json().get("id")
 
 
+# ---------------------------------------------------------------------------
+# SAFETY GATES — added 2026-08-14 after two live failures:
+#   (1) reels published with a completely BLANK caption, and
+#   (2) reels published SQUISHED because a landscape (pillarboxed) export was
+#       force-crammed into 1080x1920 with a bare `scale=1080:1920`.
+# Both slipped through because nothing checked the post before it went out.
+# These two functions are the check. A row that fails a gate is marked FAILED
+# with the reason written to the log — it is never posted.
+# ---------------------------------------------------------------------------
+
+BLANK_OK = ("none", "-", "no", "skip", "off", "blank")
+
+
+def caption_gate(row):
+    """Refuse to post a row with an empty caption.
+
+    A blank caption is almost always a mistake (it is exactly what produced the
+    'Your reel' posts with no text). If a post is MEANT to carry no words —
+    a flyer where the image says everything — put the word `none` in the
+    caption cell to say so on purpose.
+
+    Returns '' when the row is fine, or a plain-English reason to refuse.
+    """
+    cap = (row.get("caption") or "").strip()
+    if cap.lower() in BLANK_OK:
+        return ""          # deliberately wordless — allowed
+    if not cap:
+        return ("caption is EMPTY. Nothing posts without words. Write a caption, "
+                "or put `none` in the caption cell if it is meant to be wordless.")
+    return ""
+
+
+def probe_video(url):
+    """Read a remote video's real pixel size with ffprobe (no download).
+
+    Returns (width, height) or None when it can't tell — ffprobe missing, a
+    network hiccup, or an unreadable file. Unknown is NOT treated as failure:
+    the bot warns and carries on rather than blocking a good post over tooling.
+    """
+    if not shutil.which("ffprobe"):
+        return None
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height", "-of", "json", url],
+            capture_output=True, text=True, timeout=180,
+        )
+        if out.returncode != 0:
+            return None
+        st = (json.loads(out.stdout).get("streams") or [{}])[0]
+        w, h = int(st.get("width") or 0), int(st.get("height") or 0)
+        return (w, h) if w and h else None
+    except Exception:
+        return None
+
+
+def aspect_gate(url):
+    """Refuse to post a video that is not vertical 9:16.
+
+    THE BUG THIS CATCHES: some DaVinci exports came out 1920x1080 LANDSCAPE with
+    the vertical footage pillarboxed (black bars) inside them. Pushed to Meta as
+    a reel, that publishes visibly squished. The fix is a genuine 9:16 re-export.
+
+    If you ever need to convert, NEVER use a bare `scale=W:H` — it force-crams
+    the picture into the box and crushes it. Use:
+      -vf "scale=1080:1920:force_original_aspect_ratio=decrease,\\
+            pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1"
+    which fits the picture and pads the gap instead of distorting it.
+
+    Returns '' when the clip is fine (or unknowable), or a reason to refuse.
+    """
+    if not is_video(url):
+        return ""                       # photos are not gated
+    dims = probe_video(url)
+    if not dims:
+        log(f"WARN: could not read the video size for {url} — posting anyway (aspect gate skipped).")
+        return ""
+    w, h = dims
+    target = 9.0 / 16.0
+    ratio = w / float(h)
+    if abs(ratio - target) <= 0.02:     # ~9:16 within rounding
+        return ""
+    shape = "landscape" if w > h else "the wrong vertical shape"
+    return (f"video is {w}x{h} ({shape}), not 9:16. Publishing it would look SQUISHED. "
+            f"Re-export vertical from DaVinci, or pad it with "
+            f"scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1 "
+            f"— never a bare scale=1080:1920.")
+
+
 def resolve_comment_link(row, cfg):
     """Decide the link to drop as the first comment on a post.
 
@@ -258,7 +361,8 @@ def main():
     if not qp.exists():
         log("No content_queue.csv found. Nothing to do.")
         return
-    rows = list(csv.DictReader(open(qp, encoding="utf-8")))
+    with open(qp, encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
     if not rows:
         log("Queue empty. Nothing to do.")
         return
@@ -293,6 +397,16 @@ def main():
         plat = (row.get("platform") or "both").strip().lower()
         cap = row.get("caption", "")
         media = (row.get("media_url") or "").strip()
+
+        # ---- SAFETY GATES: check the post BEFORE it goes anywhere near Meta ----
+        stop = caption_gate(row) or (aspect_gate(media) if media else "")
+        if stop:
+            row["status"] = "FAILED"; changed += 1
+            log(f"REFUSED [{row.get('brand')}] {due} {plat}: {stop}")
+            continue
+        if (cap or "").strip().lower() in BLANK_OK:
+            cap = ""       # `none` means deliberately wordless
+
         # Optional tagging columns (absent in older queues -> treated as blank):
         fb_cap = build_fb_caption(cap, row.get("fb_page_tags", ""))   # clickable Page-mentions
         ig_cap = build_ig_caption(cap, row.get("ig_mentions", ""))    # auto-linking @handles
@@ -318,10 +432,25 @@ def main():
             row["status"] = "FAILED"; changed += 1
             log(f"FAILED [{row.get('brand')}] {due} {plat}: {e}")
     if changed:
-        w = csv.DictWriter(open(qp, "w", newline="", encoding="utf-8"), fieldnames=fieldnames)
-        w.writeheader()
-        w.writerows(rows)
-        log(f"Queue updated ({changed} row(s) changed).")
+        # Write the queue SAFELY. The old version handed a bare open() to DictWriter and
+        # never closed it, so the buffer could be thrown away and content_queue.csv was
+        # left 0 BYTES — the whole queue gone. Now: write a temp file, close it, verify it
+        # actually has every row, and only then swap it into place. A crash mid-write
+        # damages the temp file, never the real queue.
+        tmp = qp.with_suffix(".csv.tmp")
+        with open(tmp, "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=fieldnames)
+            w.writeheader()
+            w.writerows(rows)
+        with open(tmp, encoding="utf-8") as fh:
+            written = list(csv.DictReader(fh))
+        if len(written) != len(rows):
+            tmp.unlink(missing_ok=True)
+            log(f"ABORTED queue save: wrote {len(written)} rows but expected {len(rows)}. "
+                f"content_queue.csv left untouched — nothing was lost.")
+            return
+        os.replace(tmp, qp)
+        log(f"Queue updated ({changed} row(s) changed, {len(written)} rows saved).")
     else:
         log("Nothing due today. Exiting cleanly.")
 
