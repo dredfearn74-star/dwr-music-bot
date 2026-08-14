@@ -1,4 +1,4 @@
-brand,fb_page_id,ig_user_id,token,notes
-DWR Music,113416904992248,17841401335957202,,"FB 'David Wayne Redfearn Music' + IG @davidwredfearnmusic. IDs verified 2026-06-26. Leave token blank so it uses the META_TOKEN secret."
-MotiveAF,1179462511909328,,,"FB MotiveAF + IG @motiveafhq. Leave token+IG blank: IG auto-resolved from the page. Uses META_TOKEN (Content Scheduler reaches this page)."
-Midbar Moon,1173427532510546,,,"FB Midbar Moon + IG @midbarmoon. Leave token+IG blank: IG auto-resolved from the page. Uses META_TOKEN (Content Scheduler reaches this page)."
+brand,fb_page_id,ig_user_id,token,default_comment_link,notes
+DWR Music,113416904992248,17841401335957202,,,"FB 'David Wayne Redfearn Music' + IG @davidwredfearnmusic. IDs verified 2026-06-26. Leave token blank so it uses the META_TOKEN secret. default_comment_link left blank on purpose: DWR posts use a per-post first_comment (a reel -> its specific YouTube track). Channel: youtube.com/@dwredfearnmusic."
+MotiveAF,1179462511909328,,,,"FB MotiveAF + IG @motiveafhq. Leave token+IG blank: IG auto-resolved from the page. Uses META_TOKEN (Content Scheduler reaches this page). default_comment_link = Printify store URL PENDING - paste the store link here and every FB post auto-comments it."
+Midbar Moon,1173427532510546,,,https://payhip.com/u1784570516228689150460,"FB Midbar Moon + IG @midbarmoon. Leave token+IG blank: IG auto-resolved from the page. Uses META_TOKEN. default_comment_link = Payhip store, auto-commented as the first comment on every FB post."
