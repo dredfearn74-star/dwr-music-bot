@@ -9,6 +9,15 @@ Three files run the whole thing:
   - content_queue.csv   -> the post list; one row per post, each tagged with a date
   - META_TOKEN (secret) -> a long-lived Meta token for the DWR Music page (a GitHub Actions secret)
 
+Clickable tagging (optional, per-row):
+  - fb_page_tags -> Facebook PAGE IDs to mention (e.g. the venue's Page). The bot wraps
+                    each as @[ID] in the post text so Facebook renders a clickable mention.
+                    (Meta blocks tagging personal PROFILES via the API — those stay a manual
+                    edit-after-post; only Pages can be tagged hands-free.)
+  - ig_mentions  -> Instagram @handles to mention. Instagram auto-links any @handle in the
+                    caption, so these become real clickable mentions on IG.
+  Leave either cell blank to skip. Older queues without these columns still work unchanged.
+
 Each run: for every QUEUED row whose date is today (US Central) or earlier, it posts to
 Facebook and/or Instagram, then marks the row POSTED. A .mp4/.mov/.m4v media file is posted
 as a reel/video; anything else is posted as a photo. A row is skipped safely if the
@@ -21,6 +30,7 @@ import csv
 import datetime
 import os
 import pathlib
+import re
 import time
 
 import requests
@@ -71,6 +81,64 @@ def log(m):
 
 def is_video(url):
     return url.lower().split("?")[0].endswith((".mp4", ".mov", ".m4v"))
+
+
+def _split_tokens(s):
+    """Split a tag/mention cell on commas, pipes, or newlines into clean tokens."""
+    if not s:
+        return []
+    return [p.strip() for p in re.split(r"[,\|\n]+", str(s)) if p.strip()]
+
+
+def build_fb_caption(cap, fb_page_tags):
+    """Append clickable Facebook PAGE-mentions to a caption.
+
+    Facebook turns the token @[PAGE_ID] inside a post's text into a clickable
+    mention of that Page (works for Pages you manage or that allow it — e.g. the
+    venue's Page, another band's Page). It does NOT work for personal profiles;
+    Meta blocks tagging people via the API, so those stay a manual edit-after-post.
+
+    fb_page_tags: a cell like "1234567890, @[1112223334]" (numeric IDs and/or
+    already-wrapped @[id] tokens). Anything non-numeric is passed through as-is so
+    a hand-written @[id] still works. Mentions are placed at the END of the caption.
+    """
+    cap = cap or ""
+    mentions = []
+    for t in _split_tokens(fb_page_tags):
+        if t.startswith("@[") and t.endswith("]"):
+            mentions.append(t)               # already wrapped
+        elif t.isdigit():
+            mentions.append("@[%s]" % t)      # bare Page ID -> wrap it
+        else:
+            mentions.append(t)                # pass through (defensive)
+    # de-dupe, keep order
+    seen, uniq = set(), []
+    for m in mentions:
+        if m not in seen:
+            seen.add(m); uniq.append(m)
+    if not uniq:
+        return cap
+    tail = " ".join(uniq)
+    return (cap.rstrip() + "\n\n" + tail).strip() if cap.strip() else tail
+
+
+def build_ig_caption(cap, ig_mentions):
+    """Append Instagram @mentions to a caption.
+
+    Instagram auto-links any @handle in a caption to that account (for business/
+    creator accounts). ig_mentions: a cell like "@handle1, handle2" — the @ is
+    optional and normalized. Mentions are placed at the END of the caption.
+    """
+    cap = cap or ""
+    handles, seen = [], set()
+    for h in _split_tokens(ig_mentions):
+        h = "@" + h.lstrip("@")
+        if h != "@" and h.lower() not in seen:
+            seen.add(h.lower()); handles.append(h)
+    if not handles:
+        return cap
+    tail = " ".join(handles)
+    return (cap.rstrip() + "\n\n" + tail).strip() if cap.strip() else tail
 
 
 def fb_post(ver, pid, tok, cap, media):
@@ -188,14 +256,17 @@ def main():
         plat = (row.get("platform") or "both").strip().lower()
         cap = row.get("caption", "")
         media = (row.get("media_url") or "").strip()
+        # Optional tagging columns (absent in older queues -> treated as blank):
+        fb_cap = build_fb_caption(cap, row.get("fb_page_tags", ""))   # clickable Page-mentions
+        ig_cap = build_ig_caption(cap, row.get("ig_mentions", ""))    # auto-linking @handles
         res = []
         try:
             if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id"):
-                res.append("FB:" + str(fb_post(ver, cfg["fb_page_id"].strip(), post_tok, cap, media)))
+                res.append("FB:" + str(fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)))
             if plat in ("instagram", "ig", "both"):
                 igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
                 if igid:
-                    res.append("IG:" + str(ig_post(ver, igid, post_tok, cap, media)))
+                    res.append("IG:" + str(ig_post(ver, igid, post_tok, ig_cap, media)))
             row["status"] = "POSTED"; changed += 1
             log(f"POSTED [{row.get('brand')}] {due} {plat} -> {', '.join(res) or '(nothing matched platform)'}")
         except Exception as e:
