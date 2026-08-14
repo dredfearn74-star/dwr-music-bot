@@ -1,0 +1,29 @@
+name: Fix blank reel captions
+on:
+  workflow_dispatch:
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests
+      - name: Inspect and patch scheduled reels
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import os, json, requests
+          T = os.environ['META_TOKEN']; PAGE = '113416904992248'; V = 'v23.0'
+          B = 'https://graph.facebook.com/' + V
+          pt = requests.get(B + '/' + PAGE, params={'fields':'access_token','access_token':T}).json().get('access_token') or T
+          for edge in ['scheduled_posts', 'video_reels', 'videos']:
+              try:
+                  r = requests.get(B + '/' + PAGE + '/' + edge,
+                        params={'fields':'id,message,description,scheduled_publish_time,status,created_time',
+                                'limit':100,'access_token':pt}, timeout=60).json()
+              except Exception as e:
+                  print('EDGE', edge, 'ERROR', e); continue
+              print('=== EDGE:', edge, '===')
+              print(json.dumps(r, indent=1)[:5000])
+          PY
+
