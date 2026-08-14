@@ -18,6 +18,15 @@ Clickable tagging (optional, per-row):
                     caption, so these become real clickable mentions on IG.
   Leave either cell blank to skip. Older queues without these columns still work unchanged.
 
+Link-in-first-comment (Facebook reach protection):
+  Facebook throttles posts that put an off-site link in the body, so the bot posts the
+  link as the FIRST COMMENT instead (Meta's own guidance). Two places set it:
+  - brands.csv column `default_comment_link` -> the brand's standing link (e.g. MotiveAF's
+    Printify store, DWR's YouTube channel). Auto-commented on every FB post for that brand.
+  - content_queue.csv column `first_comment`  -> per-post override: a specific link (a track,
+    an event page), or `none` to suppress the comment on that post. Blank = use brand default.
+  Instagram is excluded on purpose (links in IG comments/captions are never clickable).
+
 Each run: for every QUEUED row whose date is today (US Central) or earlier, it posts to
 Facebook and/or Instagram, then marks the row POSTED. A .mp4/.mov/.m4v media file is posted
 as a reel/video; anything else is posted as a photo. A row is skipped safely if the
@@ -212,6 +221,34 @@ def resolve_ig(ver, pid, tok):
     return ""
 
 
+def fb_comment(ver, post_id, tok, message):
+    """Post a comment on a Facebook post — as the Page.
+
+    Facebook REDUCES the reach of posts that have an off-site link in the body
+    (Meta's own data: ~97% of views go to posts with NO external link). So the
+    link goes in the FIRST COMMENT instead: the photo/caption gets full reach up
+    top, and the link sits in the comments where it isn't penalized."""
+    base = f"https://graph.facebook.com/{ver}"
+    r = requests.post(f"{base}/{post_id}/comments", data={"message": message, "access_token": tok}, timeout=120)
+    r.raise_for_status()
+    return r.json().get("id")
+
+
+def resolve_comment_link(row, cfg):
+    """Decide the link to drop as the first comment on a post.
+
+    - row 'first_comment' has a value  -> use it (e.g. a specific track or event link).
+    - row 'first_comment' = none/-/skip/no/off -> suppress (no comment this post).
+    - row 'first_comment' blank        -> fall back to the brand's default_comment_link
+                                          (brands.csv) — e.g. MotiveAF's store, DWR's YouTube.
+    Returns '' when there's nothing to comment. Instagram is intentionally excluded:
+    links in IG comments/captions are never clickable, so IG posts stay link-free."""
+    v = (row.get("first_comment") or "").strip()
+    if v:
+        return "" if v.lower() in ("none", "-", "no", "skip", "off") else v
+    return (cfg.get("default_comment_link") or "").strip()
+
+
 def main():
     env = read_env()
     brands = read_brands()
@@ -259,10 +296,18 @@ def main():
         # Optional tagging columns (absent in older queues -> treated as blank):
         fb_cap = build_fb_caption(cap, row.get("fb_page_tags", ""))   # clickable Page-mentions
         ig_cap = build_ig_caption(cap, row.get("ig_mentions", ""))    # auto-linking @handles
+        comment_link = resolve_comment_link(row, cfg)                 # off-site link -> first comment (FB only)
         res = []
         try:
             if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id"):
-                res.append("FB:" + str(fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)))
+                fb_id = fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)
+                res.append("FB:" + str(fb_id))
+                if comment_link and fb_id:
+                    # Link-in-first-comment (Facebook throttles links in the body).
+                    try:
+                        res.append("cmt:" + str(fb_comment(ver, fb_id, post_tok, comment_link)))
+                    except Exception as ce:
+                        log(f"WARN [{row.get('brand')}] {due}: post OK but first-comment failed: {ce}")
             if plat in ("instagram", "ig", "both"):
                 igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
                 if igid:
