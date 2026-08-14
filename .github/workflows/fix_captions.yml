@@ -12,18 +12,25 @@ jobs:
           META_TOKEN: ${{ secrets.META_TOKEN }}
         run: |
           python3 - <<'PY'
-          import os, json, requests
+          import os, requests
           T = os.environ['META_TOKEN']; PAGE = '113416904992248'; V = 'v23.0'
           B = 'https://graph.facebook.com/' + V
           pt = requests.get(B + '/' + PAGE, params={'fields':'access_token','access_token':T}).json().get('access_token') or T
-          for edge in ['scheduled_posts', 'video_reels', 'videos']:
-              try:
-                  r = requests.get(B + '/' + PAGE + '/' + edge,
-                        params={'fields':'id,message,description,scheduled_publish_time,status,created_time',
-                                'limit':100,'access_token':pt}, timeout=60).json()
-              except Exception as e:
-                  print('EDGE', edge, 'ERROR', e); continue
-              print('=== EDGE:', edge, '===')
-              print(json.dumps(r, indent=1)[:5000])
+          CAPS = {
+            '2026-08-17': 'A little "Trouble" from our monthly open mic at Murph and Mary\'s, with Ben Jammin\' Music on percussion. Taylor Swift, run through the DWR filter. Full song is up on my YouTube - David Wayne Redfearn Music. Next open mic is Aug 30 - come play or come listen! #DavidWayneRedfearn #DWRmusic #LiveMusic #OpenMic #Trouble #Newton #Iowa',
+            '2026-08-19': '"Get On Up" - one of mine. Live at our monthly open mic at Murph and Mary\'s, with Ben Jammin\' Music on percussion. Original song, (c) David Wayne Redfearn. Full track is up on my YouTube - David Wayne Redfearn Music. Next open mic is Aug 30 - come play or come listen! #DavidWayneRedfearn #DWRmusic #OriginalMusic #LiveMusic #OpenMic #Newton #Iowa',
+            '2026-08-21': '"Don\'t" from our monthly open mic at Murph and Mary\'s, with Ben Jammin\' Music on percussion. Ed Sheeran, with a little DWR groove on it. Full song is up on my YouTube - David Wayne Redfearn Music. Next open mic is Aug 30 - come play or come listen! #DavidWayneRedfearn #DWRmusic #LiveMusic #OpenMic #EdSheeran #Newton #Iowa',
+          }
+          r = requests.get(B + '/' + PAGE + '/video_reels',
+                params={'fields':'id,description,status,created_time','limit':100,'access_token':pt}, timeout=60).json()
+          rows = r.get('data', [])
+          print('TOTAL REELS:', len(rows))
+          for v in rows:
+              ph = (v.get('status') or {}).get('publishing_phase') or {}
+              st = ph.get('publish_status',''); when = (ph.get('publish_time') or '')[:10]
+              desc = (v.get('description') or '').strip()
+              print('%-20s %-12s %-12s desc=%d' % (v['id'], st, when, len(desc)))
+              if st == 'scheduled' and not desc and when in CAPS:
+                  res = requests.post(B + '/' + v['id'], data={'description': CAPS[when], 'access_token': pt}, timeout=60)
+                  print('   -> PATCH', when, res.status_code, res.text[:200])
           PY
-
