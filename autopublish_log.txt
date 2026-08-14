@@ -26,3 +26,5 @@
 [2026-08-13 10:54:41] Nothing due today. Exiting cleanly.
 [2026-08-13 11:51:35] POSTED [DWR Music] 2026-08-13 facebook -> FB:113416904992248_1024620347210873
 [2026-08-13 11:51:35] Queue updated (1 row(s) changed).
+[2026-08-14 10:46:10] POSTED [DWR Music] 2026-08-14 both -> FB:1025422723797302, IG:18081664526693444
+[2026-08-14 10:46:10] Queue updated (1 row(s) changed).
