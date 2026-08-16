@@ -30,3 +30,5 @@
 [2026-08-14 10:46:10] Queue updated (1 row(s) changed).
 [2026-08-15 10:16:10] POSTED [DWR Music] 2026-08-15 facebook -> FB:113416904992248_1026315867041321
 [2026-08-15 10:16:10] Queue updated (1 row(s) changed, 12 rows saved).
+[2026-08-16 10:16:54] POSTED [DWR Music] 2026-08-16 both -> FB:1027183336954574, IG:18090579818419568
+[2026-08-16 10:16:54] Queue updated (1 row(s) changed, 12 rows saved).
