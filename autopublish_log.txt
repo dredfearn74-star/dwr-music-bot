@@ -32,3 +32,5 @@
 [2026-08-15 10:16:10] Queue updated (1 row(s) changed, 12 rows saved).
 [2026-08-16 10:16:54] POSTED [DWR Music] 2026-08-16 both -> FB:1027183336954574, IG:18090579818419568
 [2026-08-16 10:16:54] Queue updated (1 row(s) changed, 12 rows saved).
+[2026-08-17 10:20:39] FAILED [DWR Music] 2026-08-17 both: 400 Client Error: Bad Request for url: https://graph.facebook.com/v23.0/113416904992248/photos
+[2026-08-17 10:20:39] Queue updated (1 row(s) changed, 12 rows saved).
