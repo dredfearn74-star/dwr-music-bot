@@ -2,11 +2,12 @@ name: DWR daily post
 
 on:
   schedule:
-    - cron: '0 15 * * *'   # 15:00 UTC = 10:00 AM US Central (CDT). Adjust the hour if you like.
-  workflow_dispatch: {}     # lets you run it manually from the Actions tab (for testing)
+    - cron: '0 15 * * *'   # 15:00 UTC = 10:00 AM US Central (CDT)
+  workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
-  contents: write           # needed so the bot can save queue status back to the repo
+  contents: write           # save queue status back to the repo
+  issues: write             # open an alert issue when a post fails
 
 jobs:
   post:
@@ -17,16 +18,63 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - name: Install ffmpeg (the 9:16 aspect-ratio gate uses ffprobe)
+      - name: Install ffmpeg (the 9:16 aspect gate uses ffprobe)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
       - name: Post what's due today
+        id: post
         env:
           META_TOKEN: ${{ secrets.META_TOKEN }}
         run: python post.py
+
+      # MUST run even when posting failed, or a failure would throw away the
+      # queue status and the log.
       - name: Save queue status back to the repo
+        if: always()
         run: |
           git config user.name "dwr-music-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add content_queue.csv autopublish_log.txt 2>/dev/null || true
+          git add content_queue.csv autopublish_log.txt last_failure.txt 2>/dev/null || true
           git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
           git push || echo "nothing to push"
+
+      # ---- THE ALARM -------------------------------------------------------
+      # Before this existed, a failed post still finished GREEN and nobody was
+      # told — that is how Micah Spurlock's spotlight was silently lost on
+      # 2026-08-17. Now a failure opens an issue, which emails David straight away.
+      - name: Raise the alarm — open an issue so David is told immediately
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let detail = '(no detail file was written)';
+            try { detail = fs.readFileSync('last_failure.txt', 'utf8'); } catch (e) {}
+            const when = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            const body = [
+              '## A scheduled post did NOT go out',
+              '',
+              '**What failed**',
+              '```',
+              detail.trim(),
+              '```',
+              '',
+              '**What happens next**',
+              '- The bot retries this row automatically on the next run (up to 3 attempts).',
+              '- Anything already live on Facebook or Instagram is recorded in the queue`s `posted_to` column and will NOT be posted twice.',
+              '',
+              '**If you want to know exactly why Facebook refused it**',
+              'Actions tab → **Diagnose a failed post** → Run workflow → type the row date.',
+              'It asks Facebook directly and publishes nothing.',
+              '',
+              `[Open the full run log](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+              '',
+              `_Raised automatically ${when} UTC._`
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 DWR bot: a post failed to go out (${when} UTC)`,
+              body,
+              labels: ['bot-failure']
+            });
