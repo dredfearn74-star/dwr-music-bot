@@ -1,0 +1,35 @@
+name: Tag check (why did the @ mentions not work)
+
+# Publishes NOTHING. Reads message_tags back off posts we already made, then
+# creates one UNPUBLISHED test post containing @[PageID] and reads it back to
+# prove whether the API is allowed to tag Pages at all right now. Deletes it after.
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_ids:
+        description: 'Space-separated Facebook post IDs to inspect'
+        required: false
+        default: '1025422723797302 1026315867041321 1027183336954574 1028366090169632'
+  push:
+    paths:
+      - 'RUN_TAGCHECK.txt'
+
+jobs:
+  tagcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Ask Facebook about the tags
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+        run: |
+          IDS="${{ github.event.inputs.post_ids }}"
+          if [ -z "$IDS" ]; then
+            IDS="1025422723797302 1026315867041321 1027183336954574 1028366090169632"
+          fi
+          python post.py --tagcheck $IDS
