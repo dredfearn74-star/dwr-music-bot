@@ -363,6 +363,35 @@ def aspect_gate(url):
             f"— never a bare scale=1080:1920.")
 
 
+def verify_fb_tags(ver, post_id, tok, wanted_tags):
+    """After posting, check whether Facebook actually kept the Page mentions.
+
+    PROVEN 2026-08-17: it does not. A probe posting "@[110966485223915]" came
+    back as plain text with message_tags = 0 — Facebook DELETES the mention
+    silently. That is the "Page Mentioning" restriction; it stays that way until
+    the app passes App Review. Instagram @handles are unaffected (Instagram
+    auto-links them in the caption).
+
+    So rather than pretend, the bot now checks and, when the tag was stripped,
+    writes the post link into needs_tagging.txt so the tags can be added by hand
+    in about twenty seconds. The moment App Review lands, tags start sticking and
+    this stops firing on its own — nothing to undo.
+
+    Returns True if the tags stuck, False if they were stripped, None if unknown.
+    """
+    if not wanted_tags or not post_id:
+        return None
+    base = f"https://graph.facebook.com/{ver}"
+    for fields in ("message,message_tags", "caption,message_tags", "name,message_tags"):
+        try:
+            r = requests.get(f"{base}/{post_id}", params={"fields": fields, "access_token": tok}, timeout=60)
+            if r.ok:
+                return bool((r.json() or {}).get("message_tags"))
+        except Exception:
+            pass
+    return None
+
+
 def resolve_comment_link(row, cfg):
     """Decide the link to drop as the first comment on a post.
 
@@ -585,6 +614,7 @@ def main():
     today = now_ct().date()
     changed = 0
     failures = []          # anything in here at the end makes this run exit RED
+    needs_tagging = []     # posts that went out but had their @ mentions stripped
     for row in rows:
         st = (row.get("status") or "").strip().upper()
         if st in ("POSTED", "SKIPPED", "DRAFT", "HOLD"):
@@ -647,6 +677,15 @@ def main():
                 fb_id = fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)
                 res.append("FB:" + str(fb_id))
                 mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
+                wanted = _split_tokens(row.get("fb_page_tags", ""))
+                if wanted:
+                    stuck = verify_fb_tags(ver, fb_id, post_tok, wanted)
+                    if stuck is False:
+                        link = f"https://www.facebook.com/{cfg['fb_page_id'].strip()}/posts/{str(fb_id).split('_')[-1]}"
+                        log(f"  TAGS STRIPPED by Facebook on {due} — add them by hand: {link}")
+                        needs_tagging.append(f"{due}  {row.get('caption','')[:45]}...  {link}")
+                    elif stuck:
+                        log(f"  tags stuck on {due} — Page Mentioning is working now.")
                 if comment_link and fb_id:
                     # Link-in-first-comment (Facebook throttles links in the body).
                     try:
@@ -692,6 +731,22 @@ def main():
         log(f"Queue updated ({changed} row(s) changed, {len(written)} rows saved).")
     else:
         log("Nothing due today. Exiting cleanly.")
+
+    # ---- POSTS THAT NEED HAND-TAGGING ---------------------------------------
+    tag_file = HERE / "needs_tagging.txt"
+    if needs_tagging:
+        log("")
+        log(f"@ MENTIONS: {len(needs_tagging)} post(s) went out with the tags stripped by Facebook.")
+        log("   Facebook removes API Page-mentions until the app passes App Review.")
+        log("   Open each link and tag by hand (about 20 seconds each):")
+        for n in needs_tagging:
+            log(f"   - {n}")
+        with open(tag_file, "w", encoding="utf-8") as fh:
+            fh.write("Posts that went out but had their @ mentions stripped by Facebook.\n")
+            fh.write("Open each and add the tags by hand. This file is rewritten every run.\n\n")
+            fh.write("\n".join(needs_tagging) + "\n")
+    elif tag_file.exists():
+        tag_file.unlink()
 
     # ---- LOUD FAILURE -------------------------------------------------------
     # This run used to finish GREEN even when a post had failed, which is exactly
