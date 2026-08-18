@@ -502,6 +502,7 @@ def main():
                 r_.setdefault(extra_col, "")
     today = now_ct().date()
     changed = 0
+    failures = []          # anything in here at the end makes this run exit RED
     for row in rows:
         st = (row.get("status") or "").strip().upper()
         if st in ("POSTED", "SKIPPED", "DRAFT", "HOLD"):
@@ -548,6 +549,7 @@ def main():
         if stop:
             row["status"] = "FAILED"; changed += 1
             log(f"REFUSED [{row.get('brand')}] {due} {plat}: {stop}")
+            failures.append(f"{row.get('brand')} {due} — REFUSED: {stop}")
             continue
         if (cap or "").strip().lower() in BLANK_OK:
             cap = ""       # `none` means deliberately wordless
@@ -583,6 +585,7 @@ def main():
             done_now = done_platforms(row)
             extra = f" (already live on {'+'.join(sorted(done_now))} — will NOT be re-posted)" if done_now else ""
             log(f"FAILED [{row.get('brand')}] {due} {plat} attempt {attempts_of(row)}/{MAX_ATTEMPTS}{extra}: {e}")
+            failures.append(f"{row.get('brand')} {due} {plat} (attempt {attempts_of(row)}/{MAX_ATTEMPTS}) — {e}")
             if attempts_of(row) >= MAX_ATTEMPTS:
                 log(f"  ^ giving up on this row after {MAX_ATTEMPTS} attempts. Fix it and set status back to QUEUED to try again.")
     if changed:
@@ -607,6 +610,21 @@ def main():
         log(f"Queue updated ({changed} row(s) changed, {len(written)} rows saved).")
     else:
         log("Nothing due today. Exiting cleanly.")
+
+    # ---- LOUD FAILURE -------------------------------------------------------
+    # This run used to finish GREEN even when a post had failed, which is exactly
+    # how Micah Spurlock's 2026-08-17 spotlight was lost without anyone being told.
+    # A failed post now fails the whole run, so GitHub turns it RED and emails.
+    if failures:
+        log("")
+        log("=" * 68)
+        log(f"!! {len(failures)} POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose")
+        for f in failures:
+            log(f"   - {f}")
+        log("=" * 68)
+        with open(HERE / "last_failure.txt", "w", encoding="utf-8") as fh:
+            fh.write("\n".join(failures))
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
