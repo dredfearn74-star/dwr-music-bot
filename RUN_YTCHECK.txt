@@ -1,0 +1,2 @@
+Every song is checked before it can go out.
+Touch/commit this file to fire the Song link check workflow. It publishes nothing.

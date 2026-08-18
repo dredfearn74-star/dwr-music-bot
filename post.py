@@ -20,12 +20,22 @@ Clickable tagging (optional, per-row):
 
 Link-in-first-comment (Facebook reach protection):
   Facebook throttles posts that put an off-site link in the body, so the bot posts the
-  link as the FIRST COMMENT instead (Meta's own guidance). Two places set it:
-  - brands.csv column `default_comment_link` -> the brand's standing link (e.g. MotiveAF's
-    Printify store, DWR's YouTube channel). Auto-commented on every FB post for that brand.
-  - content_queue.csv column `first_comment`  -> per-post override: a specific link (a track,
-    an event page), or `none` to suppress the comment on that post. Blank = use brand default.
-  Instagram is excluded on purpose (links in IG comments/captions are never clickable).
+  link as the FIRST COMMENT instead (Meta's own guidance), adds a "link in the comments"
+  line to the caption so people know to look, and then READS THE COMMENT BACK off the
+  live post to prove it actually landed. Ways to set it:
+  - content_queue.csv `first_comment` = yt:Song Title  -> the bot LOOKS THE SONG UP on the
+    brand's YouTube channel and comments the link to THAT SPECIFIC SONG. This is the rule
+    for song reels (David, 2026-08-18): point at the song, never at the channel front door.
+    If it cannot find the song with confidence it publishes NOTHING and says why, because
+    a comment pointing at the wrong song is worse than no comment.
+  - content_queue.csv `first_comment` = https://...   -> that exact link, no lookup.
+  - content_queue.csv `first_comment` = none          -> no comment on this post, on purpose
+    (the evergreen quote cards use this: they are not selling anything).
+  - brands.csv `default_comment_link`                 -> the brand's standing link, used only
+    when first_comment is blank (e.g. MotiveAF's store). DWR's is blank on purpose.
+  Instagram gets the comment too, at David's request. Note that Instagram does not make
+  links in comments clickable — it still puts the exact song in front of people, and an IG
+  comment failure is a warning, never a red run. Facebook is the clickable one.
 
 Safety gates (added 2026-08-14, after two live failures):
   - CAPTION GATE  -> a row with an empty caption is REFUSED, never posted. Put the word
@@ -104,6 +114,132 @@ def log(m):
 
 def is_video(url):
     return url.lower().split("?")[0].endswith((".mp4", ".mov", ".m4v"))
+
+
+# =============================================================================
+# YOUTUBE — POINT AT THE SONG, NOT THE CHANNEL
+# =============================================================================
+# David's rule (2026-08-18): when a REEL of a song drops, the first comment must
+# link to THAT SONG on YouTube — not the channel front door. So the bot looks the
+# song up on the DWR channel itself and comes back with the real watch URL.
+#
+# How a row asks for it:  first_comment = yt:Get On Up
+#                                          ^^^ the song title, as it is on YouTube
+#
+# Two ways it finds the song, in order:
+#   1. YOUTUBE_API_KEY secret set -> YouTube Data API search, whole catalogue.
+#   2. No key -> the channel's public RSS feed (last 15 uploads), no key needed.
+#
+# It REFUSES to guess. If nothing matches the title well enough, it posts NO
+# comment and says so loudly, because a comment pointing at the wrong song is
+# worse than no comment at all.
+# =============================================================================
+
+YT_WATCH = "https://www.youtube.com/watch?v={}"
+YT_MATCH_FLOOR = 0.72          # below this, we do not believe it is the same song
+_YT_CACHE = {}                 # channel_id -> [(title, video_id), ...] (RSS only)
+
+
+def _yt_norm(s):
+    """Squash a title down to comparable words: lowercase, no punctuation, no filler."""
+    s = (s or "").lower()
+    s = re.sub(r"[‘’“”]", "'", s)
+    s = re.sub(r"\(.*?\)|\[.*?\]", " ", s)              # drop "(live)", "[official video]"
+    s = re.sub(r"[^a-z0-9' ]+", " ", s)
+    drop = {"official", "video", "audio", "lyric", "lyrics", "live", "cover", "hd", "4k",
+            "the", "a", "an", "by", "feat", "ft", "david", "wayne", "redfearn", "dwr"}
+    words = [w for w in s.split() if w and w not in drop]
+    return " ".join(words)
+
+
+def _yt_score(want, have):
+    """0..1 — how confident are we that `have` is the song `want` asked for."""
+    w, h = _yt_norm(want), _yt_norm(have)
+    if not w or not h:
+        return 0.0
+    if w == h:
+        return 1.0
+    if h.startswith(w) or w.startswith(h):
+        return 0.93
+    if w in h or h in w:
+        return 0.85
+    ws, hs = set(w.split()), set(h.split())
+    if not ws or not hs:
+        return 0.0
+    return len(ws & hs) / float(len(ws | hs))          # Jaccard on the words
+
+
+def _yt_from_api(channel_id, api_key, query):
+    """Search the whole channel via the YouTube Data API. Returns [(title, video_id)]."""
+    r = requests.get(
+        "https://www.googleapis.com/youtube/v3/search",
+        params={"part": "snippet", "channelId": channel_id, "q": query, "type": "video",
+                "maxResults": 25, "key": api_key},
+        timeout=60,
+    )
+    if not r.ok:
+        raise RuntimeError(f"YouTube API -> HTTP {r.status_code}: {(r.text or '')[:250]}")
+    out = []
+    for it in (r.json() or {}).get("items", []):
+        vid = ((it.get("id") or {}).get("videoId") or "").strip()
+        title = ((it.get("snippet") or {}).get("title") or "").strip()
+        if vid and title:
+            out.append((title, vid))
+    return out
+
+
+def _yt_from_rss(channel_id):
+    """No-key fallback: the channel's public feed (most recent ~15 uploads)."""
+    if channel_id in _YT_CACHE:
+        return _YT_CACHE[channel_id]
+    r = requests.get("https://www.youtube.com/feeds/videos.xml",
+                     params={"channel_id": channel_id}, timeout=60)
+    if not r.ok:
+        raise RuntimeError(f"YouTube feed -> HTTP {r.status_code}")
+    pairs = []
+    for entry in re.split(r"<entry>", r.text)[1:]:
+        vid = re.search(r"<yt:videoId>(.*?)</yt:videoId>", entry)
+        title = re.search(r"<title>(.*?)</title>", entry, re.S)
+        if vid and title:
+            t = re.sub(r"&amp;", "&", title.group(1))
+            t = re.sub(r"&(quot|#39|apos);", "'", t).strip()
+            pairs.append((t, vid.group(1).strip()))
+    _YT_CACHE[channel_id] = pairs
+    return pairs
+
+
+def yt_lookup(song, cfg, env):
+    """Find `song` on the brand's YouTube channel.
+
+    Returns (watch_url, explanation). watch_url is '' when we are not confident —
+    and the explanation always says why, in plain English, so the log is useful.
+    """
+    song = (song or "").strip()
+    if not song:
+        return "", "no song title given after 'yt:'"
+    channel_id = (cfg.get("youtube_channel_id") or "").strip()
+    if not channel_id:
+        return "", ("no youtube_channel_id for brand '%s' — add it to brands.csv"
+                    % cfg.get("brand", "?"))
+    api_key = (env.get("YOUTUBE_API_KEY") or "").strip()
+    how = "YouTube Data API" if api_key else "channel RSS feed (last ~15 uploads)"
+    try:
+        pairs = _yt_from_api(channel_id, api_key, song) if api_key else _yt_from_rss(channel_id)
+    except Exception as e:
+        return "", f"lookup via {how} failed: {e}"
+    if not pairs:
+        return "", f"{how} returned no videos for this channel"
+    scored = sorted(((_yt_score(song, t), t, v) for t, v in pairs), reverse=True)
+    best, runner = scored[0], (scored[1] if len(scored) > 1 else (0.0, "", ""))
+    if best[0] < YT_MATCH_FLOOR:
+        near = ", ".join(f"{t!r}" for _, t, _ in scored[:3])
+        return "", (f"no confident match for {song!r} on the channel via {how} "
+                    f"(best was {best[1]!r} at {best[0]:.2f}, floor {YT_MATCH_FLOOR}). "
+                    f"Closest titles: {near}. Put the full YouTube URL in first_comment to be sure.")
+    if best[0] - runner[0] < 0.05 and runner[0] >= YT_MATCH_FLOOR:
+        return "", (f"two videos match {song!r} equally well ({best[1]!r} vs {runner[1]!r}) — "
+                    f"refusing to guess. Put the full YouTube URL in first_comment.")
+    return YT_WATCH.format(best[2]), f"matched {best[1]!r} at {best[0]:.2f} via {how}"
 
 
 def _split_tokens(s):
@@ -274,6 +410,109 @@ def fb_comment(ver, post_id, tok, message):
     return r.json().get("id")
 
 
+# =============================================================================
+# FIRST COMMENT — POST IT, THEN PROVE IT LANDED
+# =============================================================================
+# "Bots finish the job — save, publish, verify." Posting a comment and walking
+# away is how a link quietly goes missing. Every comment is now read back off the
+# live post before we call it done.
+# =============================================================================
+
+LINK_IN_COMMENTS = "🔗 Full song on YouTube — link in the comments 👇"
+
+
+def caption_says_link_in_comments(cap):
+    return "link in the comment" in (cap or "").lower() or "link in comments" in (cap or "").lower()
+
+
+def add_link_line(cap, line=LINK_IN_COMMENTS):
+    """Tell people the link is down in the comments — but only say it once.
+
+    Facebook throttles a post with an off-site link in the body, so the link goes
+    in the first comment. That only works if the post TELLS people to look there.
+    Idempotent: a caption that already says it is left exactly as written.
+    """
+    cap = cap or ""
+    if caption_says_link_in_comments(cap):
+        return cap
+    return (cap.rstrip() + "\n\n" + line).strip() if cap.strip() else line
+
+
+def comment_caption_line(link, cfg):
+    """Work out what the caption should SAY about the comment — or say nothing.
+
+    The line has to match what the link actually is. A song reel earns "full song
+    on YouTube"; MotiveAF's standing store link is a different animal and keeps
+    posting exactly as it does today (no line) unless the brand sets its own via
+    a `comment_caption_line` column in brands.csv. Saying "full song on YouTube"
+    over a t-shirt store is exactly the kind of small wrongness that erodes trust.
+    """
+    override = (cfg.get("comment_caption_line") or "").strip()
+    if override:
+        return override
+    low = (link or "").lower()
+    if "youtube.com" in low or "youtu.be" in low:
+        return LINK_IN_COMMENTS
+    return ""
+
+
+def verify_fb_comment(ver, post_id, tok, comment_id, message):
+    """Read the comments back off the live post and prove ours is really there.
+
+    Returns True (confirmed on the post), False (published but NOT found — a human
+    needs to look), or None (we could not check; treat as unproven, not as failed).
+    """
+    base = f"https://graph.facebook.com/{ver}"
+    try:
+        r = requests.get(f"{base}/{post_id}/comments",
+                         params={"fields": "id,message", "limit": 50, "access_token": tok},
+                         timeout=60)
+        if not r.ok:
+            return None
+        for c in (r.json() or {}).get("data", []):
+            if str(c.get("id")) == str(comment_id):
+                return True
+            if message and (message.strip() in (c.get("message") or "")):
+                return True
+        return False
+    except Exception:
+        return None
+
+
+def ig_comment(ver, media_id, tok, message):
+    """Comment on an Instagram post as the account.
+
+    NOTE (told to David 2026-08-18): Instagram does NOT make links in comments
+    clickable — people have to copy it. It still puts the exact song in front of
+    them, which is why he asked for it on both platforms. Needs the
+    instagram_manage_comments permission; if that is missing this raises and the
+    run logs it as a warning rather than pretending it worked.
+    """
+    base = f"https://graph.facebook.com/{ver}"
+    r = requests.post(f"{base}/{media_id}/comments",
+                      data={"message": message, "access_token": tok}, timeout=120)
+    graph_raise(r, "Instagram first comment")
+    return r.json().get("id")
+
+
+def verify_ig_comment(ver, media_id, tok, comment_id, message):
+    base = f"https://graph.facebook.com/{ver}"
+    try:
+        r = requests.get(f"{base}/{media_id}/comments",
+                         params={"fields": "id,text", "limit": 50, "access_token": tok},
+                         timeout=60)
+        if not r.ok:
+            return None
+        for c in (r.json() or {}).get("data", []):
+            if str(c.get("id")) == str(comment_id):
+                return True
+            if message and (message.strip() in (c.get("text") or "")):
+                return True
+        return False
+    except Exception:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # SAFETY GATES — added 2026-08-14 after two live failures:
 #   (1) reels published with a completely BLANK caption, and
@@ -392,19 +631,34 @@ def verify_fb_tags(ver, post_id, tok, wanted_tags):
     return None
 
 
-def resolve_comment_link(row, cfg):
-    """Decide the link to drop as the first comment on a post.
+def resolve_comment_link(row, cfg, env=None):
+    """Decide the exact text to drop as the first comment on a post.
 
-    - row 'first_comment' has a value  -> use it (e.g. a specific track or event link).
-    - row 'first_comment' = none/-/skip/no/off -> suppress (no comment this post).
-    - row 'first_comment' blank        -> fall back to the brand's default_comment_link
-                                          (brands.csv) — e.g. MotiveAF's store, DWR's YouTube.
-    Returns '' when there's nothing to comment. Instagram is intentionally excluded:
-    links in IG comments/captions are never clickable, so IG posts stay link-free."""
+    A row's `first_comment` cell can say four different things:
+      yt:Get On Up          -> LOOK THE SONG UP on the brand's YouTube channel and
+                               comment the link to THAT SONG (David's rule, 2026-08-18).
+      https://...           -> use that link exactly as written.
+      none / - / no / skip  -> post NO comment on this one. (The evergreen quote
+                               cards use this: they point at nothing on purpose.)
+      (blank)               -> fall back to the brand's default_comment_link in
+                               brands.csv — e.g. MotiveAF's store. DWR's is blank
+                               on purpose, so a blank DWR row gets no comment.
+
+    Returns (text, explanation). text is '' when nothing should be commented.
+    """
+    env = env or {}
     v = (row.get("first_comment") or "").strip()
+    if v.lower() in ("none", "-", "no", "skip", "off"):
+        return "", "first_comment says 'none' — no comment on this one, on purpose"
+    if v.lower().startswith("yt:"):
+        url, why = yt_lookup(v[3:], cfg, env)
+        return url, why
     if v:
-        return "" if v.lower() in ("none", "-", "no", "skip", "off") else v
-    return (cfg.get("default_comment_link") or "").strip()
+        return v, "using the first_comment cell exactly as written"
+    d = (cfg.get("default_comment_link") or "").strip()
+    if d:
+        return d, "using the brand's default_comment_link from brands.csv"
+    return "", "nothing to comment (blank first_comment, brand has no default link)"
 
 
 # --- retry bookkeeping --------------------------------------------------------
@@ -432,6 +686,53 @@ def attempts_of(row):
 
 def bump_attempts(row):
     row["attempts"] = str(attempts_of(row) + 1)
+
+
+# =============================================================================
+# YTCHECK MODE  —  python post.py --ytcheck ["Song Title" ...]
+# =============================================================================
+# Proves the song lookup works BEFORE anything is published. With no arguments it
+# walks content_queue.csv and resolves every `yt:` row, showing exactly which
+# YouTube video each post would link to. It publishes nothing and comments nothing.
+# =============================================================================
+
+def ytcheck(songs=None):
+    env = read_env()
+    brands = read_brands()
+    key = (env.get("YOUTUBE_API_KEY") or "").strip()
+    log("YTCHECK — publishing nothing, just resolving song links.")
+    log("Lookup method: " + ("YouTube Data API (full catalogue)" if key
+                             else "channel RSS feed — last ~15 uploads only. "
+                                  "Set the YOUTUBE_API_KEY secret to search everything."))
+    bad = 0
+    if songs:
+        cfg = brands.get("dwr music") or {}
+        for s in songs:
+            url, why = yt_lookup(s, cfg, env)
+            log(f"  {'✅' if url else '🔴'} {s!r} -> {url or 'NO MATCH'}   ({why})")
+            bad += 0 if url else 1
+    else:
+        qp = HERE / "content_queue.csv"
+        if not qp.exists():
+            log("No content_queue.csv to check."); return
+        with open(qp, encoding="utf-8") as fh:
+            rows = list(csv.DictReader(fh))
+        hits = 0
+        for row in rows:
+            fc = (row.get("first_comment") or "").strip()
+            if not fc.lower().startswith("yt:"):
+                continue
+            hits += 1
+            cfg = brands.get((row.get("brand") or "").strip().lower()) or {}
+            url, why = yt_lookup(fc[3:], cfg, env)
+            log(f"  {'✅' if url else '🔴'} {row.get('date')}  {fc} -> {url or 'NO MATCH'}   ({why})")
+            bad += 0 if url else 1
+        if not hits:
+            log("  (no rows in the queue are using yt: lookups right now)")
+    if bad:
+        log(f"🔴 {bad} song(s) did not resolve. Those rows would be REFUSED, not posted blind.")
+        raise SystemExit(1)
+    log("✅ Every song resolved.")
 
 
 # =============================================================================
@@ -615,6 +916,7 @@ def main():
     changed = 0
     failures = []          # anything in here at the end makes this run exit RED
     needs_tagging = []     # posts that went out but had their @ mentions stripped
+    needs_comment = []     # posts that went out but whose first comment is missing/unproven
     for row in rows:
         st = (row.get("status") or "").strip().upper()
         if st in ("POSTED", "SKIPPED", "DRAFT", "HOLD"):
@@ -667,9 +969,26 @@ def main():
             cap = ""       # `none` means deliberately wordless
 
         # Optional tagging columns (absent in older queues -> treated as blank):
+        # ---- FIRST COMMENT is worked out BEFORE the caption, because a post only
+        # earns the "link in the comments" line if a comment is really going to fire.
+        comment_link, comment_why = resolve_comment_link(row, cfg, env)
+        asked_for_song = (row.get("first_comment") or "").strip().lower().startswith("yt:")
+        if asked_for_song and not comment_link:
+            # The row asked for a specific song and we could not find it. Publishing a
+            # song reel with no song link is a half-done job, so nothing goes out —
+            # the row is fixable and will be retried.
+            row["status"] = "FAILED"; bump_attempts(row); changed += 1
+            log(f"REFUSED [{row.get('brand')}] {due}: {comment_why}")
+            log("         Nothing was published. Fix first_comment (or paste the full YouTube URL) and re-run.")
+            failures.append(f"{row.get('brand')} {due} — song link not found, post held back: {comment_why}")
+            continue
+        if comment_link:
+            log(f"  first comment for {due}: {comment_link}   ({comment_why})")
+            line = comment_caption_line(comment_link, cfg)
+            if line:
+                cap = add_link_line(cap, line)
         fb_cap = build_fb_caption(cap, row.get("fb_page_tags", ""))   # clickable Page-mentions
         ig_cap = build_ig_caption(cap, row.get("ig_mentions", ""))    # auto-linking @handles
-        comment_link = resolve_comment_link(row, cfg)                 # off-site link -> first comment (FB only)
         res = []
         done = done_platforms(row)          # platforms that already succeeded on an earlier attempt
         try:
@@ -687,16 +1006,50 @@ def main():
                     elif stuck:
                         log(f"  tags stuck on {due} — Page Mentioning is working now.")
                 if comment_link and fb_id:
-                    # Link-in-first-comment (Facebook throttles links in the body).
+                    # Link-in-first-comment (Facebook throttles links in the body),
+                    # then READ IT BACK. A comment we never confirmed is a comment we
+                    # are not allowed to say we made.
+                    fb_link = f"https://www.facebook.com/{cfg['fb_page_id'].strip()}/posts/{str(fb_id).split('_')[-1]}"
                     try:
-                        res.append("cmt:" + str(fb_comment(ver, fb_id, post_tok, comment_link)))
+                        cid = fb_comment(ver, fb_id, post_tok, comment_link)
+                        res.append("cmt:" + str(cid))
+                        ok = verify_fb_comment(ver, fb_id, post_tok, cid, comment_link)
+                        if ok is True:
+                            log(f"  first comment CONFIRMED on the live post: {comment_link}")
+                        elif ok is False:
+                            log(f"  FIRST COMMENT MISSING on {due} — add it by hand: {fb_link}")
+                            needs_comment.append(f"{due}  FB  {comment_link}  ->  {fb_link}")
+                            failures.append(f"{row.get('brand')} {due} — post is live but its first comment is NOT on it: {comment_link}")
+                        else:
+                            log(f"  first comment posted but could not be read back to confirm: {fb_link}")
+                            needs_comment.append(f"{due}  FB  (unconfirmed) {comment_link}  ->  {fb_link}")
                     except Exception as ce:
-                        log(f"WARN [{row.get('brand')}] {due}: post OK but first-comment failed: {ce}")
+                        log(f"  FIRST COMMENT FAILED on {due} (the post itself is fine): {ce}")
+                        needs_comment.append(f"{due}  FB  {comment_link}  ->  {fb_link}")
+                        failures.append(f"{row.get('brand')} {due} — first comment failed: {ce}")
             if plat in ("instagram", "ig", "both") and "IG" not in done:
                 igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
                 if igid:
-                    res.append("IG:" + str(ig_post(ver, igid, post_tok, ig_cap, media)))
+                    ig_media_id = ig_post(ver, igid, post_tok, ig_cap, media)
+                    res.append("IG:" + str(ig_media_id))
                     mark_done(row, "IG")
+                    if comment_link:
+                        # David asked for the song link on BOTH platforms. Instagram does
+                        # not make comment links clickable, but it does put the exact song
+                        # in front of people. A failure here is a warning, not a red run —
+                        # Facebook is where the clickable one lives.
+                        try:
+                            icid = ig_comment(ver, ig_media_id, post_tok, comment_link)
+                            res.append("igcmt:" + str(icid))
+                            iok = verify_ig_comment(ver, ig_media_id, post_tok, icid, comment_link)
+                            if iok is True:
+                                log("  first comment confirmed on Instagram too.")
+                            else:
+                                log("  Instagram comment posted but could not be confirmed.")
+                                needs_comment.append(f"{due}  IG  (unconfirmed) {comment_link}")
+                        except Exception as ie:
+                            log(f"  Instagram first comment failed (the post itself is fine): {ie}")
+                            needs_comment.append(f"{due}  IG  {comment_link}")
             row["status"] = "POSTED"; changed += 1
             log(f"POSTED [{row.get('brand')}] {due} {plat} -> {', '.join(res) or '(nothing matched platform)'}")
         except Exception as e:
@@ -748,6 +1101,21 @@ def main():
     elif tag_file.exists():
         tag_file.unlink()
 
+    # ---- POSTS WHOSE FIRST COMMENT IS MISSING -------------------------------
+    cmt_file = HERE / "needs_comment.txt"
+    if needs_comment:
+        log("")
+        log(f"FIRST COMMENTS: {len(needs_comment)} post(s) went out without a confirmed comment.")
+        log("   The post is live and fine — only the link in the comments is missing.")
+        for n in needs_comment:
+            log(f"   - {n}")
+        with open(cmt_file, "w", encoding="utf-8") as fh:
+            fh.write("Posts that published but whose first comment is missing or unconfirmed.\n")
+            fh.write("Open each post, paste the link as a comment. Rewritten every run.\n\n")
+            fh.write("\n".join(needs_comment) + "\n")
+    elif cmt_file.exists():
+        cmt_file.unlink()
+
     # ---- LOUD FAILURE -------------------------------------------------------
     # This run used to finish GREEN even when a post had failed, which is exactly
     # how Micah Spurlock's 2026-08-17 spotlight was lost without anyone being told.
@@ -766,7 +1134,10 @@ def main():
 
 if __name__ == "__main__":
     import sys
-    if "--tagcheck" in sys.argv:
+    if "--ytcheck" in sys.argv:
+        i = sys.argv.index("--ytcheck")
+        ytcheck(sys.argv[i + 1:])
+    elif "--tagcheck" in sys.argv:
         i = sys.argv.index("--tagcheck")
         tagcheck(sys.argv[i + 1:])
     elif "--diagnose" in sys.argv:
