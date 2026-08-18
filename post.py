@@ -480,6 +480,88 @@ def diagnose(target_date=None):
     log("DIAGNOSE finished. Nothing was published.")
 
 
+# =============================================================================
+# TAG CHECK  —  python post.py --tagcheck
+# =============================================================================
+# Answers "why do the @ mentions work on some posts and not others?" with
+# evidence instead of theory.
+#
+# It does three things, and publishes NOTHING:
+#   1. Reads message_tags back off the posts we already made. A real mention
+#      shows up there; text that Facebook stripped does not.
+#   2. Creates an UNPUBLISHED test post containing @[PAGE_ID] and reads its
+#      message_tags back, then deletes it. That is the definitive test of
+#      whether the API is allowed to tag at all right now.
+#   3. Lists what the token is actually permitted to do.
+# =============================================================================
+
+def tagcheck(post_ids=None):
+    env = read_env()
+    brands = read_brands()
+    ver = env.get("GRAPH_VERSION", GRAPH_VERSION_DEFAULT)
+    gtok = env.get("META_TOKEN") or ""
+    if not gtok:
+        log("NO TOKEN."); return
+    cfg = brands.get("dwr music") or {}
+    pid = (cfg.get("fb_page_id") or "").strip()
+    base = f"https://graph.facebook.com/{ver}"
+    tok = resolve_page_token(ver, pid, gtok) or gtok
+    log("TAGCHECK — nothing will be published.")
+
+    # 1) What does the token actually have?
+    try:
+        r = requests.get(f"{base}/me/permissions", params={"access_token": tok}, timeout=60)
+        if r.ok:
+            granted = [d.get("permission") for d in (r.json().get("data") or []) if d.get("status") == "granted"]
+            log(f"  granted permissions: {', '.join(sorted(granted)) or '(none reported)'}")
+    except Exception as e:
+        log(f"  permissions lookup failed: {e}")
+
+    # 2) Existing posts — do they carry real tags?
+    for post_id in (post_ids or []):
+        try:
+            r = requests.get(f"{base}/{post_id}",
+                             params={"fields": "id,message,message_tags,created_time,is_eligible_for_promotion",
+                                     "access_token": tok}, timeout=60)
+            if not r.ok:
+                log(f"  [{post_id}] could not read: HTTP {r.status_code} {r.text[:160]}"); continue
+            j = r.json() or {}
+            tags = j.get("message_tags") or []
+            msg = (j.get("message") or "").replace("\n", " ")
+            log(f"  [{post_id}] tags={len(tags)}  " +
+                (", ".join(f"{t.get('name')}({t.get('type')})" for t in tags) if tags else "NO TAGS"))
+            log(f"      text ends: ...{msg[-70:]}")
+        except Exception as e:
+            log(f"  [{post_id}] error: {e}")
+
+    # 3) The decisive test: does an API tag register at all, right now?
+    venue = "110966485223915"
+    probe = f"TAG TEST please ignore @[{venue}]"
+    try:
+        r = requests.post(f"{base}/{pid}/feed",
+                          data={"message": probe, "published": "false", "access_token": tok}, timeout=120)
+        if not r.ok:
+            log(f"  UNPUBLISHED tag probe rejected: HTTP {r.status_code} {r.text[:220]}")
+        else:
+            new_id = (r.json() or {}).get("id")
+            g = requests.get(f"{base}/{new_id}",
+                             params={"fields": "message,message_tags", "access_token": tok}, timeout=60)
+            jj = g.json() if g.ok else {}
+            tags = jj.get("message_tags") or []
+            log(f"  UNPUBLISHED tag probe -> message_tags={len(tags)} :: {jj.get('message')!r}")
+            if tags:
+                log("      ==> the API CAN tag Pages. The @[id] syntax is being accepted.")
+            else:
+                log("      ==> the API CANNOT tag Pages. Facebook stripped @[id] silently.")
+                log("          This is the Page Mentioning restriction — it needs App Review.")
+            if new_id:
+                d = requests.delete(f"{base}/{new_id}", params={"access_token": tok}, timeout=60)
+                log(f"      cleaned up the test post: HTTP {d.status_code}")
+    except Exception as e:
+        log(f"  tag probe error: {e}")
+    log("TAGCHECK finished. Nothing was published.")
+
+
 def main():
     env = read_env()
     brands = read_brands()
@@ -629,7 +711,10 @@ def main():
 
 if __name__ == "__main__":
     import sys
-    if "--diagnose" in sys.argv:
+    if "--tagcheck" in sys.argv:
+        i = sys.argv.index("--tagcheck")
+        tagcheck(sys.argv[i + 1:])
+    elif "--diagnose" in sys.argv:
         i = sys.argv.index("--diagnose")
         date_arg = sys.argv[i + 1] if len(sys.argv) > i + 1 else None
         diagnose(date_arg)
