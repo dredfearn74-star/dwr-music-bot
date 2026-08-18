@@ -273,11 +273,19 @@ def yt_lookup(song, cfg, env):
         chosen = tied[0]
         others = ", ".join(repr(t) for _, t, _ in tied[1:3])
         _YT_CHOSEN[YT_WATCH.format(chosen[2])] = chosen[1]
+        # Say what we ACTUALLY did. Claiming "picked the full version" when every
+        # upload is a #Shorts clip would be a lie in the log, and the log is the
+        # only thing standing between us and "I thought it posted."
+        if not _yt_is_short(chosen[1]) and any(_yt_is_short(t) for _, t, _ in tied[1:]):
+            why_this = "picked the full version over a #Shorts clip"
+        elif all(_yt_is_short(t) for _, t, _ in tied):
+            why_this = "they are ALL #Shorts clips — picked the more descriptive title"
+        else:
+            why_this = "picked the more descriptive title"
         return YT_WATCH.format(chosen[2]), (
             f"matched {chosen[1]!r} at {chosen[0]:.2f} via {how}. "
             f"NOTE: your channel has {len(tied)} uploads of this song ({others}) — "
-            f"picked the full version over a #Shorts clip. Put a full YouTube URL in "
-            f"first_comment if you want a different one.")
+            f"{why_this}. Put a full YouTube URL in first_comment if you want a different one.")
     _YT_CHOSEN[YT_WATCH.format(best[2])] = best[1]
     return YT_WATCH.format(best[2]), f"matched {best[1]!r} at {best[0]:.2f} via {how}"
 
