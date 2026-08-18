@@ -1,0 +1,5 @@
+Touch or edit this file to make the DWR bot run immediately.
+The daily schedule still runs at 10:00 AM US Central.
+
+Last manual run requested: 2026-08-17 evening - recovering the Micah Spurlock spotlight
+after a transient Meta 400 dropped it on the 10:20 AM run.
