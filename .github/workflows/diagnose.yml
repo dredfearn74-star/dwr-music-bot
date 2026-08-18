@@ -1,0 +1,28 @@
+name: Diagnose a failed post
+
+# Answers "why did that row fail?" WITHOUT publishing anything.
+# Actions tab -> "Diagnose a failed post" -> Run workflow -> optionally type a date.
+# It creates an UNPUBLISHED test photo (same validation, never appears on the Page),
+# reads back Facebook's real error, then deletes the test photo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Queue row date to test, e.g. 2026-08-17. Leave blank to test every FAILED row.'
+        required: false
+        default: ''
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Ask Facebook what is actually wrong
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+        run: python post.py --diagnose ${{ github.event.inputs.date }}
