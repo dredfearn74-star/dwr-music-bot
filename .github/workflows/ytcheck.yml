@@ -1,0 +1,38 @@
+name: Song link check (prove the YouTube lookup before anything posts)
+
+# Publishes NOTHING and comments NOTHING. It reads content_queue.csv, finds every
+# row whose first_comment says `yt:Song Title`, looks that song up on the DWR
+# YouTube channel, and prints the exact video link that post WOULD comment.
+#
+# Run it after adding song reels to the queue. If a song does not resolve here,
+# the daily run will REFUSE to publish that row rather than post it with the
+# wrong link (or no link) — so this is the five-second way to catch it early.
+#
+# Optional: set a YOUTUBE_API_KEY secret to search the whole channel. Without it
+# the bot falls back to the channel's public RSS feed, which only sees the ~15
+# most recent uploads.
+
+on:
+  workflow_dispatch:
+    inputs:
+      songs:
+        description: 'Optional: song titles to test, space separated and quoted. Blank = check every yt: row in the queue.'
+        required: false
+        default: ''
+  push:
+    paths:
+      - 'RUN_YTCHECK.txt'
+
+jobs:
+  ytcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Resolve the song links
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python post.py --ytcheck ${{ github.event.inputs.songs }}
