@@ -138,6 +138,11 @@ def is_video(url):
 YT_WATCH = "https://www.youtube.com/watch?v={}"
 YT_MATCH_FLOOR = 0.72          # below this, we do not believe it is the same song
 _YT_CACHE = {}                 # channel_id -> [(title, video_id), ...] (RSS only)
+_YT_CHOSEN = {}                # watch_url -> the video title we picked (so the caption can be honest)
+
+
+def _yt_is_short(title):
+    return bool(re.search(r"#?\bshorts?\b", title or "", re.I))
 
 
 def _yt_norm(s):
@@ -146,8 +151,15 @@ def _yt_norm(s):
     s = re.sub(r"[‘’“”]", "'", s)
     s = re.sub(r"\(.*?\)|\[.*?\]", " ", s)              # drop "(live)", "[official video]"
     s = re.sub(r"[^a-z0-9' ]+", " ", s)
+    # Words that describe the UPLOAD, not the SONG. Stripping them is what lets the
+    # bot see that "Trouble #Shorts" and "Trouble (Taylor Swift) Live Open Mic" are
+    # the same song — which they are, and which David's channel has two of.
     drop = {"official", "video", "audio", "lyric", "lyrics", "live", "cover", "hd", "4k",
-            "the", "a", "an", "by", "feat", "ft", "david", "wayne", "redfearn", "dwr"}
+            "the", "a", "an", "by", "feat", "ft", "david", "wayne", "redfearn", "dwr",
+            "short", "shorts", "original", "originals", "open", "mic", "night", "nights",
+            "session", "sessions", "acoustic", "full", "song", "music", "performance",
+            "performing", "at", "and", "with", "murph", "murphs", "mary", "marys",
+            "newton", "iowa", "clip", "version", "take"}
     words = [w for w in s.split() if w and w not in drop]
     return " ".join(words)
 
@@ -236,9 +248,37 @@ def yt_lookup(song, cfg, env):
         return "", (f"no confident match for {song!r} on the channel via {how} "
                     f"(best was {best[1]!r} at {best[0]:.2f}, floor {YT_MATCH_FLOOR}). "
                     f"Closest titles: {near}. Put the full YouTube URL in first_comment to be sure.")
-    if best[0] - runner[0] < 0.05 and runner[0] >= YT_MATCH_FLOOR:
-        return "", (f"two videos match {song!r} equally well ({best[1]!r} vs {runner[1]!r}) — "
-                    f"refusing to guess. Put the full YouTube URL in first_comment.")
+    # ---- TIES -------------------------------------------------------------
+    # David's channel has TWO uploads of most songs (found live 2026-08-18: e.g.
+    # "Trouble 🎸 open mic night #Shorts" AND "Trouble (Taylor Swift) 🎸 Live Open
+    # Mic #Shorts"). Refusing every tie would hold back every single reel.
+    #
+    # The refusal exists to stop us linking the WRONG SONG. If the tied titles are
+    # the SAME song once the upload-noise is stripped, there is no wrong answer —
+    # so pick one, say which, and list the alternates so David can override with a
+    # full URL. Only a tie between genuinely DIFFERENT songs still refuses.
+    tied = [c for c in scored if best[0] - c[0] < 0.05]
+    if len(tied) > 1:
+        same_song = {_yt_norm(t) for _, t, _ in tied}
+        if len(same_song) > 1:
+            names = " vs ".join(repr(t) for _, t, _ in tied[:3])
+            return "", (f"two DIFFERENT songs match {song!r} equally well ({names}) — "
+                        f"refusing to guess. Put the full YouTube URL in first_comment.")
+        # Same song, more than one upload. Prefer the full version over a #Shorts
+        # clip — the caption promises "full song on YouTube", so honour that. Then
+        # prefer the more descriptive title, then feed order, so the choice is stable.
+        def rank(c):
+            return (1 if _yt_is_short(c[1]) else 0, -len(c[1]))
+        tied.sort(key=rank)
+        chosen = tied[0]
+        others = ", ".join(repr(t) for _, t, _ in tied[1:3])
+        _YT_CHOSEN[YT_WATCH.format(chosen[2])] = chosen[1]
+        return YT_WATCH.format(chosen[2]), (
+            f"matched {chosen[1]!r} at {chosen[0]:.2f} via {how}. "
+            f"NOTE: your channel has {len(tied)} uploads of this song ({others}) — "
+            f"picked the full version over a #Shorts clip. Put a full YouTube URL in "
+            f"first_comment if you want a different one.")
+    _YT_CHOSEN[YT_WATCH.format(best[2])] = best[1]
     return YT_WATCH.format(best[2]), f"matched {best[1]!r} at {best[0]:.2f} via {how}"
 
 
@@ -419,6 +459,7 @@ def fb_comment(ver, post_id, tok, message):
 # =============================================================================
 
 LINK_IN_COMMENTS = "🔗 Full song on YouTube — link in the comments 👇"
+LINK_IN_COMMENTS_SHORT = "🔗 Hear it on YouTube — link in the comments 👇"
 
 
 def caption_says_link_in_comments(cap):
@@ -452,7 +493,11 @@ def comment_caption_line(link, cfg):
         return override
     low = (link or "").lower()
     if "youtube.com" in low or "youtu.be" in low:
-        return LINK_IN_COMMENTS
+        # Only promise a FULL song when we actually linked one. David's channel is
+        # mostly #Shorts clips right now, and a caption that says "full song" over a
+        # 60-second clip is a small lie the whole system is supposed to prevent.
+        title = _YT_CHOSEN.get(link, "")
+        return LINK_IN_COMMENTS_SHORT if _yt_is_short(title) else LINK_IN_COMMENTS
     return ""
 
 
