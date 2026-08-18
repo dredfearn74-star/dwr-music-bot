@@ -1,0 +1,3 @@
+Touch this file to run the tag check.
+Requested 2026-08-17: find out why the @ mentions work on some posts and not others.
+Publishes nothing.
