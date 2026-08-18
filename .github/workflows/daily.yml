@@ -37,7 +37,7 @@ jobs:
           # Add only the files that exist. `git add` aborts the WHOLE command if any
           # pathspec is missing, and last_failure.txt only exists after a failure —
           # which silently stopped the queue ever being saved (2026-08-17).
-          for f in content_queue.csv autopublish_log.txt last_failure.txt; do
+          for f in content_queue.csv autopublish_log.txt last_failure.txt needs_tagging.txt; do
             [ -f "$f" ] && git add "$f"
           done
           git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
