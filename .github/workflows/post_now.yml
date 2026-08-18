@@ -1,0 +1,96 @@
+name: Post now (manual)
+
+# Runs the queue immediately instead of waiting for the 10:00 AM CT schedule.
+# Use it when something was missed and needs to go out today.
+# It posts exactly what the daily run would post: every QUEUED row dated today
+# or earlier. Nothing dated in the future goes out early.
+#
+# Built 2026-08-17 to get Micah Spurlock's spotlight out after a transient
+# Meta error dropped it — and because the Run workflow dialog on the daily
+# schedule refused to open.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type yes to actually publish. Anything else does a safe preview only.'
+        required: true
+        default: 'no'
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Install ffmpeg (the 9:16 aspect gate uses ffprobe)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Preview what would go out
+        run: |
+          python - <<'PY'
+          import csv, datetime
+          from zoneinfo import ZoneInfo
+          today = datetime.datetime.now(ZoneInfo("America/Chicago")).date()
+          print(f"Today in US Central: {today}")
+          with open('content_queue.csv', encoding='utf-8') as fh:
+              rows = list(csv.DictReader(fh))
+          any_due = False
+          for r in rows:
+              st = (r.get('status') or '').upper()
+              try:
+                  due = datetime.datetime.strptime(r['date'].strip(), '%Y-%m-%d').date()
+              except Exception:
+                  continue
+              att = int(r.get('attempts') or 0)
+              go = (st in ('QUEUED', '') or (st == 'FAILED' and att < 3)) and due <= today
+              if go:
+                  any_due = True
+                  print(f"  WILL POST  {r['date']}  {r.get('platform')}  {r.get('caption','')[:60]}")
+          if not any_due:
+              print("  (nothing is due — this run would post nothing)")
+          PY
+
+      - name: Publish
+        if: ${{ github.event.inputs.confirm == 'yes' }}
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+        run: python post.py
+
+      - name: Save queue status back to the repo
+        if: always()
+        run: |
+          git config user.name "dwr-music-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add content_queue.csv autopublish_log.txt last_failure.txt 2>/dev/null || true
+          git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
+          git push || echo "nothing to push"
+
+      - name: Raise the alarm if a post failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let detail = '(no detail file was written)';
+            try { detail = fs.readFileSync('last_failure.txt', 'utf8'); } catch (e) {}
+            const when = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 DWR bot: a post failed to go out (${when} UTC)`,
+              body: [
+                '## A post did NOT go out', '',
+                '```', detail.trim(), '```', '',
+                'The bot retries automatically next run (up to 3 attempts). Anything already live is recorded in `posted_to` and will not be posted twice.', '',
+                `[Open the full run log](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+              ].join('\n'),
+              labels: ['bot-failure']
+            });
