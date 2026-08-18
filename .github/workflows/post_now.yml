@@ -16,6 +16,13 @@ on:
         description: 'Type yes to actually publish. Anything else does a safe preview only.'
         required: true
         default: 'no'
+  # Fallback trigger. GitHub's "Run workflow" dialog sometimes refuses to load
+  # ("Sorry, something went wrong"), which left us unable to run the bot by hand
+  # on 2026-08-17 with a spotlight owed. Committing/touching the file RUN_NOW.txt
+  # fires this workflow immediately, no dialog involved.
+  push:
+    paths:
+      - 'RUN_NOW.txt'
 
 permissions:
   contents: write
@@ -59,7 +66,7 @@ jobs:
           PY
 
       - name: Publish
-        if: ${{ github.event.inputs.confirm == 'yes' }}
+        if: ${{ github.event.inputs.confirm == 'yes' || github.event_name == 'push' }}
         env:
           META_TOKEN: ${{ secrets.META_TOKEN }}
         run: python post.py
