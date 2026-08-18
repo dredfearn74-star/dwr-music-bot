@@ -164,6 +164,32 @@ def build_ig_caption(cap, ig_mentions):
     return (cap.rstrip() + "\n\n" + tail).strip() if cap.strip() else tail
 
 
+def graph_raise(r, what):
+    """Turn a Graph API failure into an error that actually says what went wrong.
+
+    `r.raise_for_status()` only ever produced "400 Client Error: Bad Request",
+    which is useless — it cost us a whole day of guessing when Micah Spurlock's
+    spotlight failed on 2026-08-17. Meta puts the real reason in the JSON body,
+    so we read it out and put it in the log where a human can act on it.
+    """
+    if r.ok:
+        return
+    detail = ""
+    try:
+        e = (r.json() or {}).get("error") or {}
+        bits = [e.get("message") or "", ]
+        if e.get("error_user_title"):  bits.append("user_title=" + str(e["error_user_title"]))
+        if e.get("error_user_msg"):    bits.append("user_msg=" + str(e["error_user_msg"]))
+        if e.get("type") is not None:  bits.append("type=" + str(e["type"]))
+        if e.get("code") is not None:  bits.append("code=" + str(e["code"]))
+        if e.get("error_subcode") is not None: bits.append("subcode=" + str(e["error_subcode"]))
+        if e.get("fbtrace_id"):        bits.append("fbtrace=" + str(e["fbtrace_id"]))
+        detail = " | ".join(b for b in bits if b)
+    except Exception:
+        detail = (r.text or "")[:400]
+    raise RuntimeError(f"{what} -> HTTP {r.status_code}: {detail or '(no error body returned)'}")
+
+
 def fb_post(ver, pid, tok, cap, media):
     base = f"https://graph.facebook.com/{ver}"
     if media and is_video(media):
@@ -176,7 +202,7 @@ def fb_post(ver, pid, tok, cap, media):
         url = f"{base}/{pid}/feed"
         data = {"message": cap, "access_token": tok}
     r = requests.post(url, data=data, timeout=300)
-    r.raise_for_status()
+    graph_raise(r, f"Facebook post to {url.rsplit('/',1)[-1]}")
     j = r.json()
     return j.get("id") or j.get("post_id")
 
@@ -191,7 +217,7 @@ def ig_post(ver, igid, tok, cap, media):
     else:
         c.update({"image_url": media})
     r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
-    r.raise_for_status()
+    graph_raise(r, "Instagram media container")
     cid = r.json()["id"]
     # Wait for Instagram to finish processing (video reels take a while).
     for _ in range(50):
@@ -202,7 +228,7 @@ def ig_post(ver, igid, tok, cap, media):
             raise RuntimeError(f"IG media processing error: {s.json()}")
         time.sleep(6)
     p = requests.post(f"{base}/{igid}/media_publish", data={"creation_id": cid, "access_token": tok}, timeout=120)
-    p.raise_for_status()
+    graph_raise(p, "Instagram publish")
     return p.json().get("id")
 
 
@@ -244,7 +270,7 @@ def fb_comment(ver, post_id, tok, message):
     top, and the link sits in the comments where it isn't penalized."""
     base = f"https://graph.facebook.com/{ver}"
     r = requests.post(f"{base}/{post_id}/comments", data={"message": message, "access_token": tok}, timeout=120)
-    r.raise_for_status()
+    graph_raise(r, "Facebook first comment")
     return r.json().get("id")
 
 
@@ -352,6 +378,108 @@ def resolve_comment_link(row, cfg):
     return (cfg.get("default_comment_link") or "").strip()
 
 
+# --- retry bookkeeping --------------------------------------------------------
+# Two optional columns keep a retry safe. Older queues without them still work.
+#   posted_to -> which platforms have ALREADY gone live for this row ("FB", "IG")
+#   attempts  -> how many times we have tried
+MAX_ATTEMPTS = 3
+
+
+def done_platforms(row):
+    return {p.strip().upper() for p in (row.get("posted_to") or "").split(",") if p.strip()}
+
+
+def mark_done(row, platform):
+    d = done_platforms(row); d.add(platform.upper())
+    row["posted_to"] = ",".join(sorted(d))
+
+
+def attempts_of(row):
+    try:
+        return int(str(row.get("attempts") or "0").strip() or 0)
+    except ValueError:
+        return 0
+
+
+def bump_attempts(row):
+    row["attempts"] = str(attempts_of(row) + 1)
+
+
+# =============================================================================
+# DIAGNOSE MODE  —  python post.py --diagnose [YYYY-MM-DD]
+# =============================================================================
+# Answers "why did that row fail?" WITHOUT putting anything on the page.
+#
+# Facebook lets you create a Page photo with published=false. It runs the exact
+# same validation as a real post — token, permissions, caption, image fetch —
+# and returns the exact same error, but nothing appears on the Page. We create
+# it unpublished, read the result, then delete it again.
+#
+# Built 2026-08-17 because Micah Spurlock's spotlight failed with a bare
+# "400 Bad Request" and there was no way to find out why without posting.
+# =============================================================================
+
+def diagnose(target_date=None):
+    env = read_env()
+    brands = read_brands()
+    ver = env.get("GRAPH_VERSION", GRAPH_VERSION_DEFAULT)
+    gtok = env.get("META_TOKEN") or env.get("GLOBAL_TOKEN") or env.get("FB_TOKEN") or ""
+    log(f"DIAGNOSE starting. Graph version {ver}. Nothing will be published.")
+    if not gtok:
+        log("  NO TOKEN. Set the META_TOKEN secret."); return
+
+    with open(HERE / "content_queue.csv", encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    targets = [r for r in rows if (not target_date or r.get("date", "").strip() == target_date)]
+    if target_date and not targets:
+        log(f"  No row dated {target_date}."); return
+    if not target_date:
+        targets = [r for r in rows if (r.get("status") or "").strip().upper() == "FAILED"]
+        log(f"  No date given — checking the {len(targets)} FAILED row(s).")
+
+    for row in targets:
+        cfg = brands.get((row.get("brand") or "").strip().lower())
+        if not cfg:
+            log(f"  [{row.get('date')}] brand not in brands.csv"); continue
+        pid = (cfg.get("fb_page_id") or "").strip()
+        base = f"https://graph.facebook.com/{ver}"
+
+        # 1) Can we even get a Page token?
+        page_tok = resolve_page_token(ver, pid, gtok)
+        log(f"  [{row.get('date')}] page token: {'OK' if page_tok else 'COULD NOT RESOLVE — this alone breaks posting'}")
+        tok = page_tok or gtok
+
+        # 2) Is the image actually reachable, and is it really an image?
+        media = (row.get("media_url") or "").strip()
+        if media:
+            try:
+                h = requests.get(media, stream=True, timeout=60)
+                log(f"  [{row.get('date')}] image: HTTP {h.status_code}, "
+                    f"{h.headers.get('content-type')}, {h.headers.get('content-length')} bytes")
+                h.close()
+            except Exception as e:
+                log(f"  [{row.get('date')}] image FETCH FAILED: {e}")
+
+        # 3) The real thing, unpublished.
+        cap = build_fb_caption(row.get("caption", ""), row.get("fb_page_tags", ""))
+        log(f"  [{row.get('date')}] caption {len(cap)} chars / {len(cap.encode('utf-8'))} bytes")
+        data = {"caption": cap, "url": media, "published": "false", "access_token": tok}
+        try:
+            r = requests.post(f"{base}/{pid}/photos", data=data, timeout=180)
+            graph_raise(r, "UNPUBLISHED test post")
+            new_id = (r.json() or {}).get("id")
+            log(f"  [{row.get('date')}] ✅ ACCEPTED by Facebook (unpublished id {new_id}). "
+                f"The row itself is fine — the earlier failure was transient.")
+            if new_id:
+                d = requests.delete(f"{base}/{new_id}", params={"access_token": tok}, timeout=60)
+                log(f"  [{row.get('date')}] cleaned up the test photo: HTTP {d.status_code}")
+        except Exception as e:
+            log(f"  [{row.get('date')}] ❌ REJECTED — this is the real reason it failed:")
+            log(f"        {e}")
+
+    log("DIAGNOSE finished. Nothing was published.")
+
+
 def main():
     env = read_env()
     brands = read_brands()
@@ -367,12 +495,29 @@ def main():
         log("Queue empty. Nothing to do.")
         return
     fieldnames = list(rows[0].keys())
+    for extra_col in ("first_comment", "posted_to", "attempts"):
+        if extra_col not in fieldnames:
+            fieldnames.insert(len(fieldnames) - 1, extra_col)   # keep `status` last
+            for r_ in rows:
+                r_.setdefault(extra_col, "")
     today = now_ct().date()
     changed = 0
     for row in rows:
         st = (row.get("status") or "").strip().upper()
-        if st in ("POSTED", "SKIPPED", "DRAFT", "HOLD", "FAILED"):
-            continue  # only QUEUED (or blank) rows are eligible
+        if st in ("POSTED", "SKIPPED", "DRAFT", "HOLD"):
+            continue  # these are finished or deliberately parked
+        if st == "REFUSED":
+            continue  # a safety gate said no; a human must fix the row first
+        if st == "FAILED":
+            # A FAILED row used to sit there dead for ever. That is how Micah
+            # Spurlock's 2026-08-17 spotlight quietly never went out. Now a
+            # failure is retried on the next run, up to MAX_ATTEMPTS, and the
+            # `posted_to` column guarantees we never re-post to a platform that
+            # already succeeded.
+            if attempts_of(row) >= MAX_ATTEMPTS:
+                continue
+            log(f"RETRY [{row.get('brand')}] {row.get('date')}: attempt "
+                f"{attempts_of(row) + 1} of {MAX_ATTEMPTS} (already live on: {'+'.join(sorted(done_platforms(row))) or 'nothing yet'})")
         try:
             due = datetime.datetime.strptime(row["date"].strip(), "%Y-%m-%d").date()
         except Exception:
@@ -412,25 +557,34 @@ def main():
         ig_cap = build_ig_caption(cap, row.get("ig_mentions", ""))    # auto-linking @handles
         comment_link = resolve_comment_link(row, cfg)                 # off-site link -> first comment (FB only)
         res = []
+        done = done_platforms(row)          # platforms that already succeeded on an earlier attempt
         try:
-            if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id"):
+            if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id") and "FB" not in done:
                 fb_id = fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)
                 res.append("FB:" + str(fb_id))
+                mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
                 if comment_link and fb_id:
                     # Link-in-first-comment (Facebook throttles links in the body).
                     try:
                         res.append("cmt:" + str(fb_comment(ver, fb_id, post_tok, comment_link)))
                     except Exception as ce:
                         log(f"WARN [{row.get('brand')}] {due}: post OK but first-comment failed: {ce}")
-            if plat in ("instagram", "ig", "both"):
+            if plat in ("instagram", "ig", "both") and "IG" not in done:
                 igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
                 if igid:
                     res.append("IG:" + str(ig_post(ver, igid, post_tok, ig_cap, media)))
+                    mark_done(row, "IG")
             row["status"] = "POSTED"; changed += 1
             log(f"POSTED [{row.get('brand')}] {due} {plat} -> {', '.join(res) or '(nothing matched platform)'}")
         except Exception as e:
-            row["status"] = "FAILED"; changed += 1
-            log(f"FAILED [{row.get('brand')}] {due} {plat}: {e}")
+            row["status"] = "FAILED"
+            bump_attempts(row)
+            changed += 1
+            done_now = done_platforms(row)
+            extra = f" (already live on {'+'.join(sorted(done_now))} — will NOT be re-posted)" if done_now else ""
+            log(f"FAILED [{row.get('brand')}] {due} {plat} attempt {attempts_of(row)}/{MAX_ATTEMPTS}{extra}: {e}")
+            if attempts_of(row) >= MAX_ATTEMPTS:
+                log(f"  ^ giving up on this row after {MAX_ATTEMPTS} attempts. Fix it and set status back to QUEUED to try again.")
     if changed:
         # Write the queue SAFELY. The old version handed a bare open() to DictWriter and
         # never closed it, so the buffer could be thrown away and content_queue.csv was
@@ -456,4 +610,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--diagnose" in sys.argv:
+        i = sys.argv.index("--diagnose")
+        date_arg = sys.argv[i + 1] if len(sys.argv) > i + 1 else None
+        diagnose(date_arg)
+    else:
+        main()
