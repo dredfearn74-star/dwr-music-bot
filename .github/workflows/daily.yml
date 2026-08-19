@@ -12,6 +12,13 @@ permissions:
 jobs:
   post:
     runs-on: ubuntu-latest
+    # A run must never be able to eat a posting window again. The Aug 19
+    # scheduled run sat there for 2h15m; GitHub's default lets a job run for
+    # SIX HOURS before it is killed. Twenty minutes is far more than posting
+    # ever needs (an Instagram reel polls for at most 5 minutes) and well
+    # inside the daily window, so a stuck run dies loudly while there is
+    # still time to fix it by hand.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,6 +48,29 @@ jobs:
           done
           echo "::warning::ffmpeg would not install. Posting anyway; the 9:16 reel aspect gate is skipped for this run."
 
+      # ---- WHAT WAS DUE, RECORDED BEFORE WE TOUCH ANYTHING -----------------
+      # Written BEFORE posting so the end-state check has something honest to
+      # compare against. Without this, a run that publishes nothing looks
+      # identical whether nothing was due or everything silently failed.
+      - name: Record what is due before posting
+        if: always()
+        run: |
+          python - <<'PY' > due_before.txt
+          import csv, datetime
+          from zoneinfo import ZoneInfo
+          today = datetime.datetime.now(ZoneInfo("America/Chicago")).date()
+          for r in csv.DictReader(open('content_queue.csv', encoding='utf-8')):
+              st = (r.get('status') or '').strip().upper()
+              try:
+                  due = datetime.datetime.strptime(r['date'].strip(), '%Y-%m-%d').date()
+              except Exception:
+                  continue
+              att = int((r.get('attempts') or '0').strip() or 0)
+              if due <= today and (st == 'QUEUED' or st == '' or (st == 'FAILED' and att < 3)):
+                  print(r['date'].strip())
+          PY
+          echo "Due at the start of this run:"; cat due_before.txt || true
+
       - name: Post what's due today
         id: post
         env:
@@ -62,6 +92,55 @@ jobs:
           done
           git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
           git push || echo "nothing to push"
+
+
+      # ---- END STATE, NOT THE ATTEMPT --------------------------------------
+      # 2026-08-19: the scheduled run hung for 2h15m and the Aug 19 James Wood
+      # spotlight never went out. Nothing went red, so nobody was told — David
+      # found out by looking at Facebook. A hung job is a failure.
+      #
+      # This step reads the queue back off disk AFTER posting and reports what
+      # actually happened, not what we tried to do. It is deliberately NOT
+      # "publishing nothing = red": on a day with nothing scheduled, publishing
+      # nothing is correct, and a daily false alarm would train David to ignore
+      # the real ones. The rule is: anything that was DUE must now be POSTED.
+      - name: Verify the end state — did what was due actually publish?
+        if: always()
+        run: |
+          python - <<'PY'
+          import csv, os, sys
+          due = []
+          if os.path.exists('due_before.txt'):
+              due = [l.strip() for l in open('due_before.txt', encoding='utf-8') if l.strip()]
+          rows = {r['date'].strip(): r for r in csv.DictReader(open('content_queue.csv', encoding='utf-8'))}
+          print("=" * 62)
+          if not due:
+              print("END STATE: nothing was due today. Nothing published. This is correct.")
+              print("=" * 62)
+              sys.exit(0)
+          bad = []
+          for d in due:
+              r = rows.get(d)
+              if r is None:
+                  bad.append(f"{d} — ROW HAS VANISHED from the queue"); continue
+              st = (r.get('status') or '').strip().upper()
+              live = (r.get('posted_to') or '').strip() or 'nothing'
+              if st == 'POSTED':
+                  print(f"END STATE: {d} POSTED  (live on: {live})")
+              else:
+                  print(f"END STATE: {d} *** {st or 'NO STATUS'} ***  (live on: {live})")
+                  bad.append(f"{d} was due but its status is {st or 'blank'} (live on: {live})")
+          print("=" * 62)
+          if bad:
+              print("!! THIS RUN DID NOT FINISH THE JOB:")
+              for b in bad:
+                  print("   - " + b)
+              print("   Marking the run FAILED so it goes red and David is told.")
+              with open('last_failure.txt', 'w', encoding='utf-8') as fh:
+                  fh.write("A scheduled post did not complete.\n\n" + "\n".join(bad) + "\n")
+              sys.exit(1)
+          print(f"All {len(due)} post(s) that were due are confirmed POSTED.")
+          PY
 
       # ---- THE ALARM -------------------------------------------------------
       # Before this existed, a failed post still finished GREEN and nobody was
