@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       songs:
-        description: 'Optional: song titles to test, space separated and quoted. Blank = check every yt: row in the queue.'
+        description: 'Optional: ONE song title to test, e.g. Get On Up (no quotes needed). Blank = check every yt: row in the queue.'
         required: false
         default: ''
   push:
@@ -35,4 +35,12 @@ jobs:
       - name: Resolve the song links
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: python post.py --ytcheck ${{ github.event.inputs.songs }}
+          # Passed as an env var, never pasted straight into the shell command:
+          # whatever is typed in that box is data, not something the runner executes.
+          SONGS: ${{ github.event.inputs.songs }}
+        run: |
+          if [ -z "$SONGS" ]; then
+            python post.py --ytcheck
+          else
+            python post.py --ytcheck "$SONGS"
+          fi
