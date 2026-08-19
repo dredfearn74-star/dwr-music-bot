@@ -43,3 +43,6 @@
 [2026-08-19 12:44:36] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-08-19 12:44:36]    - DWR Music 2026-08-19 both (attempt 1/3) — Instagram media container -> HTTP 400: The aspect ratio is not supported. | user_title=Invalid Aspect Ratio | user_msg=The submitted image with aspect ratio () cannot be published. Please submit an image with a valid aspect ratio. | type=OAuthException | code=36003 | subcode=2207009 | fbtrace=AGdkCyG_ex4seEkUcICl-np
 [2026-08-19 12:44:36] ====================================================================
+[2026-08-19 14:43:28] RETRY [DWR Music] 2026-08-19: attempt 2 of 3 (already live on: FB)
+[2026-08-19 14:43:46] POSTED [DWR Music] 2026-08-19 both -> IG:18123976942764866
+[2026-08-19 14:43:46] Queue updated (1 row(s) changed, 24 rows saved).
