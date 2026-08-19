@@ -19,7 +19,27 @@ jobs:
           python-version: '3.11'
       - run: pip install requests
       - name: Install ffmpeg (the 9:16 aspect gate uses ffprobe)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+        # 2026-08-19: this step HUNG for 2h 15m on the scheduled run and silently
+        # ate the Aug 19 James Wood spotlight. A run that FAILS goes red and tells
+        # David. A run that HANGS tells nobody anything, which is worse. So:
+        #   - hard 5-minute cap, then the step dies instead of hanging forever
+        #   - one retry, because this is nearly always a flaky apt mirror
+        #   - if it still will not install, the run CARRIES ON and posts anyway.
+        # post.py's probe_video() already stands down gracefully when ffprobe is
+        # missing (it warns and skips the 9:16 check), so the worst case is one
+        # unchecked reel - never a missed post.
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          for attempt in 1 2; do
+            if sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; then
+              echo "ffmpeg installed on attempt $attempt"
+              exit 0
+            fi
+            echo "ffmpeg install attempt $attempt failed - retrying in 10s"
+            sleep 10
+          done
+          echo "::warning::ffmpeg would not install. Posting anyway; the 9:16 reel aspect gate is skipped for this run."
 
       - name: Post what's due today
         id: post
