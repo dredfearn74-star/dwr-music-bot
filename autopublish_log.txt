@@ -36,3 +36,10 @@
 [2026-08-17 10:20:39] Queue updated (1 row(s) changed, 12 rows saved).
 [2026-08-18 10:27:38] POSTED [DWR Music] 2026-08-18 both -> FB:1028871016785806, IG:18109079702103565
 [2026-08-18 10:27:38] Queue updated (1 row(s) changed, 12 rows saved).
+[2026-08-19 12:44:36] FAILED [DWR Music] 2026-08-19 both attempt 1/3 (already live on FB — will NOT be re-posted): Instagram media container -> HTTP 400: The aspect ratio is not supported. | user_title=Invalid Aspect Ratio | user_msg=The submitted image with aspect ratio () cannot be published. Please submit an image with a valid aspect ratio. | type=OAuthException | code=36003 | subcode=2207009 | fbtrace=AGdkCyG_ex4seEkUcICl-np
+[2026-08-19 12:44:36] Queue updated (1 row(s) changed, 24 rows saved).
+[2026-08-19 12:44:36] 
+[2026-08-19 12:44:36] ====================================================================
+[2026-08-19 12:44:36] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-08-19 12:44:36]    - DWR Music 2026-08-19 both (attempt 1/3) — Instagram media container -> HTTP 400: The aspect ratio is not supported. | user_title=Invalid Aspect Ratio | user_msg=The submitted image with aspect ratio () cannot be published. Please submit an image with a valid aspect ratio. | type=OAuthException | code=36003 | subcode=2207009 | fbtrace=AGdkCyG_ex4seEkUcICl-np
+[2026-08-19 12:44:36] ====================================================================

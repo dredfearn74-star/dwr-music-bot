@@ -1,0 +1,1 @@
+DWR Music 2026-08-19 both (attempt 1/3) — Instagram media container -> HTTP 400: The aspect ratio is not supported. | user_title=Invalid Aspect Ratio | user_msg=The submitted image with aspect ratio () cannot be published. Please submit an image with a valid aspect ratio. | type=OAuthException | code=36003 | subcode=2207009 | fbtrace=AGdkCyG_ex4seEkUcICl-np
