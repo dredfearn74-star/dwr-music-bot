@@ -46,3 +46,5 @@
 [2026-08-19 14:43:28] RETRY [DWR Music] 2026-08-19: attempt 2 of 3 (already live on: FB)
 [2026-08-19 14:43:46] POSTED [DWR Music] 2026-08-19 both -> IG:18123976942764866
 [2026-08-19 14:43:46] Queue updated (1 row(s) changed, 24 rows saved).
+[2026-08-20 10:28:58] POSTED [DWR Music] 2026-08-20 both -> FB:1030605446612363, IG:18488967928096365
+[2026-08-20 10:28:58] Queue updated (1 row(s) changed, 24 rows saved).
