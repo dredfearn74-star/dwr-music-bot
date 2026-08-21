@@ -33,3 +33,5 @@ jobs:
             IDS="1025422723797302 1026315867041321 1027183336954574 1028366090169632"
           fi
           python post.py --tagcheck $IDS
+          python placecheck.py
+          
