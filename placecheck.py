@@ -1,39 +1,25 @@
 """
-POST HISTORY DUMP + LINK AUDIT — read-only, publishes NOTHING.
+ONE-TIME FIX — move the YouTube link out of the 2026-08-23 caption and into the
+first comment, where David's rule says it belongs.
 
-Two jobs:
-1. THE SAFETY QUESTION. David asked (2026-08-25) whether the 12 unused "batch 1"
-   images in media/ (both-count, just-start, music-meets-you, gratitude,
-   in-the-bridge, come-make-noise, your-voice-matters, one-whole-song,
-   pass-the-light, turn-it-up, keep-playing, gentle) have ALREADY been posted.
-   Re-posting a real post is a hard failure, so this walks the Page's whole
-   published history and prints every post's date and caption. The queue cannot
-   answer this — only the platform can.
-2. The link-placement audit: is any URL sitting in a post BODY rather than in
-   the first comment.
+Authorised by David 2026-08-25: "fix it right now."
+
+The post: 113416904992248_1033215906351317
+Its caption carries https://youtu.be/S5gRdSLGWgA in the BODY, which throttles
+reach. This edits the caption to remove the URL (leaving the words intact) and
+posts the URL as the first comment instead. Then it READS BOTH BACK off the live
+post and prints them, so the result is proved rather than assumed.
+
+Editing does NOT recover reach already lost. This is about not leaving a
+throttled post standing.
 """
 import os, re, requests
 
 VER  = "v23.0"
 PAGE = "113416904992248"
+POST = "113416904992248_1033215906351317"
 BASE = "https://graph.facebook.com/" + VER
-URL_RE = re.compile(r'(https?://\S+|www\.\S+)', re.I)
-
-# the themes of the 12 unused batch-1 images, from their filenames
-THEMES = {
-    "both-count": ["both count", "every one counts"],
-    "just-start": ["just start", "start where"],
-    "music-meets-you": ["music meets you", "meets you"],
-    "gratitude": ["grateful", "gratitude", "thank"],
-    "in-the-bridge": ["bridge"],
-    "come-make-noise": ["make noise", "make some noise"],
-    "your-voice-matters": ["your voice", "voice matters"],
-    "one-whole-song": ["whole song", "one song"],
-    "pass-the-light": ["pass the light", "the light"],
-    "turn-it-up": ["turn it up"],
-    "keep-playing": ["keep playing", "keep going"],
-    "gentle": ["gentle", "be gentle"],
-}
+URL_RE = re.compile(r'https?://\S+|www\.\S+', re.I)
 
 
 def log(m):
@@ -48,58 +34,65 @@ def main():
                      params={"fields": "access_token", "access_token": tok}, timeout=60)
     ptok = (r.json() or {}).get("access_token") or tok
 
-    posts, url = [], BASE + "/" + PAGE + "/posts"
-    params = {"fields": "id,created_time,message", "limit": 100, "access_token": ptok}
-    for _ in range(6):                       # up to ~600 posts, plenty
-        rr = requests.get(url, params=params, timeout=90)
-        if not rr.ok:
-            log("list failed: HTTP %s %s" % (rr.status_code, rr.text[:200])); break
-        j = rr.json() or {}
-        posts.extend(j.get("data") or [])
-        nxt = ((j.get("paging") or {}).get("next"))
-        if not nxt:
-            break
-        url, params = nxt, None
+    log("=" * 74)
+    log("FIXING THE 2026-08-23 POST - link out of the caption, into a comment")
+    log("=" * 74)
+
+    r = requests.get(BASE + "/" + POST, timeout=60,
+                     params={"fields": "id,message,created_time", "access_token": ptok})
+    if not r.ok:
+        log("could not read the post: HTTP %s %s" % (r.status_code, r.text[:300])); return
+    before = (r.json() or {}).get("message") or ""
+    log("BEFORE: %r" % before)
+
+    urls = URL_RE.findall(before)
+    if not urls:
+        log("")
+        log("==> No URL in this caption any more. Nothing to fix - it is already clean.")
+        return
+    link = urls[0].rstrip(".,")
+    log("link found: %s" % link)
+
+    after = URL_RE.sub("", before)
+    after = re.sub(r"[ \t]{2,}", " ", after)
+    after = re.sub(r"\n{3,}", "\n\n", after).strip().rstrip("-–—").strip()
+    after = after + "\n\n\U0001F517 Full song on YouTube — link in the comments \U0001F447"
+    log("AFTER : %r" % after)
 
     log("")
-    log("=" * 78)
-    log("FULL PUBLISHED HISTORY - DWR Music Page - %d posts" % len(posts))
-    log("=" * 78)
-    for p in posts:
-        when = (p.get("created_time") or "")[:10]
-        msg = (p.get("message") or "(no caption)").replace("\n", " ")
-        log("%s | %s" % (when, msg[:96]))
+    log("-- 1. editing the caption --")
+    e = requests.post(BASE + "/" + POST, timeout=90,
+                      data={"message": after, "access_token": ptok})
+    log("   edit -> HTTP %s %s" % (e.status_code, e.text[:200]))
+
+    log("-- 2. posting the link as the first comment --")
+    c = requests.post(BASE + "/" + POST + "/comments", timeout=90,
+                      data={"message": link, "access_token": ptok})
+    log("   comment -> HTTP %s %s" % (c.status_code, c.text[:200]))
+    cid = (c.json() or {}).get("id") if c.ok else None
 
     log("")
-    log("=" * 78)
-    log("HAVE THE 12 BATCH-1 IMAGES ALREADY BEEN POSTED?")
-    log("=" * 78)
-    blob = " ".join((p.get("message") or "").lower() for p in posts)
-    any_hit = False
-    for name, needles in sorted(THEMES.items()):
-        hits = [n for n in needles if n in blob]
-        if hits:
-            any_hit = True
-        log("  %-22s %s" % (name, ("*** POSSIBLE MATCH: " + ", ".join(hits)) if hits else "no trace"))
-    log("")
-    log("  ==> %s" % ("SOME THEMES APPEAR IN LIVE POSTS - check the history above by hand "
-                      "BEFORE queueing anything" if any_hit else
-                      "NO trace of any batch-1 theme in the entire published history. "
-                      "They have NOT been posted. Safe to queue."))
+    log("-- 3. READING IT BACK OFF THE LIVE POST --")
+    v = requests.get(BASE + "/" + POST, timeout=60,
+                     params={"fields": "message", "access_token": ptok})
+    now = ((v.json() or {}).get("message") or "") if v.ok else "(could not read)"
+    log("   caption now : %r" % now)
+    log("   caption clean: %s" % ("YES" if not URL_RE.search(now) else "NO - STILL HAS A URL"))
+
+    g = requests.get(BASE + "/" + POST + "/comments", timeout=60,
+                     params={"fields": "id,message", "order": "chronological",
+                             "limit": 5, "access_token": ptok})
+    data = ((g.json() or {}).get("data") or []) if g.ok else []
+    log("   comments now: %d" % len(data))
+    for d in data:
+        log("     [%s] %s" % (d.get("id"), d.get("message")))
+    ok = any(link.split("?")[0] in (d.get("message") or "") for d in data)
+    log("   link is in a comment: %s" % ("YES" if ok else "NO"))
 
     log("")
-    log("=" * 78)
-    log("LINK AUDIT - any URL sitting in a post BODY?")
-    log("=" * 78)
-    bad = [(p, URL_RE.findall(p.get("message") or "")) for p in posts]
-    bad = [(p, u) for p, u in bad if u]
-    if not bad:
-        log("  none. every caption is clean.")
-    for p, u in bad:
-        log("  %s  %s  -> %s" % ((p.get("created_time") or "")[:10], p.get("id"), ", ".join(u)[:70]))
-
-    log("")
-    log("finished. Nothing was published.")
+    log("RESULT: %s" % ("FIXED - caption clean, link in the comments."
+                        if (not URL_RE.search(now) and ok) else
+                        "NOT fully fixed - read the lines above."))
 
 
 if __name__ == "__main__":
