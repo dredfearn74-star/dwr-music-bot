@@ -579,8 +579,31 @@ def verify_ig_comment(ver, media_id, tok, comment_id, message):
 BLANK_OK = ("none", "-", "no", "skip", "off", "blank")
 
 
+# A URL in the post BODY is what kills reach: Facebook throttles any post
+# carrying an off-Facebook link, and roughly 97% of views go to posts with no
+# external link. The link belongs in the FIRST COMMENT — Meta's own guidance,
+# and the bot already does that. David's rule, 2026-08-25: "the YouTube link is
+# supposed to be the first comment after the post goes out. Hard stop."
+#
+# CAREFUL — this matches URL SHAPES, never the bare word "YouTube". The caption
+# line the bot legitimately adds is "Full song on YouTube — link in the comments".
+# A naive check for the substring "youtu" would match that and refuse every song
+# reel, killing the exact feature this is meant to protect.
+CAPTION_URL_RE = re.compile(
+    r"https?://|\bwww\.[a-z0-9-]|\byoutu\.be/|\byoutube\.com/", re.I)
+
+
+def caption_has_url(text):
+    """Return the offending snippet if a caption carries a URL, else ''."""
+    m = CAPTION_URL_RE.search(text or "")
+    if not m:
+        return ""
+    start = max(0, m.start() - 20)
+    return text[start:m.start() + 45].replace("\n", " ").strip()
+
+
 def caption_gate(row):
-    """Refuse to post a row with an empty caption.
+    """Refuse to post a row with an empty caption, or one carrying a URL.
 
     A blank caption is almost always a mistake (it is exactly what produced the
     'Your reel' posts with no text). If a post is MEANT to carry no words —
@@ -595,6 +618,13 @@ def caption_gate(row):
     if not cap:
         return ("caption is EMPTY. Nothing posts without words. Write a caption, "
                 "or put `none` in the caption cell if it is meant to be wordless.")
+    hit = caption_has_url(cap)
+    if hit:
+        return ("caption contains a LINK — Facebook throttles any post with an "
+                "off-site link in the body, so this would publish crippled. "
+                "Found: " + hit + ". Take the URL out of the caption and put it "
+                "in this row's `first_comment` cell instead; the bot will post it "
+                "as the first comment, which is where it belongs.")
     return ""
 
 
@@ -1042,6 +1072,21 @@ def main():
                 cap = add_link_line(cap, line)
         fb_cap = build_fb_caption(cap, row.get("fb_page_tags", ""))   # clickable Page-mentions
         ig_cap = build_ig_caption(cap, row.get("ig_mentions", ""))    # auto-linking @handles
+
+        # LAST LINE OF DEFENCE. caption_gate() checked the row as written; this
+        # checks the text genuinely about to hit Meta, after the link line, the
+        # Page-mentions and the @handles have been folded in. If a URL reached
+        # the body by any route, nothing publishes and the run goes red — a
+        # throttled post cannot be un-throttled by editing it afterwards.
+        leak = caption_has_url(fb_cap) or caption_has_url(ig_cap)
+        if leak:
+            row["status"] = "FAILED"; changed += 1
+            log(f"REFUSED [{row.get('brand')}] {due}: a LINK reached the finished "
+                f"caption -> {leak}. Nothing was published.")
+            log("  The link belongs in the first comment. Check this row's caption "
+                "and the brand's comment_caption_line in brands.csv.")
+            failures.append(f"{row.get('brand')} {due} — REFUSED: link in the post body ({leak})")
+            continue
         res = []
         done = done_platforms(row)          # platforms that already succeeded on an earlier attempt
         try:

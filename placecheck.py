@@ -46,12 +46,12 @@ def main():
 
     log("")
     log("=" * 78)
-    log("LINK PLACEMENT AUDIT - DWR Music Page - read-only, nothing published")
+    log("LINK PLACEMENT AUDIT - DWR Music Page - last 25 posts - read-only")
     log("=" * 78)
 
     r = requests.get(BASE + "/" + PAGE + "/posts", timeout=90, params={
         "fields": "id,created_time,message,permalink_url",
-        "limit": 10, "access_token": ptok})
+        "limit": 25, "access_token": ptok})
     if not r.ok:
         log("could not list posts: HTTP %s %s" % (r.status_code, r.text[:300]))
         return
