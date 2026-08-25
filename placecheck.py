@@ -1,118 +1,121 @@
 """
-PLACE CHECK — can we attach the venue to a post WITHOUT Meta App Review?
-=======================================================================
-Publishes NOTHING. Everything it creates is unpublished and deleted again.
+LINK PLACEMENT AUDIT — where do our links actually sit?
+=======================================================
+Publishes NOTHING. Read-only.
 
-WHY THIS EXISTS
----------------
-The @[PageID] mention syntax is dead. tagcheck proved it again on 2026-08-21:
-Facebook silently deletes the token and hands back message_tags=0. App Review is
-the only thing that revives it, and David declined that on 2026-08-19. So every
-venue tag on every campaign post has been added BY HAND. That has to stop.
+THE RULE (Social Command standing rule):
+  NO OUTBOUND LINKS IN THE POST BODY. Facebook throttles any post carrying an
+  off-Facebook link. Publish the photo/video + caption clean, then put the link
+  in the FIRST COMMENT. That is Meta's own guidance.
 
-This probes a different mechanism, one that is NOT part of the Page Mentioning
-restriction: the `place` parameter. A post carrying place=<venue Page ID> renders
-as "- at Murph and Mary's Pub", the venue name is a live link, and the post
-surfaces on the venue's own Page. If it works, the venue half of the hand-tagging
-goes away for good.
+So: a URL in the FIRST COMMENT is correct and deliberate.
+    A URL in the CAPTION is the violation.
 
-It probes the exact shape a real spotlight post needs:
-  photo uploaded UNPUBLISHED to /photos  ->  /feed post that attaches it + place
-That route also returns a proper page-post id (PAGEID_POSTID) instead of the bare
-photo id the current /photos route returns - which is the OTHER bug on the 8/23
-list, the one that kills needs_tagging.txt. So this tests both fixes at once.
-
-Run it from the Tag check workflow. It touches post.py not at all.
+David reported a DWR Music post "carrying a YouTube link" and called it a
+violation. This settles which of the two actually happened, from the live posts
+rather than from config. For the last 10 posts on the DWR Music Page it prints:
+date, whether the CAPTION holds a URL, whether the FIRST COMMENT holds a URL,
+and the URL itself.
 """
-import os, json, requests
+import os, re, requests
 
-VER   = "v23.0"
-PAGE  = "113416904992248"
-VENUE = "110966485223915"
-IMG   = "https://raw.githubusercontent.com/dredfearn74-star/dwr-music-bot/main/media/aug22_flyer.png"
-BASE  = "https://graph.facebook.com/" + VER
+VER  = "v23.0"
+PAGE = "113416904992248"
+BASE = "https://graph.facebook.com/" + VER
+URL_RE = re.compile(r'(https?://\S+|www\.\S+|\byoutu\.be/\S+|\byoutube\.com/\S+)', re.I)
+SNIFF  = re.compile(r'http|youtu|www\.', re.I)
 
 
 def log(m):
     print(m, flush=True)
 
 
+def urls_in(text):
+    return URL_RE.findall(text or "")
+
+
 def main():
     tok = os.environ.get("META_TOKEN", "")
     if not tok:
-        log("PLACECHECK: no META_TOKEN. Nothing to do.")
+        log("LINKAUDIT: no META_TOKEN.")
         return
-
-    log("")
-    log("========================================================================")
-    log("PLACECHECK - nothing will be published. Every object is deleted again.")
-    log("========================================================================")
 
     r = requests.get(BASE + "/" + PAGE,
                      params={"fields": "access_token", "access_token": tok}, timeout=60)
     ptok = (r.json() or {}).get("access_token") or tok
-    log("page-scoped token resolved: %s" % ("yes" if ptok != tok else "no - using the token as given"))
-
-    cleanup = []
 
     log("")
-    log("=== TEST 1 - plain /feed post carrying place ==========================")
-    r = requests.post(BASE + "/" + PAGE + "/feed", timeout=120, data={
-        "message": "PLACE TEST please ignore",
-        "place": VENUE,
-        "published": "false",
-        "access_token": ptok})
+    log("=" * 78)
+    log("LINK PLACEMENT AUDIT - DWR Music Page - read-only, nothing published")
+    log("=" * 78)
+
+    r = requests.get(BASE + "/" + PAGE + "/posts", timeout=90, params={
+        "fields": "id,created_time,message,permalink_url",
+        "limit": 10, "access_token": ptok})
     if not r.ok:
-        log("  REJECTED HTTP %s: %s" % (r.status_code, r.text[:400]))
+        log("could not list posts: HTTP %s %s" % (r.status_code, r.text[:300]))
+        return
+
+    posts = (r.json() or {}).get("data") or []
+    log("posts returned: %d" % len(posts))
+    log("")
+    log("%-12s %-9s %-13s %s" % ("DATE", "CAP_URL?", "1ST_CMT_URL?", "THE URL"))
+    log("-" * 78)
+
+    violations = []
+    for p in posts:
+        pid  = p.get("id")
+        when = (p.get("created_time") or "")[:10]
+        msg  = p.get("message") or ""
+        cap_urls = urls_in(msg)
+
+        c = requests.get(BASE + "/" + str(pid) + "/comments", timeout=60, params={
+            "fields": "from,message,created_time", "order": "chronological",
+            "limit": 5, "access_token": ptok})
+        comments = ((c.json() or {}).get("data") or []) if c.ok else []
+        first = comments[0].get("message") if comments else ""
+        cmt_urls = urls_in(first)
+
+        shown = (cap_urls + cmt_urls)
+        log("%-12s %-9s %-13s %s" % (
+            when,
+            "YES !!" if cap_urls else "no",
+            "yes" if cmt_urls else "no",
+            (shown[0][:44] if shown else "-")))
+        if cap_urls:
+            violations.append((when, pid, cap_urls, msg[:120]))
+
+    log("-" * 78)
+    log("")
+    if violations:
+        log("!! CAPTION VIOLATIONS FOUND - these are the ones that get throttled:")
+        for when, pid, urls, snippet in violations:
+            log("   %s  %s" % (when, pid))
+            log("      urls    : %s" % ", ".join(urls))
+            log("      caption : %s..." % snippet)
     else:
-        pid = (r.json() or {}).get("id")
-        cleanup.append(pid)
-        log("  created id: %s" % pid)
-        g = requests.get(BASE + "/" + str(pid), timeout=60,
-                         params={"fields": "id,message,place,message_tags", "access_token": ptok})
-        body = g.json() if g.ok else {"error_text": g.text[:300]}
-        log("  read back : %s" % json.dumps(body, indent=2)[:900])
-        log("  >>> PLACE STUCK: %s" % ("YES" if body.get("place") else "NO"))
+        log("==> NO caption carries a URL. The rule is being FOLLOWED.")
+        log("    Any link seen on these posts is in the FIRST COMMENT, which is")
+        log("    correct and deliberate - that is Meta's own guidance and it is")
+        log("    what protects the post's reach.")
 
     log("")
-    log("=== TEST 2 - the real shape: unpublished photo + /feed with place =====")
-    r = requests.post(BASE + "/" + PAGE + "/photos", timeout=180, data={
-        "url": IMG, "published": "false", "access_token": ptok})
-    if not r.ok:
-        log("  photo upload REJECTED HTTP %s: %s" % (r.status_code, r.text[:400]))
-    else:
-        media_id = (r.json() or {}).get("id")
-        cleanup.append(media_id)
-        log("  unpublished photo id: %s" % media_id)
-        r2 = requests.post(BASE + "/" + PAGE + "/feed", timeout=120, data={
-            "message": "PLACE TEST 2 please ignore",
-            "place": VENUE,
-            "attached_media[0]": json.dumps({"media_fbid": media_id}),
-            "published": "false",
-            "access_token": ptok})
-        if not r2.ok:
-            log("  feed post REJECTED HTTP %s: %s" % (r2.status_code, r2.text[:400]))
+    log("--- full first comment on each post, for the record ---")
+    for p in posts:
+        pid = p.get("id"); when = (p.get("created_time") or "")[:10]
+        c = requests.get(BASE + "/" + str(pid) + "/comments", timeout=60, params={
+            "fields": "from,message", "order": "chronological",
+            "limit": 3, "access_token": ptok})
+        data = ((c.json() or {}).get("data") or []) if c.ok else []
+        if not data:
+            log("  %s  (no comments)" % when)
         else:
-            pid2 = (r2.json() or {}).get("id")
-            cleanup.append(pid2)
-            log("  created id: %s" % pid2)
-            log("  >>> ID SHAPE: %s" % ("PAGEID_POSTID - correct, this also fixes the hand-tag list bug"
-                                        if "_" in str(pid2) else "bare id - still wrong"))
-            g2 = requests.get(BASE + "/" + str(pid2), timeout=60,
-                              params={"fields": "id,message,place,message_tags,attachments",
-                                      "access_token": ptok})
-            body2 = g2.json() if g2.ok else {"error_text": g2.text[:300]}
-            log("  read back : %s" % json.dumps(body2, indent=2)[:1400])
-            log("  >>> PLACE STUCK: %s" % ("YES" if body2.get("place") else "NO"))
+            for d in data[:2]:
+                who = (d.get("from") or {}).get("name") or "?"
+                log("  %s  [%s] %s" % (when, who, (d.get("message") or "")[:90]))
 
     log("")
-    log("=== CLEANUP ===========================================================")
-    for cid in [c for c in cleanup if c]:
-        d = requests.delete(BASE + "/" + str(cid), params={"access_token": ptok}, timeout=60)
-        log("  deleted %s: HTTP %s %s" % (cid, d.status_code, d.text[:120]))
-
-    log("")
-    log("PLACECHECK finished. Nothing was published.")
+    log("LINKAUDIT finished. Nothing was published.")
 
 
 if __name__ == "__main__":
