@@ -1,0 +1,143 @@
+name: MotiveAF - make memes (Batch 3)
+
+# Generates every meme in batch3_prompts.json through OpenAI's image API and
+# commits the finished PNGs into media/motiveaf-batch3/.
+# Manual only - it never runs on a schedule and never touches the posting queue.
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Image model"
+        required: true
+        default: "gpt-image-1"
+        type: choice
+        options: ["gpt-image-1", "gpt-image-1-mini"]
+      quality:
+        description: "Quality (high = best text rendering, costs more)"
+        required: true
+        default: "high"
+        type: choice
+        options: ["high", "medium", "low"]
+      size:
+        description: "Image size"
+        required: true
+        default: "1024x1024"
+        type: choice
+        options: ["1024x1024", "1536x1024", "1024x1536"]
+      limit:
+        description: "How many to make this run (1 = cheap test, 30 = all)"
+        required: true
+        default: "1"
+
+permissions:
+  contents: write
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail fast if the API key is missing
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY secret is not set. Settings > Secrets and variables > Actions > New repository secret."
+            exit 1
+          fi
+
+      - name: Generate
+        timeout-minutes: 40
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MODEL: ${{ inputs.model }}
+          QUALITY: ${{ inputs.quality }}
+          SIZE: ${{ inputs.size }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          python - <<'PY'
+          import base64, json, os, pathlib, time, urllib.request, urllib.error
+
+          key   = os.environ["OPENAI_API_KEY"]
+          model = os.environ.get("MODEL", "gpt-image-1")
+          qual  = os.environ.get("QUALITY", "high")
+          size  = os.environ.get("SIZE", "1024x1024")
+          limit = int(os.environ.get("LIMIT", "1") or 1)
+
+          out = pathlib.Path("media/motiveaf-batch3"); out.mkdir(parents=True, exist_ok=True)
+          prompts = json.loads(pathlib.Path("batch3_prompts.json").read_text(encoding="utf-8"))
+
+          todo = [p for p in prompts if not (out / p["filename"]).exists()][:limit]
+          print(f"{len(prompts)} prompts total, {len(todo)} to make this run "
+                f"({model} / {qual} / {size})", flush=True)
+
+          def make(prompt):
+              body = json.dumps({"model": model, "prompt": prompt, "size": size,
+                                 "quality": qual, "n": 1}).encode()
+              req = urllib.request.Request(
+                  "https://api.openai.com/v1/images/generations", data=body,
+                  headers={"Authorization": "Bearer " + key,
+                           "Content-Type": "application/json"})
+              with urllib.request.urlopen(req, timeout=600) as r:
+                  d = json.load(r)
+              item = d["data"][0]
+              if item.get("b64_json"):
+                  return base64.b64decode(item["b64_json"])
+              with urllib.request.urlopen(item["url"], timeout=300) as r:
+                  return r.read()
+
+          made = failed = 0
+          for i, p in enumerate(todo, 1):
+              print(f"[{i}/{len(todo)}] {p['tagline'][:56]}", flush=True)
+              for attempt in (1, 2, 3):
+                  try:
+                      data = make(p["prompt"])
+                      if data[:8] != b"\x89PNG\r\n\x1a\n" and data[:2] != b"\xff\xd8":
+                          raise ValueError("response was not an image")
+                      (out / p["filename"]).write_bytes(data)
+                      print(f"      saved {p['filename']} ({len(data)/1e6:.1f} MB)", flush=True)
+                      made += 1
+                      break
+                  except urllib.error.HTTPError as e:
+                      msg = e.read().decode()[:300]
+                      if e.code in (429, 500, 502, 503) and attempt < 3:
+                          w = 20 * attempt
+                          print(f"      busy ({e.code}); waiting {w}s", flush=True)
+                          time.sleep(w); continue
+                      print(f"      FAILED {e.code}: {msg}", flush=True); failed += 1; break
+                  except Exception as e:
+                      if attempt < 3:
+                          print(f"      hiccup: {e}; retrying", flush=True)
+                          time.sleep(12); continue
+                      print(f"      FAILED: {e}", flush=True); failed += 1; break
+
+          print(f"\nmade {made}, failed {failed}", flush=True)
+          pathlib.Path("batch3_run_summary.txt").write_text(
+              f"model={model} quality={qual} size={size}\nmade={made} failed={failed}\n", encoding="utf-8")
+          if made == 0:
+              raise SystemExit("nothing was generated - failing the run so it goes red")
+          PY
+
+      - name: Commit the images
+        run: |
+          git config user.name "motiveaf-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add media/motiveaf-batch3 batch3_run_summary.txt
+          if git diff --cached --quiet; then
+            echo "::error::nothing new to commit"
+            exit 1
+          fi
+          git commit -m "MotiveAF batch 3: generated memes"
+          git pull --rebase --autostash
+          git push
+
+      - name: Report the end state
+        run: |
+          echo "### MotiveAF batch 3" >> $GITHUB_STEP_SUMMARY
+          cat batch3_run_summary.txt >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Files now in media/motiveaf-batch3: $(ls media/motiveaf-batch3 | wc -l) of 30" >> $GITHUB_STEP_SUMMARY
+          ls media/motiveaf-batch3 >> $GITHUB_STEP_SUMMARY
