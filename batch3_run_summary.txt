@@ -1,0 +1,2 @@
+model=gpt-image-1 quality=high size=1024x1024
+made=1 failed=0
