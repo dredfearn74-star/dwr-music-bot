@@ -602,6 +602,39 @@ def caption_has_url(text):
     return text[start:m.start() + 45].replace("\n", " ").strip()
 
 
+# ---------------------------------------------------------------------------
+# DONATION / TIP-JAR GATE  -- added 2026-08-27 on David's instruction:
+# "that needs to be removed from every single post ... fix it moving forward
+#  so that none of them can do that again."
+#
+# WHAT HAPPENED: 33 MotiveAF memes went out 27 Jun - 29 Jul 2026 from the
+# separate `motiveaf-bot` repo, every caption ending
+#   "Support the mission -> https://ko-fi.com/motiveaf"
+# Nobody approved a donation ask on any brand. The same string later turned up
+# in THIS repo's queue, in the `first_comment` column, on all 36 MotiveAF rows.
+# It was stripped by hand on 2026-08-27 (commit e993f38) -- and a hand-strip
+# protects exactly nothing, because the next person to edit a CSV puts it back.
+#
+# caption_has_url() already blocks any URL in the post BODY. It does NOT cover
+# the first comment, which is where a link is SUPPOSED to live -- so that was
+# the unguarded route. This gate closes it: approved store links (Printify,
+# Payhip) still pass; a tip jar never does, in the caption or the comment.
+#
+# TO ADD AN APPROVED LINK: nothing to do -- anything not on this list passes.
+# TO BAN ANOTHER DESTINATION: add its domain to the pattern below.
+# ---------------------------------------------------------------------------
+DONATION_RE = re.compile(
+    r"ko-?fi\.com|patreon\.com|paypal\.me|paypal\.com/(?:donate|paypalme)|"
+    r"venmo\.com|cash\.app|cashapp\.com|gofundme\.com|"
+    r"buymeacoffee\.com|givesendgo\.com|donorbox\.org|tip(?:jar|s)\.[a-z]", re.I)
+
+
+def donation_link(text):
+    """Return the offending donation domain if there is one, else ''."""
+    m = DONATION_RE.search(text or "")
+    return m.group(0) if m else ""
+
+
 def caption_gate(row):
     """Refuse to post a row with an empty caption, or one carrying a URL.
 
@@ -618,6 +651,12 @@ def caption_gate(row):
     if not cap:
         return ("caption is EMPTY. Nothing posts without words. Write a caption, "
                 "or put `none` in the caption cell if it is meant to be wordless.")
+    beg = donation_link(cap)
+    if beg:
+        return ("caption contains a DONATION / TIP-JAR link (" + beg + "). Those "
+                "are banned on every brand — David has never approved a donation "
+                "ask, and one shipped on 33 MotiveAF posts before anyone noticed. "
+                "Take it out of the caption cell.")
     hit = caption_has_url(cap)
     if hit:
         return ("caption contains a LINK — Facebook throttles any post with an "
@@ -1064,6 +1103,19 @@ def main():
             log(f"REFUSED [{row.get('brand')}] {due}: {comment_why}")
             log("         Nothing was published. Fix first_comment (or paste the full YouTube URL) and re-run.")
             failures.append(f"{row.get('brand')} {due} — song link not found, post held back: {comment_why}")
+            continue
+        # THE FIRST COMMENT IS GATED TOO. This is the route the ko-fi tip jar
+        # actually travelled — the caption gate never sees it, because a link in
+        # the comment is the CORRECT place for a link. An unapproved destination
+        # is not, so the row is refused and the run goes red.
+        beg = donation_link(comment_link)
+        if beg:
+            row["status"] = "FAILED"; changed += 1
+            log(f"REFUSED [{row.get('brand')}] {due}: the first comment carries a "
+                f"DONATION / TIP-JAR link ({beg}). Nothing was published.")
+            log(f"  Source: {comment_why}. Clear it from this row's first_comment "
+                "cell, or from the brand's default_comment_link in brands.csv.")
+            failures.append(f"{row.get('brand')} {due} — REFUSED: donation link in the first comment ({beg})")
             continue
         if comment_link:
             log(f"  first comment for {due}: {comment_link}   ({comment_why})")
