@@ -58,3 +58,25 @@
 [2026-08-25 10:39:49] Nothing due today. Exiting cleanly.
 [2026-08-26 11:15:03] POSTED [DWR Music] 2026-08-26 both -> FB:1035764986096409, IG:18106694713885295
 [2026-08-26 11:15:03] Queue updated (1 row(s) changed, 68 rows saved).
+[2026-08-27 11:18:27]   first comment for 2026-08-27: https://youtu.be/zHuzzCme-OE   (using the first_comment cell exactly as written)
+[2026-08-27 11:18:33]   FIRST COMMENT FAILED on 2026-08-27 (the post itself is fine): Facebook first comment -> HTTP 403: (#200) The permission(s) pages_read_user_content,pages_manage_engagement are not available. It could because either they are deprecated or need to be approved by App Review. | type=OAuthException | code=200 | fbtrace=AtjgNOXEasam51BV8cOq1zv
+[2026-08-27 11:19:21]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=AVCwT0As2HeoNCajElJzQat
+[2026-08-27 11:19:21] POSTED [DWR Music] 2026-08-27 both -> FB:1803247207692994, IG:18101052677208011
+[2026-08-27 11:19:23]   first comment for 2026-08-27: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-08-27 11:19:29]   FIRST COMMENT FAILED on 2026-08-27 (the post itself is fine): Facebook first comment -> HTTP 403: (#200) The permission(s) pages_read_user_content,pages_manage_engagement are not available. It could because either they are deprecated or need to be approved by App Review. | type=OAuthException | code=200 | fbtrace=AhrZFaQvCV0IezZ6vTUODJG
+[2026-08-27 11:19:48]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=ARwoxpJ-ZPgoUO7e8RdLOMl
+[2026-08-27 11:19:48] POSTED [Midbar Moon] 2026-08-27 both -> FB:122133838947341551, IG:18093804998537121
+[2026-08-27 11:19:48] Queue updated (2 row(s) changed, 88 rows saved).
+[2026-08-27 11:19:48] 
+[2026-08-27 11:19:48] FIRST COMMENTS: 4 post(s) went out without a confirmed comment.
+[2026-08-27 11:19:48]    The post is live and fine — only the link in the comments is missing.
+[2026-08-27 11:19:48]    - 2026-08-27  FB  https://youtu.be/zHuzzCme-OE  ->  https://www.facebook.com/113416904992248/posts/1803247207692994
+[2026-08-27 11:19:48]    - 2026-08-27  IG  https://youtu.be/zHuzzCme-OE
+[2026-08-27 11:19:48]    - 2026-08-27  FB  https://payhip.com/midbarmoon  ->  https://www.facebook.com/1173427532510546/posts/122133838947341551
+[2026-08-27 11:19:48]    - 2026-08-27  IG  https://payhip.com/midbarmoon
+[2026-08-27 11:19:48] 
+[2026-08-27 11:19:48] ====================================================================
+[2026-08-27 11:19:48] !! 2 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-08-27 11:19:48]    - DWR Music 2026-08-27 — first comment failed: Facebook first comment -> HTTP 403: (#200) The permission(s) pages_read_user_content,pages_manage_engagement are not available. It could because either they are deprecated or need to be approved by App Review. | type=OAuthException | code=200 | fbtrace=AtjgNOXEasam51BV8cOq1zv
+[2026-08-27 11:19:48]    - Midbar Moon 2026-08-27 — first comment failed: Facebook first comment -> HTTP 403: (#200) The permission(s) pages_read_user_content,pages_manage_engagement are not available. It could because either they are deprecated or need to be approved by App Review. | type=OAuthException | code=200 | fbtrace=AhrZFaQvCV0IezZ6vTUODJG
+[2026-08-27 11:19:48] ====================================================================
