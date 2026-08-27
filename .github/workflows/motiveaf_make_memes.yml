@@ -36,7 +36,7 @@ permissions:
 jobs:
   make:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
 
@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Generate
-        timeout-minutes: 40
+        timeout-minutes: 280
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MODEL: ${{ inputs.model }}
@@ -121,7 +121,11 @@ jobs:
               raise SystemExit("nothing was generated - failing the run so it goes red")
           PY
 
+      # if: always() so a timeout or an API failure still SAVES whatever was
+      # generated. Without this, a run that dies at the cap throws away every
+      # paid-for image. Learned the hard way 2026-08-27.
       - name: Commit the images
+        if: always()
         run: |
           git config user.name "motiveaf-bot"
           git config user.email "actions@users.noreply.github.com"
