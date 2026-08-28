@@ -1,0 +1,130 @@
+name: MotiveAF - make shirt borders
+
+# Takes each meme in media/motiveaf-borders-in/ (already padded onto a flat
+# chroma-green margin by the caller) and asks gpt-image-2 to fill ONLY that
+# margin with a border grown from that meme's own world. Results land in
+# media/motiveaf-borders-out/.
+#
+# The centre is NOT trusted to survive - the caller pastes the original
+# artwork back over it afterwards, so the headline and wordmark can never
+# be mangled. See MotiveAF_SHIRT_BORDER_SYSTEM_2026-08-27.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "How many to border this run (1 = cheap test)"
+        required: true
+        default: "1"
+
+permissions:
+  contents: write
+
+jobs:
+  border:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail fast if the API key is missing
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY secret is not set."
+            exit 1
+          fi
+
+      - name: Border them
+        timeout-minutes: 280
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          python -m pip install --quiet requests
+          python - <<'PY'
+          import base64, json, os, pathlib, time, requests
+
+          key   = os.environ["OPENAI_API_KEY"]
+          limit = int(os.environ.get("LIMIT","1") or 1)
+          src   = pathlib.Path("media/motiveaf-borders-in")
+          out   = pathlib.Path("media/motiveaf-borders-out"); out.mkdir(parents=True, exist_ok=True)
+
+          PROMPT = (
+            "This image is finished MotiveAF poster artwork sitting on a flat bright chroma-green margin. "
+            "The artwork in the centre is SACRED MASTER ART - do not redraw it, do not alter its lettering, "
+            "characters, logo, props or composition in any way. "
+            "Your only job is to fill the GREEN MARGIN with a premium distressed shirt border that grows "
+            "OUTWARD from the artwork, never inward over it. "
+            "Design that border specifically for THIS scene: ask what would naturally escape from this world "
+            "if it continued beyond the frame, and build the border out of that scene's own materials, light "
+            "and physics. Do not use a generic cracked-rock, rubble, splatter or smoke frame. "
+            "The border must end in an organic irregular edge with clear bright chroma green still visible "
+            "outside it on all four sides - no hard rectangular edge reaching the canvas corners. "
+            "Keep the green flat and pure: never blend green into the artwork, the border, lighting, smoke, "
+            "particles or shadows. There must be a clean transition from artwork to border to solid green. "
+            "Match the MotiveAF universe: graphic novel and adult-animation energy, cinematic lighting, "
+            "warm amber, burnt orange and faded teal, bold ink outlines, gritty and collectible. "
+            "Add no new words, slogans or logos of any kind."
+          )
+
+          todo = [p for p in sorted(src.glob("*.png")) if not (out / p.name).exists()][:limit]
+          print(f"{len(todo)} to border", flush=True)
+
+          made = failed = 0
+          for i, p in enumerate(todo, 1):
+              print(f"[{i}/{len(todo)}] {p.name}", flush=True)
+              for attempt in (1, 2, 3):
+                  try:
+                      r = requests.post(
+                          "https://api.openai.com/v1/images/edits",
+                          headers={"Authorization": "Bearer " + key},
+                          files={"image": (p.name, p.open("rb"), "image/png")},
+                          data={"model": "gpt-image-2", "prompt": PROMPT,
+                                "size": "1024x1024", "quality": "high",
+                                "input_fidelity": "high", "n": "1"},
+                          timeout=600)
+                      if r.status_code != 200:
+                          raise RuntimeError(f"{r.status_code}: {r.text[:400]}")
+                      d = r.json()["data"][0]
+                      raw = base64.b64decode(d["b64_json"]) if d.get("b64_json") \
+                            else requests.get(d["url"], timeout=300).content
+                      if raw[:8] != b"\x89PNG\r\n\x1a\n" and raw[:2] != b"\xff\xd8":
+                          raise ValueError("response was not an image")
+                      (out / p.name).write_bytes(raw)
+                      print(f"      saved ({len(raw)/1e6:.1f} MB)", flush=True)
+                      made += 1
+                      break
+                  except Exception as e:
+                      if attempt < 3:
+                          print(f"      retry after: {e}", flush=True); time.sleep(20*attempt); continue
+                      print(f"      FAILED: {e}", flush=True); failed += 1
+
+          print(f"\nmade {made}, failed {failed}", flush=True)
+          pathlib.Path("borders_run_summary.txt").write_text(
+              f"model=gpt-image-2 quality=high size=1024x1024\nmade={made} failed={failed}\n")
+          if made == 0:
+              raise SystemExit("nothing was bordered - failing the run so it goes red")
+          PY
+
+      # if: always() so a timeout or API failure still SAVES whatever was made.
+      - name: Commit the borders
+        if: always()
+        run: |
+          git config user.name "motiveaf-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add media/motiveaf-borders-out borders_run_summary.txt || true
+          if git diff --cached --quiet; then
+            echo "nothing new to commit"; exit 0
+          fi
+          git commit -m "MotiveAF: shirt borders"
+          git pull --rebase --autostash
+          git push
+
+      - name: Report
+        if: always()
+        run: |
+          echo "### MotiveAF borders" >> $GITHUB_STEP_SUMMARY
+          cat borders_run_summary.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+          ls media/motiveaf-borders-out 2>/dev/null >> $GITHUB_STEP_SUMMARY || true
