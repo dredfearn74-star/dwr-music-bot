@@ -83,7 +83,7 @@ jobs:
                           files={"image": (p.name, p.open("rb"), "image/png")},
                           data={"model": "gpt-image-2", "prompt": PROMPT,
                                 "size": "1024x1024", "quality": "high",
-                                "input_fidelity": "high", "n": "1"},
+                                "n": "1"},
                           timeout=600)
                       if r.status_code != 200:
                           raise RuntimeError(f"{r.status_code}: {r.text[:400]}")
