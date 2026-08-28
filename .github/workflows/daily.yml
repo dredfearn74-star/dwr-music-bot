@@ -3,6 +3,7 @@ name: DWR daily post
 on:
   schedule:
     - cron: '0 15 * * *'   # 15:00 UTC = 10:00 AM US Central (CDT)
+    - cron: '30 15 * * *'   # BACKSTOP. GitHub dropped the 10:00 slot on 2026-08-27 and ran it 9h late.
   workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
