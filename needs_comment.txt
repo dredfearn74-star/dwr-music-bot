@@ -1,7 +1,5 @@
 Posts that published but whose first comment is missing or unconfirmed.
 Open each post, paste the link as a comment. Rewritten every run.
 
-2026-08-27  FB  https://youtu.be/zHuzzCme-OE  ->  https://www.facebook.com/113416904992248/posts/1803247207692994
-2026-08-27  IG  https://youtu.be/zHuzzCme-OE
-2026-08-27  FB  https://payhip.com/midbarmoon  ->  https://www.facebook.com/1173427532510546/posts/122133838947341551
-2026-08-27  IG  https://payhip.com/midbarmoon
+2026-08-28  IG  https://youtu.be/6ImmG5KwyX4
+2026-08-28  IG  https://payhip.com/midbarmoon

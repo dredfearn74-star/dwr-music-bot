@@ -81,3 +81,17 @@
 [2026-08-27 11:19:48]    - Midbar Moon 2026-08-27 — first comment failed: Facebook first comment -> HTTP 403: (#200) The permission(s) pages_read_user_content,pages_manage_engagement are not available. It could because either they are deprecated or need to be approved by App Review. | type=OAuthException | code=200 | fbtrace=AhrZFaQvCV0IezZ6vTUODJG
 [2026-08-27 11:19:48] ====================================================================
 [2026-08-27 19:13:03] Nothing due today. Exiting cleanly.
+[2026-08-28 10:43:21]   first comment for 2026-08-28: https://youtu.be/6ImmG5KwyX4   (using the first_comment cell exactly as written)
+[2026-08-28 10:43:39]   first comment CONFIRMED on the live post: https://youtu.be/6ImmG5KwyX4
+[2026-08-28 10:44:41]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=AJJLMStiYWk9Oq-UC60AN4Q
+[2026-08-28 10:44:41] POSTED [DWR Music] 2026-08-28 both -> FB:1102474075452369, cmt:1102474075452369_1419691606690784, IG:18104814050232145
+[2026-08-28 10:44:41]   first comment for 2026-08-28: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-08-28 10:44:56]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-08-28 10:45:08]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=AE7lURr7va-Zgaq8GfP6kE_
+[2026-08-28 10:45:08] POSTED [Midbar Moon] 2026-08-28 both -> FB:122134290735341551, cmt:122134290735341551_1890178825277701, IG:18333711064287935
+[2026-08-28 10:45:08] Queue updated (2 row(s) changed, 88 rows saved).
+[2026-08-28 10:45:08] 
+[2026-08-28 10:45:08] FIRST COMMENTS: 2 post(s) went out without a confirmed comment.
+[2026-08-28 10:45:08]    The post is live and fine — only the link in the comments is missing.
+[2026-08-28 10:45:08]    - 2026-08-28  IG  https://youtu.be/6ImmG5KwyX4
+[2026-08-28 10:45:08]    - 2026-08-28  IG  https://payhip.com/midbarmoon
