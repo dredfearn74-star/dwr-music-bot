@@ -96,3 +96,18 @@
 [2026-08-28 10:45:08]    - 2026-08-28  IG  https://youtu.be/6ImmG5KwyX4
 [2026-08-28 10:45:08]    - 2026-08-28  IG  https://payhip.com/midbarmoon
 [2026-08-28 18:50:01] Nothing due today. Exiting cleanly.
+[2026-08-29 13:09:09] POSTED [DWR Music] 2026-08-29 both -> FB:1038405705832337, IG:18088784990424009
+[2026-08-29 13:09:10]   first comment for 2026-08-29: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-08-29 13:09:25]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-08-29 13:09:37]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=ABYK5imt9rPbdw7lNbFonDm
+[2026-08-29 13:09:37] POSTED [MotiveAF] 2026-08-29 both -> FB:122139426291352686, cmt:122139426291352686_1933498537321094, IG:18113960743946710
+[2026-08-29 13:09:37]   first comment for 2026-08-29: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-08-29 13:09:49]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-08-29 13:10:01]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=Av5gIA0uI-7ibXgS_88E-Mv
+[2026-08-29 13:10:01] POSTED [Midbar Moon] 2026-08-29 both -> FB:122134685841341551, cmt:122134685841341551_1279595607524812, IG:18080507654700197
+[2026-08-29 13:10:01] Queue updated (3 row(s) changed, 88 rows saved).
+[2026-08-29 13:10:01] 
+[2026-08-29 13:10:01] FIRST COMMENTS: 2 post(s) went out without a confirmed comment.
+[2026-08-29 13:10:01]    The post is live and fine — only the link in the comments is missing.
+[2026-08-29 13:10:01]    - 2026-08-29  IG  Shirts: https://motiveaf.printify.me
+[2026-08-29 13:10:01]    - 2026-08-29  IG  https://payhip.com/midbarmoon
