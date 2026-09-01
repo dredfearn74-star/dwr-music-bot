@@ -667,36 +667,75 @@ def caption_gate(row):
     return ""
 
 
-def probe_video(url):
-    """Read a remote video's real pixel size with ffprobe (no download).
+def probe_media(url):
+    """Read a remote picture or video's real pixel size AND its pixel shape.
 
-    Returns (width, height) or None when it can't tell — ffprobe missing, a
-    network hiccup, or an unreadable file. Unknown is NOT treated as failure:
+    Returns (width, height, sar) or None when it can't tell — ffprobe missing,
+    a network hiccup, or an unreadable file. Unknown is NOT treated as failure:
     the bot warns and carries on rather than blocking a good post over tooling.
+
+    WHY SAR MATTERS — added 2026-09-01 after a third squished-reel report.
+    The old gate read width and height only. A file can measure a perfect
+    1080x1920 and STILL publish squished, because `sample_aspect_ratio` (the
+    shape of each individual pixel) can be non-square — the picture gets
+    stretched at playback time, not in the frame size. Reading w/h alone cannot
+    see that. Now anything whose pixels are not square is refused.
     """
     if not shutil.which("ffprobe"):
         return None
     try:
         out = subprocess.run(
             ["ffprobe", "-v", "error", "-select_streams", "v:0",
-             "-show_entries", "stream=width,height", "-of", "json", url],
+             "-show_entries", "stream=width,height,sample_aspect_ratio",
+             "-of", "json", url],
             capture_output=True, text=True, timeout=180,
         )
         if out.returncode != 0:
             return None
         st = (json.loads(out.stdout).get("streams") or [{}])[0]
         w, h = int(st.get("width") or 0), int(st.get("height") or 0)
-        return (w, h) if w and h else None
+        sar = (st.get("sample_aspect_ratio") or "").strip()
+        return (w, h, sar) if w and h else None
     except Exception:
         return None
 
 
-def aspect_gate(url):
-    """Refuse to post a video that is not vertical 9:16.
+def square_pixels(sar):
+    """True when the pixel shape is square, or genuinely unknown.
 
-    THE BUG THIS CATCHES: some DaVinci exports came out 1920x1080 LANDSCAPE with
-    the vertical footage pillarboxed (black bars) inside them. Pushed to Meta as
-    a reel, that publishes visibly squished. The fix is a genuine 9:16 re-export.
+    ffprobe reports '1:1' for square, '0:1' or 'N/A' or nothing when the file
+    does not say. Unknown is treated as fine — same principle as the rest of
+    the gate: never block a good post over missing tooling information.
+    """
+    s = (sar or "").strip()
+    if s in ("", "1:1", "0:1", "N/A", "n/a"):
+        return True
+    try:
+        num, den = s.split(":")
+        return abs(int(num) / float(int(den)) - 1.0) <= 0.01
+    except Exception:
+        return True
+
+
+def aspect_gate(url, plat="both"):
+    """Refuse media that would publish visibly wrong. Videos AND stills.
+
+    THE VIDEO BUG THIS CATCHES: some DaVinci exports came out 1920x1080
+    LANDSCAPE with the vertical footage pillarboxed (black bars) inside them.
+    Pushed to Meta as a reel, that publishes visibly squished. The fix is a
+    genuine 9:16 re-export.
+
+    THE SECOND VIDEO BUG, added 2026-09-01: a file can measure a perfect
+    1080x1920 and still be squished, because the PIXELS themselves are not
+    square (`sample_aspect_ratio`). The old gate read width and height only and
+    could not see it. Now both are checked.
+
+    THE STILL-IMAGE BUG, added 2026-09-01: photos were never gated at all.
+    Instagram rejects any still outside 4:5 (0.80) to 1.91:1 and the run comes
+    back HTTP 400 "The aspect ratio is not supported" AFTER the Facebook half
+    has already published — which is exactly what happened on 2026-08-19. That
+    rejection was predictable from the file on disk, so it is caught here now.
+    Facebook-only rows are not gated on shape; Facebook accepts them.
 
     If you ever need to convert, NEVER use a bare `scale=W:H` — it force-crams
     the picture into the box and crushes it. Use:
@@ -704,24 +743,50 @@ def aspect_gate(url):
             pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1"
     which fits the picture and pads the gap instead of distorting it.
 
-    Returns '' when the clip is fine (or unknowable), or a reason to refuse.
+    Returns '' when the media is fine (or unknowable), or a reason to refuse.
     """
-    if not is_video(url):
-        return ""                       # photos are not gated
-    dims = probe_video(url)
-    if not dims:
-        log(f"WARN: could not read the video size for {url} — posting anyway (aspect gate skipped).")
+    got = probe_media(url)
+    if not got:
+        log(f"WARN: could not read the media size for {url} — posting anyway (aspect gate skipped).")
         return ""
-    w, h = dims
-    target = 9.0 / 16.0
+    w, h, sar = got
+
+    # --- square-pixel check applies to everything ---
+    if not square_pixels(sar):
+        return (f"pixels are not square (sample aspect ratio {sar}). The frame measures "
+                f"{w}x{h} but it will play back STRETCHED. Re-export it, or fix it with "
+                f"scale=1080:1920:force_original_aspect_ratio=decrease,"
+                f"pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1 — the setsar=1 is the part "
+                f"that makes the pixels square again.")
+
+    if is_video(url):
+        target = 9.0 / 16.0
+        ratio = w / float(h)
+        if abs(ratio - target) <= 0.02:     # ~9:16 within rounding
+            return ""
+        shape = "landscape" if w > h else "the wrong vertical shape"
+        return (f"video is {w}x{h} ({shape}), not 9:16. Publishing it would look SQUISHED. "
+                f"Re-export vertical from DaVinci, or pad it with "
+                f"scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1 "
+                f"— never a bare scale=1080:1920.")
+
+    # --- stills: only Instagram is fussy about shape ---
+    p = (plat or "both").strip().lower()
+    if not ("both" in p or "ig" in p or "insta" in p):
+        return ""                       # Facebook-only still — Facebook takes any shape
     ratio = w / float(h)
-    if abs(ratio - target) <= 0.02:     # ~9:16 within rounding
+    if 0.79 <= ratio <= 1.92:           # 4:5 through 1.91:1, with rounding room
         return ""
-    shape = "landscape" if w > h else "the wrong vertical shape"
-    return (f"video is {w}x{h} ({shape}), not 9:16. Publishing it would look SQUISHED. "
-            f"Re-export vertical from DaVinci, or pad it with "
-            f"scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1 "
-            f"— never a bare scale=1080:1920.")
+    if ratio < 0.79:
+        how = "too tall and narrow"
+    else:
+        how = "too wide"
+    return (f"still image is {w}x{h} (ratio {ratio:.2f}), which is {how} for Instagram. "
+            f"Instagram only accepts 4:5 (0.80) through 1.91:1 and returns HTTP 400 "
+            f"'The aspect ratio is not supported' — AFTER the Facebook half has already "
+            f"published, which leaves the two platforms out of step. Re-crop it to 1080x1080 "
+            f"(square), 1080x1350 (4:5) or 1080x566 (1.91:1), or set this row's platform "
+            f"cell to `fb` to post it to Facebook only.")
 
 
 def verify_fb_tags(ver, post_id, tok, wanted_tags):
@@ -1081,7 +1146,7 @@ def main():
         media = (row.get("media_url") or "").strip()
 
         # ---- SAFETY GATES: check the post BEFORE it goes anywhere near Meta ----
-        stop = caption_gate(row) or (aspect_gate(media) if media else "")
+        stop = caption_gate(row) or (aspect_gate(media, plat) if media else "")
         if stop:
             row["status"] = "FAILED"; changed += 1
             log(f"REFUSED [{row.get('brand')}] {due} {plat}: {stop}")
