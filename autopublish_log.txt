@@ -147,3 +147,23 @@
 [2026-08-31 15:38:04]    - 2026-08-31  IG  Shirts: https://motiveaf.printify.me
 [2026-08-31 15:38:04]    - 2026-08-31  IG  https://payhip.com/midbarmoon
 [2026-08-31 15:56:38] Nothing due today. Exiting cleanly.
+[2026-09-01 13:07:48] POSTED [DWR Music] 2026-09-01 both -> FB:1040927715580136, IG:18342884107270163
+[2026-09-01 13:07:48]   first comment for 2026-09-01: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-01 13:08:05]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-01 13:08:22]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=AY5hCO_ZvAb10kcWGoLbCF-
+[2026-09-01 13:08:22] POSTED [MotiveAF] 2026-09-01 both -> FB:122140402053352686, cmt:122140402053352686_911449294957974, IG:18058969958526998
+[2026-09-01 13:08:23]   first comment for 2026-09-01: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-01 13:08:39]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-01 13:08:56]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=Avjl9nIFb4FJ66x2dlS1gfa
+[2026-09-01 13:08:56] POSTED [Midbar Moon] 2026-09-01 both -> FB:122136260295341551, cmt:122136260295341551_2292112401615101, IG:18390022333165006
+[2026-09-01 13:08:56]   first comment for 2026-09-01: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-01 13:09:09]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-01 13:10:25]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=ArcGj3bvDU1wgvN4r0bopA7
+[2026-09-01 13:10:25] POSTED [MotiveAF] 2026-09-01 both -> FB:1063188059826575, cmt:1063188059826575_1496730275551455, IG:18052971437572367
+[2026-09-01 13:10:25] Queue updated (4 row(s) changed, 96 rows saved).
+[2026-09-01 13:10:25] 
+[2026-09-01 13:10:25] FIRST COMMENTS: 3 post(s) went out without a confirmed comment.
+[2026-09-01 13:10:25]    The post is live and fine — only the link in the comments is missing.
+[2026-09-01 13:10:25]    - 2026-09-01  IG  Shirts: https://motiveaf.printify.me
+[2026-09-01 13:10:25]    - 2026-09-01  IG  https://payhip.com/midbarmoon
+[2026-09-01 13:10:25]    - 2026-09-01  IG  Shirts: https://motiveaf.printify.me
