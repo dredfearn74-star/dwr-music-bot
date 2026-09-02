@@ -189,3 +189,18 @@
 [2026-09-02 13:25:27]    - 2026-09-02  IG  https://youtu.be/zHuzzCme-OE
 [2026-09-02 13:25:27]    - 2026-09-02  IG  https://payhip.com/midbarmoon
 [2026-09-02 13:51:28] Nothing due today. Exiting cleanly.
+[2026-09-02 16:18:44]   first comment for 2026-09-02: https://youtu.be/zHuzzCme-OE   (using the first_comment cell exactly as written)
+[2026-09-02 16:18:49]   FIRST COMMENT FAILED on 2026-09-02 (the post itself is fine): Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '1049708251141052' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=Ap8M2NMl12DgpnVjxMW4nBB
+[2026-09-02 16:19:30]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=A5V-VwrBzJb1mv7OglepPFA
+[2026-09-02 16:19:30] POSTED [DWR Music] 2026-09-02 both -> FB:1049708251141052, IG:18161645089468131
+[2026-09-02 16:19:30] Queue updated (1 row(s) changed, 113 rows saved).
+[2026-09-02 16:19:30] 
+[2026-09-02 16:19:30] FIRST COMMENTS: 2 post(s) went out without a confirmed comment.
+[2026-09-02 16:19:30]    The post is live and fine — only the link in the comments is missing.
+[2026-09-02 16:19:30]    - 2026-09-02  FB  https://youtu.be/zHuzzCme-OE  ->  https://www.facebook.com/113416904992248/posts/1049708251141052
+[2026-09-02 16:19:30]    - 2026-09-02  IG  https://youtu.be/zHuzzCme-OE
+[2026-09-02 16:19:30] 
+[2026-09-02 16:19:30] ====================================================================
+[2026-09-02 16:19:30] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-02 16:19:30]    - DWR Music 2026-09-02 — first comment failed: Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '1049708251141052' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=Ap8M2NMl12DgpnVjxMW4nBB
+[2026-09-02 16:19:30] ====================================================================
