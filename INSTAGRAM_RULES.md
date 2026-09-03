@@ -64,10 +64,14 @@ does not resolve — a typo, an @handle pasted in by mistake, a Place that canno
 writes the reason into the run log and **publishes the post without the tag.** A missing location
 tag is a much smaller loss than a missing post, so the post always wins.
 
-### 4. Stories go to BOTH platforms — still NOT SUPPORTED, see Gap 2
+### 4. Stories go to BOTH platforms — ✅ SUPPORTED as of 2026-09-03
 Last week: 6 Facebook stories, **0 Instagram stories**. Stories are the cheapest thing on
 Instagram and the main way existing followers see anything at all. Same story, both places.
-**NOT YET SUPPORTED by the bot — see gaps below.**
+**The bot does this now.** Put `story` in the row's **`format`** column. Blank (or `feed`) is an ordinary post — every existing row is unaffected.
+
+A story is a different animal and the bot treats it as one: **no caption, no first comment, no location tag, no Page mentions.** Meta ignores all of those on a story, so chasing them would only write false failures into the log every run. Story rows carry the picture or clip and nothing else, and they disappear after 24 hours.
+
+**Facebook video stories are the one thing still missing** — they need a three-phase upload that is unbuilt. A `story` row with an `.mp4` going to Facebook is refused with a plain-English reason rather than half-working; set that row's `platform` to `ig`, or use a still.
 
 ### 5. Captions
 Do not reuse a Facebook caption verbatim on Instagram. Facebook tolerates a link in the body;
@@ -99,12 +103,27 @@ retried once without it. See Rule 3 above for how to fill the column in.
 **Not yet proven on a live post** — no gig row has a Place id in it yet, and the account is still
 waiting on the Instagram API permission below. The first gig post that carries one is the test.
 
-### 🔴 Gap 2 — no stories, either platform — STILL OPEN
+### ✅ Gap 2 — stories — CLOSED 2026-09-03 (with one carve-out)
 
 ### Gap 2 — no stories, either platform
-The bot publishes feed posts and reels only. Instagram's API supports stories for Business
-accounts via `media_type=STORIES`. Proposed: add a `format` column with `feed` / `reel` / `story`
-(a `platform` value would collide with `both`). Next on Social Command's list.
+Built. `content_queue.csv` now carries a **`format`** column — blank / `feed` / `reel` = an ordinary
+post, **`story`** = a 24-hour story. A `platform` value was deliberately NOT used: it would collide
+with `both`.
+
+| Route | How it publishes | State |
+|---|---|---|
+| Instagram story, photo | `media_type=STORIES` + `image_url` | ✅ built |
+| Instagram story, video | `media_type=STORIES` + `video_url` | ✅ built |
+| Facebook story, photo | unpublished `/photos` → `/photo_stories` | ✅ built |
+| **Facebook story, video** | three-phase resumable upload | ❌ **not built** — the row is refused with a reason, never half-posted |
+
+A story row skips the caption, the first comment, the location tag and Page mentions, because Meta
+ignores all four on a story. A story row with no `media_url` is refused.
+
+**Proven end to end against a stubbed Graph API** (feed posts, IG photo story, IG video story, FB photo
+story, the no-media refusal and the FB-video refusal all behave correctly, and an ordinary feed post is
+byte-for-byte unchanged). **NOT yet proven on a live account** — same Instagram permission block as
+Gap 1.
 *Impact: 0 Instagram stories last week against 6 on Facebook. Cheapest reach on the platform,
 currently unused.*
 

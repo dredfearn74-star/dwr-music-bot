@@ -46,8 +46,8 @@ just give each one a different date.
 2. Open **`content_queue.csv`** and add a row:
 
    ```
-   brand,date,platform,caption,fb_page_tags,ig_mentions,media_url,first_comment,ig_location_id,posted_to,attempts,status
-   DWR Music,2026-08-02,both,"New cover dropping 🎶 what should I play next?",,,https://raw.githubusercontent.com/USERNAME/dwr-music-bot/main/media/cover_aug2.mp4,,,,,QUEUED
+   brand,date,platform,caption,fb_page_tags,ig_mentions,media_url,first_comment,ig_location_id,format,posted_to,attempts,status
+   DWR Music,2026-08-02,both,"New cover dropping 🎶 what should I play next?",,,https://raw.githubusercontent.com/USERNAME/dwr-music-bot/main/media/cover_aug2.mp4,,,,,,QUEUED
    ```
 
    - `date` — the day it should post (YYYY-MM-DD, US Central).
@@ -57,6 +57,7 @@ just give each one a different date.
    - `media_url` — the **raw** GitHub link to your file (replace `USERNAME` with your GitHub username).
    - `first_comment` — *(optional)* the link to post as the **first comment**. A URL posts as-is; `yt:Song Title` looks the song up on YouTube; `none` means no comment. Blank falls back to the brand's standing link in `brands.csv`. **Links never go in the caption** — Facebook throttles any post carrying one.
    - `ig_location_id` — *(optional)* the venue's numeric Facebook **Place** id, to tag the Instagram post's location (see **Location tags** below). Leave blank to skip.
+   - `format` — *(optional)* leave blank for a normal post. Put **`story`** to publish a 24-hour story instead (see **Stories** below).
    - `posted_to` / `attempts` — the bot's own bookkeeping. Leave blank.
    - `status` — `QUEUED` to go live; `DRAFT` or `HOLD` to keep it parked.
 
@@ -116,3 +117,25 @@ Put the venue's numeric **Facebook Place id** in `ig_location_id`. **Blank = no 
 - **Instagram needs a public media URL** — that's why media lives in this (public) repo.
 - **Token expired?** Re-generate + extend it and update the `META_TOKEN` secret. Symptoms: `FAILED ... OAuth`.
 - Keep media clips reasonably small (GitHub's per-file limit is 100 MB; short reels are fine).
+
+---
+
+## Stories (`format` column)
+
+*Added 2026-09-03.* Leave `format` **blank** and nothing changes — that is a normal post. Put **`story`** in it and the row publishes as a 24-hour story instead.
+
+A story is not a post with a shorter life; Meta treats it as a different object, and so does the bot:
+
+- **No caption.** Meta ignores one on a story. Put `none` in the caption cell.
+- **No first comment.** Stories cannot be commented on. The bot skips it and says so in the log instead of logging a failure every run.
+- **No location tag and no Page mentions** — ignored on stories.
+- **Just the picture or the clip.** `1080x1920` looks best; anything else still publishes, with a warning in the log, and Meta pads or crops it.
+
+| Row | Result |
+|---|---|
+| `format=story`, `.jpg`/`.png`, `platform=both` | Instagram story **and** Facebook story |
+| `format=story`, `.mp4`, `platform=ig` | Instagram video story |
+| `format=story`, `.mp4`, `platform=both` or `fb` | **Refused** with a reason — Facebook video stories are not built yet. Set `platform` to `ig`, or use a still. |
+| `format=story`, no `media_url` | Refused — a story with no picture is nothing |
+
+⚠️ **Not yet proven on a live account.** Every path above was tested against a stubbed Graph API, but the Instagram permission block means no story has actually published yet.

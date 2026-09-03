@@ -391,6 +391,96 @@ def fb_post(ver, pid, tok, cap, media):
     return j.get("id") or j.get("post_id")
 
 
+# ---------------------------------------------------------------------------
+# STORIES — INSTAGRAM_RULES.md Gap 2, built 2026-09-03.
+#
+# WHY: measured on the live account, the week of 2026-08-30 ran 6 Facebook
+# stories and ZERO Instagram stories. Stories are the cheapest reach on
+# Instagram and the main way existing followers see anything at all, and the
+# bot could not make one.
+#
+# HOW A ROW ASKS FOR ONE: the `format` column.
+#   blank / feed  -> a normal feed post (what every existing row is)
+#   reel          -> same as feed for our purposes; the bot already sends a
+#                    video to Instagram as a REEL automatically
+#   story         -> a 24-hour story
+#
+# WHAT A STORY IS NOT: it carries no caption (Meta ignores one), it cannot be
+# commented on, and it cannot take a location tag. So a story row skips the
+# first comment entirely instead of logging a false failure every run.
+# ---------------------------------------------------------------------------
+
+FORMAT_FEED = "feed"
+FORMAT_STORY = "story"
+
+
+def row_format(row):
+    """Read the `format` cell. Blank, missing or unknown -> a normal feed post.
+
+    Unknown values deliberately fall back to `feed` rather than failing: a typo
+    in one cell must never stop a post going out.
+    """
+    v = (row.get("format") or "").strip().lower()
+    if v in ("story", "stories"):
+        return FORMAT_STORY
+    return FORMAT_FEED
+
+
+def ig_story(ver, igid, tok, media):
+    """Publish an Instagram story. Same two-step container dance as a feed post,
+    with media_type=STORIES and no caption."""
+    if not media:
+        raise ValueError("An Instagram story needs a public image or video URL")
+    base = f"https://graph.facebook.com/{ver}"
+    c = {"media_type": "STORIES", "access_token": tok}
+    c["video_url" if is_video(media) else "image_url"] = media
+    r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
+    graph_raise(r, "Instagram story container")
+    cid = r.json()["id"]
+    for _ in range(50):
+        st = requests.get(f"{base}/{cid}", params={"fields": "status_code", "access_token": tok}, timeout=60)
+        if st.ok and st.json().get("status_code") == "FINISHED":
+            break
+        if st.ok and st.json().get("status_code") == "ERROR":
+            raise RuntimeError(f"IG story processing error: {st.json()}")
+        time.sleep(6)
+    p = requests.post(f"{base}/{igid}/media_publish",
+                      data={"creation_id": cid, "access_token": tok}, timeout=120)
+    graph_raise(p, "Instagram story publish")
+    return p.json().get("id")
+
+
+def fb_story(ver, pid, tok, media):
+    """Publish a Facebook PHOTO story (two steps: upload unpublished, then post it).
+
+    ⚠️ VIDEO stories are deliberately NOT attempted. Facebook publishes those
+    through a three-phase resumable upload session that is a different API
+    shape entirely, and shipping an untested guess into the thing that posts
+    for every brand is exactly the risk that is not worth taking. A video story
+    row is refused with a plain-English reason instead of half-working.
+    """
+    if not media:
+        raise ValueError("A Facebook story needs a public image URL")
+    if is_video(media):
+        raise RuntimeError(
+            "Facebook VIDEO stories are not supported by this bot yet (they need a "
+            "three-phase upload session, which is unbuilt and untested). Post this "
+            "one to Instagram only by setting the row's platform cell to `ig`, or "
+            "use a still image for the Facebook story.")
+    base = f"https://graph.facebook.com/{ver}"
+    r = requests.post(f"{base}/{pid}/photos",
+                      data={"url": media, "published": "false", "access_token": tok}, timeout=300)
+    graph_raise(r, "Facebook story photo upload")
+    photo_id = r.json().get("id")
+    if not photo_id:
+        raise RuntimeError(f"Facebook returned no photo id for the story: {r.json()}")
+    p = requests.post(f"{base}/{pid}/photo_stories",
+                      data={"photo_id": photo_id, "access_token": tok}, timeout=120)
+    graph_raise(p, "Facebook photo story publish")
+    j = p.json()
+    return j.get("post_id") or j.get("id") or photo_id
+
+
 def resolve_ig_location(ver, loc, tok):
     """Check an Instagram location id BEFORE we try to publish with it.
 
@@ -762,7 +852,7 @@ def square_pixels(sar):
         return True
 
 
-def aspect_gate(url, plat="both"):
+def aspect_gate(url, plat="both", fmt="feed"):
     """Refuse media that would publish visibly wrong. Videos AND stills.
 
     THE VIDEO BUG THIS CATCHES: some DaVinci exports came out 1920x1080
@@ -814,6 +904,16 @@ def aspect_gate(url, plat="both"):
                 f"Re-export vertical from DaVinci, or pad it with "
                 f"scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1 "
                 f"— never a bare scale=1080:1920.")
+
+    # --- a STORY is a full-screen 9:16 canvas on both platforms ---
+    # Anything else still publishes (Meta letterboxes it), so this WARNS rather
+    # than refuses — a slightly-wrong story beats no story.
+    if fmt == FORMAT_STORY:
+        ratio = w / float(h)
+        if abs(ratio - (9.0 / 16.0)) > 0.02:
+            log(f"WARN: this story image is {w}x{h}, not 1080x1920 (9:16). It will still "
+                f"publish, but Meta will pad or crop it. 1080x1920 looks best.")
+        return ""
 
     # --- stills: only Instagram is fussy about shape ---
     p = (plat or "both").strip().lower()
@@ -1139,7 +1239,7 @@ def main():
         log("Queue empty. Nothing to do.")
         return
     fieldnames = list(rows[0].keys())
-    for extra_col in ("first_comment", "ig_location_id", "posted_to", "attempts"):
+    for extra_col in ("first_comment", "ig_location_id", "format", "posted_to", "attempts"):
         if extra_col not in fieldnames:
             fieldnames.insert(len(fieldnames) - 1, extra_col)   # keep `status` last
             for r_ in rows:
@@ -1189,9 +1289,21 @@ def main():
         plat = (row.get("platform") or "both").strip().lower()
         cap = row.get("caption", "")
         media = (row.get("media_url") or "").strip()
+        fmt = row_format(row)
+        is_story = (fmt == FORMAT_STORY)
 
         # ---- SAFETY GATES: check the post BEFORE it goes anywhere near Meta ----
-        stop = caption_gate(row) or (aspect_gate(media, plat) if media else "")
+        # A story carries no caption at all, so the caption gate does not apply
+        # to it — but a story with no media is nothing, so that IS checked.
+        if is_story:
+            stop = ("" if media else
+                    "this row is a STORY but has no media_url. A story is a picture or a "
+                    "video; there is nothing to publish. Add the media, or clear the "
+                    "`format` cell to make it an ordinary post.")
+            if not stop and media:
+                stop = aspect_gate(media, plat, fmt)
+        else:
+            stop = caption_gate(row) or (aspect_gate(media, plat, fmt) if media else "")
         if stop:
             row["status"] = "FAILED"; changed += 1
             log(f"REFUSED [{row.get('brand')}] {due} {plat}: {stop}")
@@ -1204,6 +1316,12 @@ def main():
         # ---- FIRST COMMENT is worked out BEFORE the caption, because a post only
         # earns the "link in the comments" line if a comment is really going to fire.
         comment_link, comment_why = resolve_comment_link(row, cfg, env)
+        if is_story and comment_link:
+            # Stories cannot be commented on, on either platform. Chasing one
+            # would write a failure line into needs_comment.txt every single run
+            # for something that is impossible — noise that hides real misses.
+            log(f"  {due} is a STORY — skipping the first comment (stories cannot be commented on).")
+            comment_link, comment_why = "", "story: no comment possible"
         asked_for_song = (row.get("first_comment") or "").strip().lower().startswith("yt:")
         if asked_for_song and not comment_link:
             # The row asked for a specific song and we could not find it. Publishing a
@@ -1253,10 +1371,19 @@ def main():
         done = done_platforms(row)          # platforms that already succeeded on an earlier attempt
         try:
             if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id") and "FB" not in done:
-                fb_id = fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)
-                res.append("FB:" + str(fb_id))
-                mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
-                wanted = _split_tokens(row.get("fb_page_tags", ""))
+                if is_story:
+                    # A story has no caption, no Page mentions and no comments —
+                    # publish it and stop. Nothing below applies.
+                    fb_id = fb_story(ver, cfg["fb_page_id"].strip(), post_tok, media)
+                    res.append("FBstory:" + str(fb_id))
+                    mark_done(row, "FB")
+                    log(f"  Facebook STORY published for {due} (it disappears after 24 hours).")
+                    fb_id = None
+                else:
+                    fb_id = fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)
+                    res.append("FB:" + str(fb_id))
+                    mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
+                wanted = _split_tokens(row.get("fb_page_tags", "")) if not is_story else []
                 if wanted:
                     stuck = verify_fb_tags(ver, fb_id, post_tok, wanted)
                     if stuck is False:
@@ -1289,7 +1416,12 @@ def main():
                         failures.append(f"{row.get('brand')} {due} — first comment failed: {ce}")
             if plat in ("instagram", "ig", "both") and "IG" not in done:
                 igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
-                if igid:
+                if igid and is_story:
+                    ig_story_id = ig_story(ver, igid, post_tok, media)
+                    res.append("IGstory:" + str(ig_story_id))
+                    mark_done(row, "IG")
+                    log(f"  Instagram STORY published for {due} (it disappears after 24 hours).")
+                elif igid:
                     ig_media_id = ig_post(ver, igid, post_tok, ig_cap, media,
                                           row.get("ig_location_id", ""))
                     res.append("IG:" + str(ig_media_id))
