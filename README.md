@@ -46,8 +46,8 @@ just give each one a different date.
 2. Open **`content_queue.csv`** and add a row:
 
    ```
-   brand,date,platform,caption,fb_page_tags,ig_mentions,media_url,status
-   DWR Music,2026-08-02,both,"New cover dropping 🎶 what should I play next?",,,https://raw.githubusercontent.com/USERNAME/dwr-music-bot/main/media/cover_aug2.mp4,QUEUED
+   brand,date,platform,caption,fb_page_tags,ig_mentions,media_url,first_comment,ig_location_id,posted_to,attempts,status
+   DWR Music,2026-08-02,both,"New cover dropping 🎶 what should I play next?",,,https://raw.githubusercontent.com/USERNAME/dwr-music-bot/main/media/cover_aug2.mp4,,,,,QUEUED
    ```
 
    - `date` — the day it should post (YYYY-MM-DD, US Central).
@@ -55,6 +55,9 @@ just give each one a different date.
    - `fb_page_tags` — *(optional)* Facebook **Page** IDs to tag, clickable (see **Tagging** below). Leave blank to skip.
    - `ig_mentions` — *(optional)* Instagram **@handles** to mention, clickable. Leave blank to skip.
    - `media_url` — the **raw** GitHub link to your file (replace `USERNAME` with your GitHub username).
+   - `first_comment` — *(optional)* the link to post as the **first comment**. A URL posts as-is; `yt:Song Title` looks the song up on YouTube; `none` means no comment. Blank falls back to the brand's standing link in `brands.csv`. **Links never go in the caption** — Facebook throttles any post carrying one.
+   - `ig_location_id` — *(optional)* the venue's numeric Facebook **Place** id, to tag the Instagram post's location (see **Location tags** below). Leave blank to skip.
+   - `posted_to` / `attempts` — the bot's own bookkeeping. Leave blank.
    - `status` — `QUEUED` to go live; `DRAFT` or `HOLD` to keep it parked.
 
 3. Save. The bot handles the rest on the date you set.
@@ -73,6 +76,30 @@ Two optional columns let a post tag people/places **clickably, hands-free**:
 **The one thing that can't be automated:** Facebook blocks tagging **personal profiles** (a person, not a Page) through the API — that's Meta's privacy rule, not a bug. For a personal-profile performer, post the photo with the bot, then **edit the live Facebook post by hand** and type their `@name` in the composer (the photo's already attached, so it's a 20-second edit). Pages and all Instagram mentions are fully automated; only personal FB profiles need that manual touch.
 
 > **Finding a Facebook Page ID:** open the Page → *About* → the numeric **Page ID** is listed, or use the Graph API Explorer. Personal profiles have no taggable API ID.
+
+---
+
+## Location tags on Instagram (`ig_location_id`)
+
+*Added 2026-09-03. A location tag is how people nearby find a local act, so it is worth filling in on every gig post.*
+
+Put the venue's numeric **Facebook Place id** in `ig_location_id`. **Blank = no tag, which is always safe** (so are `none`, `skip`, `-`).
+
+**It is the Place id, not the Page id and not an @handle.** Open the venue's Facebook page, click its address or map, and the number is in the URL that opens. Write it into the venue tracker beside the Page id and the Instagram handle so it only ever gets looked up once.
+
+**A wrong id cannot break a post.** Before publishing, the bot looks the id up:
+
+| What you put in | What happens |
+|---|---|
+| A Place id that resolves | The post is tagged. The run log names the place, e.g. `location tag: Murph & Mary's (110…)`. |
+| Blank / `none` / `skip` | `no location on this row`. Post goes out untagged. |
+| An @handle or other non-number | Logged as ignored, with the reason. Post goes out untagged. |
+| A number that doesn't resolve | Logged as ignored, with the HTTP code. Post goes out untagged. |
+| A Place Instagram refuses to tag | Container retried once without the tag. Post still goes out. |
+
+**The post always wins** — a missing location tag is a far smaller loss than a missing post.
+
+⚠️ **Not yet proven on a live post.** The account's Instagram API permission is still refused (`#10 Application does not have permission`), so no Instagram write beyond the post itself can be confirmed. The first gig row that carries a Place id is the real test.
 
 ---
 

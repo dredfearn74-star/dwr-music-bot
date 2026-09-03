@@ -391,7 +391,41 @@ def fb_post(ver, pid, tok, cap, media):
     return j.get("id") or j.get("post_id")
 
 
-def ig_post(ver, igid, tok, cap, media):
+def resolve_ig_location(ver, loc, tok):
+    """Check an Instagram location id BEFORE we try to publish with it.
+
+    Added 2026-09-03 (INSTAGRAM_RULES.md Gap 1). A location tag is how a local
+    audience finds a local act on Instagram, and it was the single biggest
+    missing lever for DWR Music.
+
+    THE GATE MATTERS MORE THAN THE FEATURE. A bad `location_id` makes the media
+    container call fail, which would kill an otherwise perfect post — exactly the
+    "predictable rejection that reaches the API" the automation rules ban. So we
+    look the id up first with one cheap call. Resolves -> use it. Does not
+    resolve -> log loudly, post WITHOUT the tag, and let the post go out.
+    A missing location tag is a smaller loss than a missing post.
+
+    Returns (location_id_to_use, human_readable_note).
+    """
+    loc = (loc or "").strip()
+    if not loc or loc.lower() in BLANK_OK:
+        return "", "no location on this row"
+    if not loc.isdigit():
+        return "", (f"ig_location_id {loc!r} is not a numeric Facebook Place id, so it was "
+                    "IGNORED. Find the number with the Place search, not the venue's @handle.")
+    try:
+        r = requests.get(f"https://graph.facebook.com/{ver}/{loc}",
+                         params={"fields": "id,name", "access_token": tok}, timeout=60)
+        if r.ok:
+            nm = (r.json() or {}).get("name") or "(unnamed place)"
+            return loc, f"location tag: {nm} ({loc})"
+        return "", (f"ig_location_id {loc} did not resolve ({r.status_code}), so it was IGNORED "
+                    "and the post went out untagged. Check the id in the venue tracker.")
+    except Exception as e:
+        return "", f"ig_location_id {loc} could not be checked ({e}); posting untagged."
+
+
+def ig_post(ver, igid, tok, cap, media, location_id=""):
     if not media:
         raise ValueError("Instagram needs a public image or video URL")
     base = f"https://graph.facebook.com/{ver}"
@@ -400,7 +434,18 @@ def ig_post(ver, igid, tok, cap, media):
         c.update({"media_type": "REELS", "video_url": media})
     else:
         c.update({"image_url": media})
+    loc, why = resolve_ig_location(ver, location_id, tok)
+    log("  " + why)
+    if loc:
+        c["location_id"] = loc
     r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
+    if not r.ok and loc:
+        # Belt and braces: the id resolved but Instagram still refused it (some
+        # Places are not taggable on IG). Retry once WITHOUT the tag rather than
+        # losing the post.
+        log(f"  Instagram refused the location tag ({loc}); retrying untagged so the post still goes out.")
+        c.pop("location_id", None)
+        r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
     graph_raise(r, "Instagram media container")
     cid = r.json()["id"]
     # Wait for Instagram to finish processing (video reels take a while).
@@ -1094,7 +1139,7 @@ def main():
         log("Queue empty. Nothing to do.")
         return
     fieldnames = list(rows[0].keys())
-    for extra_col in ("first_comment", "posted_to", "attempts"):
+    for extra_col in ("first_comment", "ig_location_id", "posted_to", "attempts"):
         if extra_col not in fieldnames:
             fieldnames.insert(len(fieldnames) - 1, extra_col)   # keep `status` last
             for r_ in rows:
@@ -1245,7 +1290,8 @@ def main():
             if plat in ("instagram", "ig", "both") and "IG" not in done:
                 igid = (cfg.get("ig_user_id") or "").strip() or (resolve_ig(ver, cfg.get("fb_page_id","").strip(), post_tok) if cfg.get("fb_page_id") else "")
                 if igid:
-                    ig_media_id = ig_post(ver, igid, post_tok, ig_cap, media)
+                    ig_media_id = ig_post(ver, igid, post_tok, ig_cap, media,
+                                          row.get("ig_location_id", ""))
                     res.append("IG:" + str(ig_media_id))
                     mark_done(row, "IG")
                     if comment_link:
