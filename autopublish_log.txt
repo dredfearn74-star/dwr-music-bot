@@ -245,3 +245,19 @@
 [2026-09-04 13:05:23] POSTED [DWR Music] 2026-09-04 instagram -> IG:18009023012761217
 [2026-09-04 13:05:23] Queue updated (6 row(s) changed, 143 rows saved).
 [2026-09-04 13:32:08] Nothing due today. Exiting cleanly.
+[2026-09-05 12:06:01]   first comment for 2026-09-05: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-05 12:06:15]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-05 12:06:16]   no location on this row
+[2026-09-05 12:06:35]   first comment confirmed on Instagram too.
+[2026-09-05 12:06:35] POSTED [MotiveAF] 2026-09-05 both -> FB:122141671563352686, cmt:122141671563352686_1481264130693616, IG:18126997693705477, igcmt:18117938393301669
+[2026-09-05 12:06:36]   first comment for 2026-09-05: https://youtu.be/6ImmG5KwyX4   (using the first_comment cell exactly as written)
+[2026-09-05 12:06:48]   first comment CONFIRMED on the live post: https://youtu.be/6ImmG5KwyX4
+[2026-09-05 12:06:48]   no location on this row
+[2026-09-05 12:07:45]   first comment confirmed on Instagram too.
+[2026-09-05 12:07:45] POSTED [DWR Music] 2026-09-05 both -> FB:1397996491700710, cmt:1397996491700710_966564406470531, IG:18100678925114599, igcmt:17906929965508173
+[2026-09-05 12:07:46]   first comment for 2026-09-05: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-05 12:08:01]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-05 12:08:01]   no location on this row
+[2026-09-05 12:08:25]   first comment confirmed on Instagram too.
+[2026-09-05 12:08:25] POSTED [Midbar Moon] 2026-09-05 both -> FB:122137899363341551, cmt:122137899363341551_28830649249874399, IG:17930901189391039, igcmt:18073330283713300
+[2026-09-05 12:08:25] Queue updated (3 row(s) changed, 143 rows saved).
