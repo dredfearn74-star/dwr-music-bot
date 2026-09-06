@@ -262,3 +262,14 @@
 [2026-09-05 12:08:25] POSTED [Midbar Moon] 2026-09-05 both -> FB:122137899363341551, cmt:122137899363341551_28830649249874399, IG:17930901189391039, igcmt:18073330283713300
 [2026-09-05 12:08:25] Queue updated (3 row(s) changed, 143 rows saved).
 [2026-09-05 12:27:24] Nothing due today. Exiting cleanly.
+[2026-09-06 12:28:29]   first comment for 2026-09-06: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-06 12:28:42]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-06 12:28:43]   no location on this row
+[2026-09-06 12:29:02]   first comment confirmed on Instagram too.
+[2026-09-06 12:29:02] POSTED [MotiveAF] 2026-09-06 both -> FB:122141991231352686, cmt:122141991231352686_28888119607460369, IG:18072907928450032, igcmt:18080068733333865
+[2026-09-06 12:29:03]   first comment for 2026-09-06: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-06 12:29:18]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-06 12:29:19]   no location on this row
+[2026-09-06 12:29:39]   first comment confirmed on Instagram too.
+[2026-09-06 12:29:39] POSTED [Midbar Moon] 2026-09-06 both -> FB:122138078835341551, cmt:122138078835341551_918650277532377, IG:18368815948245294, igcmt:17967182505175736
+[2026-09-06 12:29:39] Queue updated (2 row(s) changed, 143 rows saved).
