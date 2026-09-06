@@ -56,6 +56,7 @@ Nothing here ever asks for a password. Runs on GitHub Actions (Facebook's API is
 reachable from the Cowork sandbox, so the bot lives on GitHub).
 """
 import csv
+import hashlib
 import datetime
 import json
 import os
@@ -802,6 +803,75 @@ def caption_gate(row):
     return ""
 
 
+
+MANIFEST_FILE = "media_manifest.csv"
+
+
+def approved_hashes():
+    """sha256 -> filename for every video a human has signed off on.
+
+    Returns {} when the manifest is missing or unreadable, which makes the
+    integrity gate below warn instead of refuse. Never block a good post
+    because a file went walkabout.
+    """
+    try:
+        p = pathlib.Path(__file__).with_name(MANIFEST_FILE)
+        if not p.exists():
+            return {}
+        out = {}
+        for r in csv.DictReader(p.read_text(encoding="utf-8").splitlines()):
+            h = (r.get("sha256") or "").strip().lower()
+            if len(h) == 64:
+                out[h] = (r.get("file") or "").strip()
+        return out
+    except Exception:
+        return {}
+
+
+def integrity_gate(url):
+    """Refuse any VIDEO whose bytes are not the bytes David approved.
+
+    WHY THIS EXISTS — 2026-09-05. Between 2026-09-02 and 09-04 a helper
+    re-encoded all ten open-mic reels with `scale=1440:1920,crop=1080:1920`,
+    a 1.3333x horizontal STRETCH, and committed them over the good files.
+    Every one of the damaged files still measured 1080x1920 with square
+    pixels, so `aspect_gate` passed them and one published on 09-05.
+
+    A shape check can never catch this: the shape was right and the picture
+    was wrong. Only the bytes tell you. So: hash the file, and if the hash is
+    not in media_manifest.csv, do not post it.
+
+    THE RULE THIS ENFORCES: reels are DaVinci exports, posted as exported.
+    Nothing re-encodes David's video. If a file legitimately changes, the new
+    hash goes in the manifest AFTER a human has watched it — that human step
+    is the whole point and must not be automated away.
+    """
+    if not is_video(url):
+        return ""
+    ok = approved_hashes()
+    if not ok:
+        log(f"WARN: {MANIFEST_FILE} is missing or empty — integrity gate skipped for {url}.")
+        return ""
+    try:
+        h = hashlib.sha256()
+        with requests.get(url, stream=True, timeout=180) as r:
+            r.raise_for_status()
+            for chunk in r.iter_content(1 << 20):
+                h.update(chunk)
+        digest = h.hexdigest()
+    except Exception as e:
+        log(f"WARN: could not hash {url} ({e}) — integrity gate skipped.")
+        return ""
+    if digest in ok:
+        return ""
+    return (f"this video is NOT the approved file. sha256 {digest[:16]}... is not in "
+            f"{MANIFEST_FILE}, which means the bytes changed since a human last watched "
+            f"it. This is exactly how the 2026-09-05 stretched reel got published: the "
+            f"frame size looked right and the picture was ruined. NOTHING re-encodes "
+            f"David's exports. Post the DaVinci export as-is, or — if the change was "
+            f"deliberate — watch the file, then add its hash to {MANIFEST_FILE}.")
+
+
 def probe_media(url):
     """Read a remote picture or video's real pixel size AND its pixel shape.
 
@@ -1304,6 +1374,8 @@ def main():
                 stop = aspect_gate(media, plat, fmt)
         else:
             stop = caption_gate(row) or (aspect_gate(media, plat, fmt) if media else "")
+        if not stop and media:
+            stop = integrity_gate(media)
         if stop:
             row["status"] = "FAILED"; changed += 1
             log(f"REFUSED [{row.get('brand')}] {due} {plat}: {stop}")
