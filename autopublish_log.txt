@@ -291,3 +291,9 @@
 [2026-09-07 13:59:41] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-09-07 13:59:41]    - Midbar Moon 2026-09-07 both (attempt 1/3) — Instagram publish -> HTTP 400: Media ID is not available | user_title=Cannot Publish | user_msg=The media is not ready for publishing, please wait for a moment | type=OAuthException | code=9007 | subcode=2207027 | fbtrace=A9Nf3ysGVQYwwsXWYnLi_Gw
 [2026-09-07 13:59:41] ====================================================================
+[2026-09-07 14:19:38] RETRY [Midbar Moon] 2026-09-07: attempt 2 of 3 (already live on: FB)
+[2026-09-07 14:19:38]   first comment for 2026-09-07: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-07 14:19:39]   no location on this row
+[2026-09-07 14:19:58]   first comment confirmed on Instagram too.
+[2026-09-07 14:19:58] POSTED [Midbar Moon] 2026-09-07 both -> IG:18020185304863774, igcmt:18491868532102474
+[2026-09-07 14:19:58] Queue updated (1 row(s) changed, 143 rows saved).
