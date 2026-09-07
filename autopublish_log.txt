@@ -274,3 +274,20 @@
 [2026-09-06 12:29:39] POSTED [Midbar Moon] 2026-09-06 both -> FB:122138078835341551, cmt:122138078835341551_918650277532377, IG:18368815948245294, igcmt:17967182505175736
 [2026-09-06 12:29:39] Queue updated (2 row(s) changed, 143 rows saved).
 [2026-09-06 12:38:40] Nothing due today. Exiting cleanly.
+[2026-09-07 13:58:38]   no location on this row
+[2026-09-07 13:58:49] POSTED [DWR Music] 2026-09-07 both -> FB:1046076885065219, IG:17978808702089805
+[2026-09-07 13:58:50]   first comment for 2026-09-07: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-07 13:59:02]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-07 13:59:03]   no location on this row
+[2026-09-07 13:59:23]   first comment confirmed on Instagram too.
+[2026-09-07 13:59:23] POSTED [MotiveAF] 2026-09-07 both -> FB:122142322131352686, cmt:122142322131352686_1075638291987118, IG:18092255045555734, igcmt:18457929847142210
+[2026-09-07 13:59:23]   first comment for 2026-09-07: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-07 13:59:36]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-07 13:59:36]   no location on this row
+[2026-09-07 13:59:41] FAILED [Midbar Moon] 2026-09-07 both attempt 1/3 (already live on FB — will NOT be re-posted): Instagram publish -> HTTP 400: Media ID is not available | user_title=Cannot Publish | user_msg=The media is not ready for publishing, please wait for a moment | type=OAuthException | code=9007 | subcode=2207027 | fbtrace=A9Nf3ysGVQYwwsXWYnLi_Gw
+[2026-09-07 13:59:41] Queue updated (3 row(s) changed, 143 rows saved).
+[2026-09-07 13:59:41] 
+[2026-09-07 13:59:41] ====================================================================
+[2026-09-07 13:59:41] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-07 13:59:41]    - Midbar Moon 2026-09-07 both (attempt 1/3) — Instagram publish -> HTTP 400: Media ID is not available | user_title=Cannot Publish | user_msg=The media is not ready for publishing, please wait for a moment | type=OAuthException | code=9007 | subcode=2207027 | fbtrace=A9Nf3ysGVQYwwsXWYnLi_Gw
+[2026-09-07 13:59:41] ====================================================================
