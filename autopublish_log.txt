@@ -297,3 +297,38 @@
 [2026-09-07 14:19:58]   first comment confirmed on Instagram too.
 [2026-09-07 14:19:58] POSTED [Midbar Moon] 2026-09-07 both -> IG:18020185304863774, igcmt:18491868532102474
 [2026-09-07 14:19:58] Queue updated (1 row(s) changed, 143 rows saved).
+[2026-09-08 13:16:10]   first comment for 2026-09-08: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-08 13:16:16]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-08 13:16:17]   no location on this row
+[2026-09-08 13:16:30]   first comment confirmed on Instagram too.
+[2026-09-08 13:16:30] POSTED [MotiveAF] 2026-09-08 both -> FB:122142612537352686, cmt:122142612537352686_1095124943074939, IG:17973371528936222, igcmt:18081958916507204
+[2026-09-08 13:16:32]   first comment for 2026-09-08: https://youtu.be/zHuzzCme-OE   (using the first_comment cell exactly as written)
+[2026-09-08 13:16:36]   FIRST COMMENT FAILED on 2026-09-08 (the post itself is fine): Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '2452768201882264' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=AR6k7zimWgUSIX8a_MxfGuM
+[2026-09-08 13:16:36]   no location on this row
+[2026-09-08 13:18:01]   first comment confirmed on Instagram too.
+[2026-09-08 13:18:01] POSTED [DWR Music] 2026-09-08 both -> FB:2452768201882264, IG:18351917434174300, igcmt:18065528570764098
+[2026-09-08 13:18:01]   first comment for 2026-09-08: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-08 13:18:08]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-08 13:18:09]   no location on this row
+[2026-09-08 13:18:22]   first comment confirmed on Instagram too.
+[2026-09-08 13:18:22] POSTED [Midbar Moon] 2026-09-08 both -> FB:122138590155341551, cmt:122138590155341551_959148587212625, IG:18087642239230024, igcmt:17981826258080556
+[2026-09-08 13:18:24]   first comment for 2026-09-08: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-08 13:18:31]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-08 13:18:31]   no location on this row
+[2026-09-08 13:19:23]   first comment confirmed on Instagram too.
+[2026-09-08 13:19:23] POSTED [MotiveAF] 2026-09-08 both -> FB:1017193941355256, cmt:1017193941355256_1395035929403713, IG:17860522911693633, igcmt:17905429188473823
+[2026-09-08 13:19:24]   first comment for 2026-09-08: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-08 13:19:35]   first comment CONFIRMED on the live post: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight
+[2026-09-08 13:19:35] POSTED [DWR Music] 2026-09-08 facebook -> FB:1046908808315360, cmt:1046908808315360_1100825662413448
+[2026-09-08 13:19:35]   no location on this row
+[2026-09-08 13:19:44] POSTED [DWR Music] 2026-09-08 instagram -> IG:18165334570422300
+[2026-09-08 13:19:44] Queue updated (6 row(s) changed, 155 rows saved).
+[2026-09-08 13:19:44] 
+[2026-09-08 13:19:44] FIRST COMMENTS: 1 post(s) went out without a confirmed comment.
+[2026-09-08 13:19:44]    The post is live and fine — only the link in the comments is missing.
+[2026-09-08 13:19:44]    - 2026-09-08  FB  https://youtu.be/zHuzzCme-OE  ->  https://www.facebook.com/113416904992248/posts/2452768201882264
+[2026-09-08 13:19:44] 
+[2026-09-08 13:19:44] ====================================================================
+[2026-09-08 13:19:44] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-08 13:19:44]    - DWR Music 2026-09-08 — first comment failed: Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '2452768201882264' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=AR6k7zimWgUSIX8a_MxfGuM
+[2026-09-08 13:19:44] ====================================================================
