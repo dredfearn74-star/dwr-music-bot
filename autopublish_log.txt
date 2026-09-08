@@ -332,3 +332,4 @@
 [2026-09-08 13:19:44] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-09-08 13:19:44]    - DWR Music 2026-09-08 — first comment failed: Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '2452768201882264' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=AR6k7zimWgUSIX8a_MxfGuM
 [2026-09-08 13:19:44] ====================================================================
+[2026-09-08 13:52:29] Nothing due today. Exiting cleanly.
