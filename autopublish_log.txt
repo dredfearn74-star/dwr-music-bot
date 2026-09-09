@@ -344,3 +344,4 @@
 [2026-09-09 13:17:42]   first comment confirmed on Instagram too.
 [2026-09-09 13:17:42] POSTED [Midbar Moon] 2026-09-09 both -> FB:122138834673341551, cmt:122138834673341551_1127220516304443, IG:18143283814576323, igcmt:18081906314509713
 [2026-09-09 13:17:42] Queue updated (2 row(s) changed, 155 rows saved).
+[2026-09-09 13:46:21] Nothing due today. Exiting cleanly.
