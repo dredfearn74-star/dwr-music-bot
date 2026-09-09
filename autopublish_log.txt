@@ -333,3 +333,14 @@
 [2026-09-08 13:19:44]    - DWR Music 2026-09-08 — first comment failed: Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '2452768201882264' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=AR6k7zimWgUSIX8a_MxfGuM
 [2026-09-08 13:19:44] ====================================================================
 [2026-09-08 13:52:29] Nothing due today. Exiting cleanly.
+[2026-09-09 13:16:28]   first comment for 2026-09-09: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-09 13:16:38]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-09 13:16:38]   no location on this row
+[2026-09-09 13:17:00]   first comment confirmed on Instagram too.
+[2026-09-09 13:17:00] POSTED [MotiveAF] 2026-09-09 both -> FB:122142931737352686, cmt:122142931737352686_1391400589080451, IG:18122494648896516, igcmt:17904887190512896
+[2026-09-09 13:17:01]   first comment for 2026-09-09: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-09 13:17:18]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-09 13:17:19]   no location on this row
+[2026-09-09 13:17:42]   first comment confirmed on Instagram too.
+[2026-09-09 13:17:42] POSTED [Midbar Moon] 2026-09-09 both -> FB:122138834673341551, cmt:122138834673341551_1127220516304443, IG:18143283814576323, igcmt:18081906314509713
+[2026-09-09 13:17:42] Queue updated (2 row(s) changed, 155 rows saved).
