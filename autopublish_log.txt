@@ -394,3 +394,4 @@
 [2026-09-11 13:12:53] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-09-11 13:12:53]    - MotiveAF 2026-09-11 — first comment failed: Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '1599260561875656' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=A-Kt0uIaxYf9bH0wF5X4pSC
 [2026-09-11 13:12:53] ====================================================================
+[2026-09-11 13:42:15] Nothing due today. Exiting cleanly.
