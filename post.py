@@ -589,9 +589,25 @@ def fb_comment(ver, post_id, tok, message):
     link goes in the FIRST COMMENT instead: the photo/caption gets full reach up
     top, and the link sits in the comments where it isn't penalized."""
     base = f"https://graph.facebook.com/{ver}"
-    r = requests.post(f"{base}/{post_id}/comments", data={"message": message, "access_token": tok}, timeout=120)
+    # 2026-09-11: a VIDEO post is not commentable the instant Facebook returns
+    # its id — the file is still processing, and the comment call comes back
+    # "Object with ID ... does not exist" (code 100 / subcode 33). The MotiveAF
+    # "Jennifer" video lost its store link that way and went red for nothing.
+    # Photos are ready at once; videos need up to a couple of minutes. So: try,
+    # and on failure wait and try again (30s, 60s, 90s = 3 min worst case, well
+    # inside the 20-minute job cap) before giving up. David's steer 2026-08-20:
+    # retry a couple of times before alarming.
+    waits = [30, 60, 90]
+    for attempt in range(len(waits) + 1):
+        r = requests.post(f"{base}/{post_id}/comments", data={"message": message, "access_token": tok}, timeout=120)
+        if r.ok:
+            if attempt:
+                log(f"  first comment landed on attempt {attempt + 1}")
+            return r.json().get("id")
+        if attempt < len(waits):
+            log(f"  first comment not accepted yet (HTTP {r.status_code}, post probably still processing) — retrying in {waits[attempt]}s")
+            time.sleep(waits[attempt])
     graph_raise(r, "Facebook first comment")
-    return r.json().get("id")
 
 
 # =============================================================================
