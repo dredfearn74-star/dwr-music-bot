@@ -395,3 +395,19 @@
 [2026-09-11 13:12:53]    - MotiveAF 2026-09-11 — first comment failed: Facebook first comment -> HTTP 400: Unsupported post request. Object with ID '1599260561875656' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api | type=GraphMethodException | code=100 | subcode=33 | fbtrace=A-Kt0uIaxYf9bH0wF5X4pSC
 [2026-09-11 13:12:53] ====================================================================
 [2026-09-11 13:42:15] Nothing due today. Exiting cleanly.
+[2026-09-12 11:50:29]   first comment for 2026-09-12: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-12 11:50:43]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-12 11:50:43]   no location on this row
+[2026-09-12 11:51:04]   first comment confirmed on Instagram too.
+[2026-09-12 11:51:04] POSTED [MotiveAF] 2026-09-12 both -> FB:122143760043352686, cmt:122143760043352686_1555143152486349, IG:18629669299014016, igcmt:18625532092044535
+[2026-09-12 11:51:04]   first comment for 2026-09-12: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-12 11:51:18]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-12 11:51:18]   no location on this row
+[2026-09-12 11:51:39]   first comment confirmed on Instagram too.
+[2026-09-12 11:51:39] POSTED [Midbar Moon] 2026-09-12 both -> FB:122139559041341551, cmt:122139559041341551_2015202685851580, IG:18132050749681116, igcmt:17909075838494380
+[2026-09-12 11:51:40]   first comment for 2026-09-12: No link yet — that's the punchline. Comment above if you want the free 30 days when it goes live and I'll save you a spot. Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-12 11:51:50]   first comment CONFIRMED on the live post: No link yet — that's the punchline. Comment above if you want the free 30 days when it goes live and I'll save you a spot. Shirts: https://motiveaf.printify.me
+[2026-09-12 11:51:51]   no location on this row
+[2026-09-12 11:52:33]   first comment confirmed on Instagram too.
+[2026-09-12 11:52:33] POSTED [MotiveAF] 2026-09-12 both -> FB:1055702697265169, cmt:1055702697265169_5014293705464217, IG:17888428476458923, igcmt:17954330190217461
+[2026-09-12 11:52:33] Queue updated (3 row(s) changed, 161 rows saved).
