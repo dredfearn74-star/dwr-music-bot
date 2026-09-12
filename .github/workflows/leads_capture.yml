@@ -1,0 +1,48 @@
+name: Capture comments → leads list
+
+# Reads the comments on a day's posts (default: the 12 Sep 2026 MotiveAF "want in?"
+# reel) and keeps leads/leads_<date>.csv up to date. READ-ONLY on Meta: it never
+# posts, replies or likes. Runs daily 11:00 AM Central for the week after the reel,
+# and any time by hand from the Actions tab (Run workflow → optionally change the date).
+
+on:
+  schedule:
+    - cron: '0 16 13-20 9 *'   # 16:00 UTC = 11:00 AM CDT, 13–20 Sep 2026 only
+  workflow_dispatch:
+    inputs:
+      post_date:
+        description: 'Which day''s posts to read (YYYY-MM-DD)'
+        default: '2026-09-12'
+        required: true
+      brand:
+        description: 'Brand exactly as in brands.csv'
+        default: 'MotiveAF'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10        # a hung job is a failure — this can never eat a window
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Read the comments
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          POST_DATE: ${{ github.event.inputs.post_date || '2026-09-12' }}
+          BRAND: ${{ github.event.inputs.brand || 'MotiveAF' }}
+        run: python capture_comments.py
+      - name: Save the leads file back to the repo
+        if: always()
+        run: |
+          git config user.name "dwr-music-bot"
+          git config user.email "actions@users.noreply.github.com"
+          [ -d leads ] && git add leads
+          git commit -m "leads: capture comments [skip ci]" || echo "nothing new to commit"
+          git push || echo "nothing to push"
