@@ -413,3 +413,16 @@
 [2026-09-12 11:52:33] Queue updated (3 row(s) changed, 161 rows saved).
 [2026-09-12 12:40:30] Nothing due today. Exiting cleanly.
 [2026-09-12 12:46:54] Nothing due today. Exiting cleanly.
+[2026-09-13 12:54:03]   no location on this row
+[2026-09-13 12:54:14] POSTED [DWR Music] 2026-09-13 both -> FB:1051201117886129, IG:18107419670614667
+[2026-09-13 12:54:15]   first comment for 2026-09-13: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-13 12:54:25]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-13 12:54:26]   no location on this row
+[2026-09-13 12:54:38]   first comment confirmed on Instagram too.
+[2026-09-13 12:54:38] POSTED [MotiveAF] 2026-09-13 both -> FB:122144067645352686, cmt:122144067645352686_1646645327166592, IG:18147259567549603, igcmt:18112030627864352
+[2026-09-13 12:54:38]   first comment for 2026-09-13: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-13 12:54:49]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-13 12:54:50]   no location on this row
+[2026-09-13 12:55:02]   first comment confirmed on Instagram too.
+[2026-09-13 12:55:02] POSTED [Midbar Moon] 2026-09-13 both -> FB:122139943707341551, cmt:122139943707341551_1055952187048995, IG:18154497148514103, igcmt:18109954460177661
+[2026-09-13 12:55:02] Queue updated (3 row(s) changed, 161 rows saved).
