@@ -444,3 +444,24 @@
 [2026-09-14 14:45:43] POSTED [DWR Music] 2026-09-14 both -> FB:1620205479544684, cmt:1620205479544684_1650914133332473, IG:18109375958126081, igcmt:18122047888856202
 [2026-09-14 14:45:43] Queue updated (3 row(s) changed, 175 rows saved).
 [2026-09-14 14:55:17] Nothing due today. Exiting cleanly.
+[2026-09-15 13:41:48]   first comment for 2026-09-15: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-15 13:42:04]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-15 13:42:05]   no location on this row
+[2026-09-15 13:42:28]   first comment confirmed on Instagram too.
+[2026-09-15 13:42:28] POSTED [MotiveAF] 2026-09-15 both -> FB:122144681547352686, cmt:122144681547352686_1547328783830358, IG:17905575546334442, igcmt:18410968627089115
+[2026-09-15 13:42:29]   first comment for 2026-09-15: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-09-15 13:42:45]   first comment CONFIRMED on the live post: https://payhip.com/midbarmoon
+[2026-09-15 13:42:46]   no location on this row
+[2026-09-15 13:43:02]   first comment confirmed on Instagram too.
+[2026-09-15 13:43:02] POSTED [Midbar Moon] 2026-09-15 both -> FB:122140558761341551, cmt:122140558761341551_1116598100930602, IG:18095514815254494, igcmt:18102259433626649
+[2026-09-15 13:43:03]   first comment for 2026-09-15: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-15 13:43:16]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-15 13:43:16]   no location on this row
+[2026-09-15 13:44:01]   first comment confirmed on Instagram too.
+[2026-09-15 13:44:01] POSTED [MotiveAF] 2026-09-15 both -> FB:3237929283081686, cmt:3237929283081686_1475681617737312, IG:18099936017040680, igcmt:18453609913139268
+[2026-09-15 13:44:01]   first comment for 2026-09-15: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-15 13:44:17]   first comment CONFIRMED on the live post: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight
+[2026-09-15 13:44:17] POSTED [DWR Music] 2026-09-15 facebook -> FB:1052972761042298, cmt:1052972761042298_1408515911000250
+[2026-09-15 13:44:17]   no location on this row
+[2026-09-15 13:44:37] POSTED [DWR Music] 2026-09-15 instagram -> IG:18425485804145594
+[2026-09-15 13:44:37] Queue updated (5 row(s) changed, 175 rows saved).
