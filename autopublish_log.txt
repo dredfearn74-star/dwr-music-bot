@@ -646,3 +646,20 @@
 [2026-09-20 12:54:29]    - DWR Music 2026-09-20 both (attempt 1/3) — Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AyrN9-29UeXQskvI7ilgMYs
 [2026-09-20 12:54:29]    - MotiveAF 2026-09-20 both (attempt 1/3) — Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AILrw7BqVWqO8PReuuGx4Dr
 [2026-09-20 12:54:29] ====================================================================
+[2026-09-20 13:15:37] RETRY [MotiveAF] 2026-09-20: attempt 2 of 3 (already live on: nothing yet)
+[2026-09-20 13:15:37]   first comment for 2026-09-20: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-20 13:15:37] FAILED [MotiveAF] 2026-09-20 both attempt 2/3: Facebook post to photos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AHKv_kkL05z3yaeYywUHH_D
+[2026-09-20 13:15:37] RETRY [DWR Music] 2026-09-20: attempt 2 of 3 (already live on: nothing yet)
+[2026-09-20 13:15:39]   first comment for 2026-09-20: https://youtu.be/wJnIn5XAn2s   (using the first_comment cell exactly as written)
+[2026-09-20 13:15:39] FAILED [DWR Music] 2026-09-20 both attempt 2/3: Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=ArLxXwoyjzpJTHuDTZAx5ij
+[2026-09-20 13:15:39] RETRY [MotiveAF] 2026-09-20: attempt 2 of 3 (already live on: nothing yet)
+[2026-09-20 13:15:41]   first comment for 2026-09-20: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-20 13:15:41] FAILED [MotiveAF] 2026-09-20 both attempt 2/3: Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AvDwBc5hmMjIFM0OvgauQe8
+[2026-09-20 13:15:41] Queue updated (3 row(s) changed, 175 rows saved).
+[2026-09-20 13:15:41] 
+[2026-09-20 13:15:41] ====================================================================
+[2026-09-20 13:15:41] !! 3 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-20 13:15:41]    - MotiveAF 2026-09-20 both (attempt 2/3) — Facebook post to photos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AHKv_kkL05z3yaeYywUHH_D
+[2026-09-20 13:15:41]    - DWR Music 2026-09-20 both (attempt 2/3) — Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=ArLxXwoyjzpJTHuDTZAx5ij
+[2026-09-20 13:15:41]    - MotiveAF 2026-09-20 both (attempt 2/3) — Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AvDwBc5hmMjIFM0OvgauQe8
+[2026-09-20 13:15:41] ====================================================================
