@@ -1,0 +1,40 @@
+name: MotiveAF daily top-up
+
+# Runs 30 minutes before "DWR daily post". If MotiveAF has no row for today,
+# it recycles a meme that already published once so the page is never silent.
+# See topup.py for what it will and will not recycle. It only ever APPENDS.
+#
+# David, 2026-09-20: "there needs to be a daily posting on MotiveAF no matter what."
+
+on:
+  schedule:
+    - cron: '30 14 * * *'   # 14:30 UTC = 9:30 AM US Central, ahead of the 10:00 poster
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  topup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5        # this job touches no network; 5 minutes is generous
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Make sure MotiveAF has something to post today
+        run: python topup.py
+
+      # Always runs, so a failure still records what it saw in the log.
+      - name: Save the queue back to the repo
+        if: always()
+        run: |
+          git config user.name "dwr-music-bot"
+          git config user.email "actions@users.noreply.github.com"
+          for f in content_queue.csv autopublish_log.txt; do
+            [ -f "$f" ] && git add "$f"
+          done
+          git commit -m "topup: keep MotiveAF daily [skip ci]" || echo "nothing to commit"
+          git push || echo "nothing to push"
