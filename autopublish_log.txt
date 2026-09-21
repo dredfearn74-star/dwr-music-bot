@@ -698,3 +698,4 @@
 [2026-09-21 19:05:22] FIXCOMMENTS   [MotiveAF] 2026-09-21 — comment is already on the post, nothing to do
 [2026-09-21 19:05:24] FIXCOMMENTS   [David Wayne Redfearn Music] 2026-09-21 — comment is already on the post, nothing to do
 [2026-09-21 19:05:24] FIXCOMMENTS done — 2 comment(s) now confirmed live, 0 still missing, 0 Instagram row(s) left alone on purpose.
+[2026-09-21 14:41:14] TOPUP MotiveAF already has a row for 2026-09-21 (status POSTED). Standing down.
