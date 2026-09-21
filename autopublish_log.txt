@@ -695,3 +695,6 @@
 [2026-09-21 17:47:49] FIXCOMMENTS   [MotiveAF] 2026-09-21 — comment posted and CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
 [2026-09-21 17:48:00] FIXCOMMENTS   [David Wayne Redfearn Music] 2026-09-21 — comment posted and CONFIRMED on the live post: Save it here → https://distrokid.com/hyperfollow/dwredm/save
 [2026-09-21 17:48:00] FIXCOMMENTS done — 2 comment(s) now confirmed live, 0 still missing, 0 Instagram row(s) left alone on purpose.
+[2026-09-21 19:05:22] FIXCOMMENTS   [MotiveAF] 2026-09-21 — comment is already on the post, nothing to do
+[2026-09-21 19:05:24] FIXCOMMENTS   [David Wayne Redfearn Music] 2026-09-21 — comment is already on the post, nothing to do
+[2026-09-21 19:05:24] FIXCOMMENTS done — 2 comment(s) now confirmed live, 0 still missing, 0 Instagram row(s) left alone on purpose.
