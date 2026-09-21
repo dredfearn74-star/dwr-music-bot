@@ -663,3 +663,32 @@
 [2026-09-20 13:15:41]    - DWR Music 2026-09-20 both (attempt 2/3) — Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=ArLxXwoyjzpJTHuDTZAx5ij
 [2026-09-20 13:15:41]    - MotiveAF 2026-09-20 both (attempt 2/3) — Facebook post to videos -> HTTP 400: Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons. | type=OAuthException | code=190 | subcode=460 | fbtrace=AvDwBc5hmMjIFM0OvgauQe8
 [2026-09-20 13:15:41] ====================================================================
+[2026-09-21 12:14:06]   first comment for 2026-09-21: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-21 12:14:11]   first comment not accepted yet (HTTP 403, post probably still processing) — retrying in 30s
+[2026-09-21 12:14:41]   first comment not accepted yet (HTTP 403, post probably still processing) — retrying in 60s
+[2026-09-21 12:15:43]   first comment not accepted yet (HTTP 403, post probably still processing) — retrying in 90s
+[2026-09-21 12:17:14]   FIRST COMMENT FAILED on 2026-09-21 (the post itself is fine): Facebook first comment -> HTTP 403: (#200) Cannot access object_id: 122146785759352686 | type=OAuthException | code=200 | fbtrace=ArQlyqDJUGJ1bksJrZv6qxH
+[2026-09-21 12:17:15]   no location on this row
+[2026-09-21 12:17:27]   Instagram first comment failed (the post itself is fine): Instagram first comment -> HTTP 400: (#10) Application does not have permission for this action | type=OAuthException | code=10 | fbtrace=ANXEhQbZG7ixBX4xPUh0YwI
+[2026-09-21 12:17:27] POSTED [MotiveAF] 2026-09-21 both -> FB:122146785729352686, IG:18133472923630492
+[2026-09-21 12:17:29]   first comment for 2026-09-21: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-21 12:17:37]   first comment not accepted yet (HTTP 403, post probably still processing) — retrying in 30s
+[2026-09-21 12:18:08]   first comment not accepted yet (HTTP 403, post probably still processing) — retrying in 60s
+[2026-09-21 12:19:09]   first comment not accepted yet (HTTP 403, post probably still processing) — retrying in 90s
+[2026-09-21 12:20:39]   FIRST COMMENT FAILED on 2026-09-21 (the post itself is fine): Facebook first comment -> HTTP 403: (#200) Cannot access object_id: 1058118530527721 | type=OAuthException | code=200 | fbtrace=AV1ZcGAhuWBQDyusUSm5Rk5
+[2026-09-21 12:20:39] POSTED [DWR Music] 2026-09-21 facebook -> FB:1058118507194390
+[2026-09-21 12:20:41]   no location on this row
+[2026-09-21 12:21:14] POSTED [DWR Music] 2026-09-21 instagram -> IG:17916596004450845
+[2026-09-21 12:21:14] Queue updated (3 row(s) changed, 175 rows saved).
+[2026-09-21 12:21:14] 
+[2026-09-21 12:21:14] FIRST COMMENTS: 3 post(s) went out without a confirmed comment.
+[2026-09-21 12:21:14]    The post is live and fine — only the link in the comments is missing.
+[2026-09-21 12:21:14]    - 2026-09-21  FB  Shirts: https://motiveaf.printify.me  ->  https://www.facebook.com/1179462511909328/posts/122146785729352686
+[2026-09-21 12:21:14]    - 2026-09-21  IG  Shirts: https://motiveaf.printify.me
+[2026-09-21 12:21:14]    - 2026-09-21  FB  Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight  ->  https://www.facebook.com/113416904992248/posts/1058118507194390
+[2026-09-21 12:21:14] 
+[2026-09-21 12:21:14] ====================================================================
+[2026-09-21 12:21:14] !! 2 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-21 12:21:14]    - MotiveAF 2026-09-21 — first comment failed: Facebook first comment -> HTTP 403: (#200) Cannot access object_id: 122146785759352686 | type=OAuthException | code=200 | fbtrace=ArQlyqDJUGJ1bksJrZv6qxH
+[2026-09-21 12:21:14]    - DWR Music 2026-09-21 — first comment failed: Facebook first comment -> HTTP 403: (#200) Cannot access object_id: 1058118530527721 | type=OAuthException | code=200 | fbtrace=AV1ZcGAhuWBQDyusUSm5Rk5
+[2026-09-21 12:21:14] ====================================================================
