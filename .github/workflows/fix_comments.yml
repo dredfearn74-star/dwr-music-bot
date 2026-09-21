@@ -1,0 +1,46 @@
+name: Fix missing first comments
+
+# Goes back for posts that published without their first comment and puts the
+# link on. Reads needs_comment.txt, posts each missing comment, reads it back
+# off the live post to prove it landed, then rewrites the file with whatever is
+# still outstanding.
+#
+# Built 2026-09-21: the new system-user token could post but not comment until
+# the "Community activity" task was added to each Page, and post.py never
+# revisits a row once it is POSTED. Three live posts were left with no link.
+#
+# Publishes COMMENTS ONLY, never a post. Safe to re-run.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+
+      - name: Put the missing comments on
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+        run: python fix_comments.py
+
+      # Always runs, so a failure still records what it saw.
+      - name: Save the result back to the repo
+        if: always()
+        run: |
+          git config user.name "dwr-music-bot"
+          git config user.email "actions@users.noreply.github.com"
+          for f in needs_comment.txt autopublish_log.txt; do
+            [ -f "$f" ] && git add "$f"
+          done
+          git commit -m "fix_comments: put the missing first comments on [skip ci]" || echo "nothing to commit"
+          git push || echo "nothing to push"
