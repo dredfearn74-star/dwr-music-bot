@@ -744,3 +744,11 @@
 [2026-09-23 13:48:39] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-09-23 13:48:39]    - DWR Music 2026-09-23 — REFUSED: this video is NOT the approved file. sha256 fdfa9dbaa27f0b76... is not in media_manifest.csv, which means the bytes changed since a human last watched it. This is exactly how the 2026-09-05 stretched reel got published: the frame size looked right and the picture was ruined. NOTHING re-encodes David's exports. Post the DaVinci export as-is, or — if the change was deliberate — watch the file, then add its hash to media_manifest.csv.
 [2026-09-23 13:48:39] ====================================================================
+[2026-09-23 14:10:01] RETRY [DWR Music] 2026-09-23: attempt 1 of 3 (already live on: nothing yet)
+[2026-09-23 14:10:03] REFUSED [DWR Music] 2026-09-23 both: this video is NOT the approved file. sha256 fdfa9dbaa27f0b76... is not in media_manifest.csv, which means the bytes changed since a human last watched it. This is exactly how the 2026-09-05 stretched reel got published: the frame size looked right and the picture was ruined. NOTHING re-encodes David's exports. Post the DaVinci export as-is, or — if the change was deliberate — watch the file, then add its hash to media_manifest.csv.
+[2026-09-23 14:10:03] Queue updated (1 row(s) changed, 182 rows saved).
+[2026-09-23 14:10:03] 
+[2026-09-23 14:10:03] ====================================================================
+[2026-09-23 14:10:03] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-23 14:10:03]    - DWR Music 2026-09-23 — REFUSED: this video is NOT the approved file. sha256 fdfa9dbaa27f0b76... is not in media_manifest.csv, which means the bytes changed since a human last watched it. This is exactly how the 2026-09-05 stretched reel got published: the frame size looked right and the picture was ruined. NOTHING re-encodes David's exports. Post the DaVinci export as-is, or — if the change was deliberate — watch the file, then add its hash to media_manifest.csv.
+[2026-09-23 14:10:03] ====================================================================
