@@ -718,3 +718,20 @@
 [2026-09-22 13:31:37] POSTED [MotiveAF] 2026-09-22 both -> FB:1076826845092599, cmt:1076826845092599_923072053856442, IG:18431898418181952, igcmt:18119488492946443
 [2026-09-22 13:31:37] Queue updated (4 row(s) changed, 175 rows saved).
 [2026-09-22 14:02:06] Nothing due today. Exiting cleanly.
+[2026-09-23 13:31:09]   first comment for 2026-09-23: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-23 13:31:16]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-23 13:31:16]   no location on this row
+[2026-09-23 13:31:26]   first comment confirmed on Instagram too.
+[2026-09-23 13:31:26] POSTED [MotiveAF] 2026-09-23 both -> FB:122147728647352686, cmt:122147728647352686_1109607405092701, IG:18629881705041772, igcmt:18341662156248633
+[2026-09-23 13:31:27]   first comment for 2026-09-23: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-23 13:31:39]   first comment CONFIRMED on the live post: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight
+[2026-09-23 13:31:39] POSTED [DWR Music] 2026-09-23 facebook -> FB:4088932348068978, cmt:4088932348068978_1985304549540734
+[2026-09-23 13:31:40]   no location on this row
+[2026-09-23 13:32:10] POSTED [DWR Music] 2026-09-23 instagram -> IG:18183702424413123
+[2026-09-23 13:32:11] REFUSED [DWR Music] 2026-09-23 both: this video is NOT the approved file. sha256 fdfa9dbaa27f0b76... is not in media_manifest.csv, which means the bytes changed since a human last watched it. This is exactly how the 2026-09-05 stretched reel got published: the frame size looked right and the picture was ruined. NOTHING re-encodes David's exports. Post the DaVinci export as-is, or — if the change was deliberate — watch the file, then add its hash to media_manifest.csv.
+[2026-09-23 13:32:11] Queue updated (4 row(s) changed, 182 rows saved).
+[2026-09-23 13:32:11] 
+[2026-09-23 13:32:11] ====================================================================
+[2026-09-23 13:32:11] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-23 13:32:11]    - DWR Music 2026-09-23 — REFUSED: this video is NOT the approved file. sha256 fdfa9dbaa27f0b76... is not in media_manifest.csv, which means the bytes changed since a human last watched it. This is exactly how the 2026-09-05 stretched reel got published: the frame size looked right and the picture was ruined. NOTHING re-encodes David's exports. Post the DaVinci export as-is, or — if the change was deliberate — watch the file, then add its hash to media_manifest.csv.
+[2026-09-23 13:32:11] ====================================================================
