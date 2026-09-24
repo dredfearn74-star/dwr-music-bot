@@ -20,6 +20,11 @@
    "num": 4,
    "slug": "back-background",
    "scene": "A calm simple background scene for the back of the book: a bright blue sky with a few puffy white clouds over gentle rolling green hills and a winding dirt road. In the bottom-left corner only, a small green tractor driven by a pig in a straw hat. Everything else is simple open sky and hills with lots of empty space, no other vehicles or characters"
+  },
+  {
+   "num": 5,
+   "slug": "back-background-red-tractor",
+   "scene": "A calm simple background scene for the back of the book: a bright blue sky with a few puffy white clouds over gentle rolling green hills and a winding dirt road. In the bottom-left corner only, one small bright red farm tractor with red wheels, driven by a pig in a straw hat; the tractor is small, taking up less than a quarter of the picture width. Everything else is simple open sky and hills with lots of empty space, no other vehicles or characters"
   }
  ]
 }
