@@ -1,3 +1,3 @@
 book=trucks model=gpt-image-2 quality=high size=1024x1536
-made=0 failed=0
-pages in folder: 3 of 40
+made=37 failed=0
+pages in folder: 40 of 40
