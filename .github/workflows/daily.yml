@@ -91,7 +91,7 @@ jobs:
           # pathspec is missing, and last_failure.txt only exists after a failure —
           # which silently stopped the queue ever being saved (2026-08-17).
           for f in content_queue.csv autopublish_log.txt last_failure.txt needs_tagging.txt needs_comment.txt; do
-            [ -f "$f" ] && git add "$f"
+            git add -A -- "$f" 2>/dev/null || true
           done
           git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
           git push || echo "nothing to push"
