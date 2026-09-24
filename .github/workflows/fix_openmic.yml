@@ -1,0 +1,102 @@
+name: Retire open mic claim on live posts
+# 2026-09-24: David ended the Murph & Mary's open mic. Rewrites the 8 already-live
+# captions that say he hosts it or invite people to it (FB + IG). History posts
+# ("played at the July open mic") are left alone on purpose - they're true.
+# Run with apply=false first: it only lists what it WOULD change.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = edit the live posts; false = dry run'
+        default: 'false'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests
+      - name: Find and rewrite
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          APPLY: ${{ github.event.inputs.apply }}
+        run: |
+          python3 - <<'PY'
+          import os, requests, datetime
+          T = os.environ['META_TOKEN']; APPLY = os.environ.get('APPLY','false').lower() == 'true'
+          PAGE = '113416904992248'; V = 'v23.0'; B = 'https://graph.facebook.com/' + V
+          SINCE = '2026-08-26'
+          # old sentence -> new sentence. Swapped wherever found, FB and IG.
+          SWAPS = [
+            ("live at the open mic I host at Murph & Mary's in Newton.", "live in Newton this summer."),
+            ("Open mic is TODAY at Murph & Mary's in Newton. 🎤 Musicians, comedians, anybody — come play or come listen.", "Live in Newton this summer. 🎤 Musicians, comedians, anybody got up and played."),
+            ("Full sets from last month are on YouTube", "Full sets are on YouTube"),
+            ("Come hear the next one live at Murph & Mary's in Newton.", "Recorded live in Newton this summer."),
+            ("Every month, Murph & Mary's, Newton — musicians, comedians, anybody.", "Live in Newton this summer."),
+            ("at the open mic I host at Murph & Mary's in Newton.", "live in Newton this summer."),
+            ("I'm still going to be at the open mic. That isn't changing.", "I'm still playing live. That isn't changing."),
+            ("at the open mic I host at Murph and Marys in Newton.", "live in Newton this summer."),
+          ]
+          BAD = ["open mic I host", "Open mic is TODAY", "next one live at Murph", "Every month, Murph", "still going to be at the open mic"]
+          def fix(t):
+              if not t or not any(b in t for b in BAD): return None
+              n = t
+              for o, w in SWAPS: n = n.replace(o, w)
+              n = n.replace(" #OpenMic", "").replace("#OpenMic ", "").replace("#OpenMic", "")
+              return n if n != t else None
+          def get_all(url, params):
+              out = []
+              while url:
+                  j = requests.get(url, params=params, timeout=60).json(); params = None
+                  if 'error' in j: raise SystemExit('GRAPH ERROR ' + str(j['error']))
+                  out += j.get('data', []); url = (j.get('paging') or {}).get('next')
+                  if out and (out[-1].get('created_time') or out[-1].get('timestamp') or '9')[:10] < SINCE: break
+              return out
+          pt = requests.get(B + '/' + PAGE, params={'fields':'access_token','access_token':T}).json().get('access_token') or T
+          igid = (requests.get(B + '/' + PAGE, params={'fields':'instagram_business_account','access_token':pt}).json().get('instagram_business_account') or {}).get('id')
+          rep = ['OPEN MIC CAPTION FIX  apply=%s  run=%s UTC' % (APPLY, datetime.datetime.utcnow().isoformat()[:16]), '']
+          fails = 0; found = 0
+          # FB: videos/reels carry 'description', photo/text posts carry 'message'
+          vids = get_all(B + '/' + PAGE + '/videos', {'fields':'id,description,created_time','limit':100,'access_token':pt})
+          posts = get_all(B + '/' + PAGE + '/posts', {'fields':'id,message,created_time','limit':100,'access_token':pt})
+          for kind, items, field in (('FB-video', vids, 'description'), ('FB-post', posts, 'message')):
+              for it in items:
+                  if (it.get('created_time') or '')[:10] < SINCE: continue
+                  new = fix(it.get(field))
+                  if not new: continue
+                  found += 1
+                  rep.append('%s %s %s\n  OLD: %s\n  NEW: %s' % (kind, it['id'], it['created_time'][:10], it[field].replace('\n',' / '), new.replace('\n',' / ')))
+                  if APPLY:
+                      r = requests.post(B + '/' + it['id'], data={field: new, 'access_token': pt}, timeout=60)
+                      back = requests.get(B + '/' + it['id'], params={'fields': field, 'access_token': pt}, timeout=60).json().get(field, '')
+                      ok = r.ok and not any(b in back for b in BAD)
+                      fails += 0 if ok else 1
+                      rep.append('  RESULT: %s  %s %s' % ('VERIFIED' if ok else 'FAILED', r.status_code, r.text[:200]))
+          # IG
+          if igid:
+              media = get_all(B + '/' + igid + '/media', {'fields':'id,caption,timestamp,permalink','limit':50,'access_token':pt})
+              for m in media:
+                  if (m.get('timestamp') or '')[:10] < SINCE: continue
+                  new = fix(m.get('caption'))
+                  if not new: continue
+                  found += 1
+                  rep.append('IG %s %s %s\n  OLD: %s\n  NEW: %s' % (m['id'], m['timestamp'][:10], m.get('permalink',''), m['caption'].replace('\n',' / '), new.replace('\n',' / ')))
+                  if APPLY:
+                      r = requests.post(B + '/' + m['id'], data={'caption': new, 'access_token': pt}, timeout=60)
+                      back = requests.get(B + '/' + m['id'], params={'fields':'caption','access_token': pt}, timeout=60).json().get('caption', '')
+                      ok = r.ok and not any(b in back for b in BAD)
+                      fails += 0 if ok else 1
+                      rep.append('  RESULT: %s  %s %s' % ('VERIFIED' if ok else 'FAILED', r.status_code, r.text[:200]))
+          else:
+              rep.append('NO IG ACCOUNT RESOLVED')
+          rep.append(''); rep.append('FOUND %d   FAILED %d' % (found, fails))
+          open('openmic_fix_report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
+          print('\n'.join(rep))
+          PY
+      - name: Save report to repo
+        if: always()
+        run: |
+          git config user.name "dwr-bot"; git config user.email "bot@users.noreply.github.com"
+          git add openmic_fix_report.txt && git commit -m "open mic fix report [skip ci]" && git pull --rebase && git push || true
