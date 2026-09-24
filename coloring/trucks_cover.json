@@ -1,0 +1,25 @@
+{
+ "style": "Bright, cheerful children's picture-book cover illustration, full color. Bold clean dark outlines, flat bright saturated colors, premium modern kids' illustration style, chunky toy-like vehicles with oversized wheels, cute friendly original animal drivers with big round eyes and happy smiles, visible in the cabs. The vehicles themselves have no faces. No text, no letters, no words, no numbers, no logos, no signs anywhere in the image. ",
+ "pages": [
+  {
+   "num": 1,
+   "slug": "front-a-bear-raccoon",
+   "scene": "A big chunky yellow dump truck driven by a smiling brown bear in an orange hard hat, and beside it a red excavator with its bucket raised, driven by a happy raccoon, seen from a low heroic angle on a sunny dirt hill. The top third of the picture is open bright blue sky with only two small puffy clouds, completely empty so a title can go there. The vehicles fill the bottom two thirds"
+  },
+  {
+   "num": 2,
+   "slug": "front-b-parade",
+   "scene": "A cheerful row of four chunky vehicles driving toward the viewer on a curving dirt road: a yellow dump truck with a brown bear, a red excavator with a raccoon, a blue monster truck with a lion cub, and a green tractor with a pig in a straw hat, all waving. The top third of the picture is open bright blue sky, completely empty so a title can go there. The vehicles fill the bottom two thirds"
+  },
+  {
+   "num": 3,
+   "slug": "front-c-hero-dumptruck",
+   "scene": "One giant chunky yellow dump truck charging straight toward the viewer from a dramatic low angle, kicking up a little dust, driven by a grinning brown bear in an orange hard hat waving one paw, with a small red excavator and a raccoon in the background. The top third of the picture is open bright blue sky, completely empty so a title can go there. The truck fills the bottom two thirds"
+  },
+  {
+   "num": 4,
+   "slug": "back-background",
+   "scene": "A calm simple background scene for the back of the book: a bright blue sky with a few puffy white clouds over gentle rolling green hills and a winding dirt road. In the bottom-left corner only, a small green tractor driven by a pig in a straw hat. Everything else is simple open sky and hills with lots of empty space, no other vehicles or characters"
+  }
+ ]
+}
