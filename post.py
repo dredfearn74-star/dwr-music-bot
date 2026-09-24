@@ -787,6 +787,28 @@ def donation_link(text):
     return m.group(0) if m else ""
 
 
+# Claims that were true once and are not any more. A caption that makes one
+# of these is refused, so an old template can't quietly bring it back.
+# 2026-09-24: Murph & Mary's dropped the open mic; David no longer hosts it.
+RETIRED_CLAIMS = [
+    r"open[\s-]*mic\s+i\s+host",
+    r"i\s+host\s+(the\s+)?open[\s-]*mic",
+    r"open[\s-]*mic\s+(runs|is\s+(today|tonight|this))",
+    r"(every|each)\s+(month|other\s+sunday)",
+    r"still\s+going\s+to\s+be\s+at\s+the\s+open[\s-]*mic",
+    r"next\s+open[\s-]*mic",
+]
+
+
+def retired_claim(text):
+    import re as _re
+    for pat in RETIRED_CLAIMS:
+        m = _re.search(pat, text or "", _re.I)
+        if m:
+            return m.group(0)
+    return ""
+
+
 def caption_gate(row):
     """Refuse to post a row with an empty caption, or one carrying a URL.
 
@@ -809,6 +831,12 @@ def caption_gate(row):
                 "are banned on every brand — David has never approved a donation "
                 "ask, and one shipped on 33 MotiveAF posts before anyone noticed. "
                 "Take it out of the caption cell.")
+    dead = retired_claim(cap)
+    if dead:
+        return ("caption makes a claim David has RETIRED (" + dead + "). "
+                "As of 2026-09-24 there is no Murph & Mary's open mic and David "
+                "is not hosting one. Past-tense footage is fine; say it was "
+                "'live in Newton this summer' instead. Rewrite the caption cell.")
     hit = caption_has_url(cap)
     if hit:
         return ("caption contains a LINK — Facebook throttles any post with an "
