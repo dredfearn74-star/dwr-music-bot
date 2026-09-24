@@ -61,7 +61,9 @@ jobs:
           # FB: videos/reels carry 'description', photo/text posts carry 'message'
           vids = get_all(B + '/' + PAGE + '/videos', {'fields':'id,description,created_time','limit':25,'since':SINCE,'access_token':pt})
           posts = get_all(B + '/' + PAGE + '/posts', {'fields':'id,message,created_time','limit':25,'since':SINCE,'access_token':pt})
-          for kind, items, field in (('FB-video', vids, 'description'), ('FB-post', posts, 'message')):
+          reels = get_all(B + '/' + PAGE + '/video_reels', {'fields':'id,description,created_time','limit':25,'since':SINCE,'access_token':pt})
+          seen = set(v['id'] for v in vids); reels = [x for x in reels if x['id'] not in seen]
+          for kind, items, field in (('FB-video', vids, 'description'), ('FB-reel', reels, 'description'), ('FB-post', posts, 'message')):
               for it in items:
                   if (it.get('created_time') or '')[:10] < SINCE: continue
                   new = fix(it.get(field))
