@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 15 * * *'   # 15:00 UTC = 10:00 AM US Central (CDT)
     - cron: '30 15 * * *'   # BACKSTOP. GitHub dropped the 10:00 slot on 2026-08-27 and ran it 9h late.
+    - cron: '10 16 * * *'   # BACKSTOP 2. Added 2026-09-24: GitHub fired NO cron on this repo that day, nothing posted, caught by hand 2.5h late.
+    - cron: '10 17 * * *'   # BACKSTOP 3. Last catch before the posting day is lost. The poster only posts QUEUED rows, so a caught-up day just exits clean.
   workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
