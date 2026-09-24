@@ -30,6 +30,7 @@ def label_for(slug):
 
 def clean_art(path, box_w, box_h):
     im = Image.open(path).convert("L")
+    im = im.crop((4, 4, im.width - 4, im.height - 4))   # drop stray 2px frame lines some pages come with
     s = min(box_w / im.width, box_h / im.height)
     im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
     im = im.filter(ImageFilter.GaussianBlur(1.2))
