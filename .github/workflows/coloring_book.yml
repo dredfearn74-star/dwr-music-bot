@@ -13,13 +13,13 @@ on:
         required: true
         default: "trucks"
       only:
-        description: "Page numbers to make, comma-separated (blank = all missing pages)"
-        required: false
-        default: "1,4,16"
+        description: "Page numbers to make, comma-separated, or 'all' for every missing page"
+        required: true
+        default: "all"
       limit:
         description: "Max pages this run"
         required: true
-        default: "3"
+        default: "40"
       model:
         description: "Image model"
         required: true
@@ -74,7 +74,8 @@ jobs:
 
           key   = os.environ["OPENAI_API_KEY"]
           book  = os.environ.get("BOOK", "trucks").strip()
-          only  = {int(x) for x in os.environ.get("ONLY", "").replace(" ", "").split(",") if x}
+          raw   = os.environ.get("ONLY", "all").replace(" ", "").lower()
+          only  = set() if raw in ("", "all") else {int(x) for x in raw.split(",") if x}
           limit = int(os.environ.get("LIMIT", "3") or 3)
           model = os.environ.get("MODEL", "gpt-image-2")
           qual  = os.environ.get("QUALITY", "high")
