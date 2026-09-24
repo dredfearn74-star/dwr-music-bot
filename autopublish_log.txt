@@ -771,3 +771,4 @@
 [2026-09-24 13:28:20] Queue updated (3 row(s) changed, 182 rows saved).
 [2026-09-24 13:38:03] TOPUP MotiveAF already has a row for 2026-09-24 (status POSTED). Standing down.
 [2026-09-24 13:49:24] Nothing due today. Exiting cleanly.
+[2026-09-24 14:23:29] Nothing due today. Exiting cleanly.
