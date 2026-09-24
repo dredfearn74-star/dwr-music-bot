@@ -1,0 +1,160 @@
+name: Coloring book - make pages
+
+# Generates coloring-book pages from coloring/<book>.json through OpenAI's image
+# API and commits the PNGs into media/coloring-<book>/.
+# Prompt for each page = the book's "style" + "Scene: <scene>."
+# Manual only. Never touches the posting queue. Skips pages that already exist.
+
+on:
+  workflow_dispatch:
+    inputs:
+      book:
+        description: "Book (reads coloring/<book>.json)"
+        required: true
+        default: "trucks"
+      only:
+        description: "Page numbers to make, comma-separated (blank = all missing pages)"
+        required: false
+        default: "1,4,16"
+      limit:
+        description: "Max pages this run"
+        required: true
+        default: "3"
+      model:
+        description: "Image model"
+        required: true
+        default: "gpt-image-2"
+        type: choice
+        options: ["gpt-image-2", "gpt-image-1", "gpt-image-1-mini"]
+      quality:
+        description: "Quality"
+        required: true
+        default: "high"
+        type: choice
+        options: ["high", "medium", "low"]
+      size:
+        description: "Image size (1024x1536 = portrait, fits 8.5x11)"
+        required: true
+        default: "1024x1536"
+        type: choice
+        options: ["1024x1536", "1024x1024", "1536x1024", "auto"]
+
+permissions:
+  contents: write
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail fast if the API key is missing
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY secret is not set."
+            exit 1
+          fi
+
+      - name: Generate
+        timeout-minutes: 280
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BOOK: ${{ inputs.book }}
+          ONLY: ${{ inputs.only }}
+          LIMIT: ${{ inputs.limit }}
+          MODEL: ${{ inputs.model }}
+          QUALITY: ${{ inputs.quality }}
+          SIZE: ${{ inputs.size }}
+        run: |
+          python - <<'PY'
+          import base64, json, os, pathlib, time, urllib.request, urllib.error
+
+          key   = os.environ["OPENAI_API_KEY"]
+          book  = os.environ.get("BOOK", "trucks").strip()
+          only  = {int(x) for x in os.environ.get("ONLY", "").replace(" ", "").split(",") if x}
+          limit = int(os.environ.get("LIMIT", "3") or 3)
+          model = os.environ.get("MODEL", "gpt-image-2")
+          qual  = os.environ.get("QUALITY", "high")
+          size  = os.environ.get("SIZE", "1024x1536")
+
+          spec  = json.loads(pathlib.Path(f"coloring/{book}.json").read_text(encoding="utf-8"))
+          style = spec["style"]
+          out   = pathlib.Path(f"media/coloring-{book}"); out.mkdir(parents=True, exist_ok=True)
+
+          pages = []
+          for p in spec["pages"]:
+              p["filename"] = f"{book}_{p['num']:02d}_{p['slug']}.png"
+              p["prompt"] = style + "Scene: " + p["scene"] + "."
+              pages.append(p)
+          todo = [p for p in pages
+                  if not (out / p["filename"]).exists() and (not only or p["num"] in only)][:limit]
+          print(f"{len(pages)} pages in book, {len(todo)} to make this run ({model}/{qual}/{size})", flush=True)
+
+          def make(prompt):
+              body = json.dumps({"model": model, "prompt": prompt, "size": size,
+                                 "quality": qual, "n": 1}).encode()
+              req = urllib.request.Request(
+                  "https://api.openai.com/v1/images/generations", data=body,
+                  headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
+              with urllib.request.urlopen(req, timeout=600) as r:
+                  d = json.load(r)
+              item = d["data"][0]
+              if item.get("b64_json"):
+                  return base64.b64decode(item["b64_json"])
+              with urllib.request.urlopen(item["url"], timeout=300) as r:
+                  return r.read()
+
+          made = failed = 0
+          for i, p in enumerate(todo, 1):
+              print(f"[{i}/{len(todo)}] page {p['num']} {p['slug']}", flush=True)
+              for attempt in (1, 2, 3):
+                  try:
+                      data = make(p["prompt"])
+                      if data[:8] != b"\x89PNG\r\n\x1a\n" and data[:2] != b"\xff\xd8":
+                          raise ValueError("response was not an image")
+                      (out / p["filename"]).write_bytes(data)
+                      print(f"      saved {p['filename']} ({len(data)/1e6:.1f} MB)", flush=True)
+                      made += 1
+                      break
+                  except urllib.error.HTTPError as e:
+                      msg = e.read().decode()[:300]
+                      if e.code in (429, 500, 502, 503) and attempt < 3:
+                          time.sleep(20 * attempt); continue
+                      print(f"      FAILED {e.code}: {msg}", flush=True); failed += 1; break
+                  except Exception as e:
+                      if attempt < 3:
+                          print(f"      hiccup: {e}; retrying", flush=True); time.sleep(12); continue
+                      print(f"      FAILED: {e}", flush=True); failed += 1; break
+
+          have = len([p for p in pages if (out / p["filename"]).exists()])
+          summary = f"book={book} model={model} quality={qual} size={size}\nmade={made} failed={failed}\npages in folder: {have} of {len(pages)}\n"
+          print(summary, flush=True)
+          pathlib.Path("coloring/last_run_summary.txt").write_text(summary, encoding="utf-8")
+          if made == 0:
+              raise SystemExit("nothing was generated - failing the run so it goes red")
+          PY
+
+      # if: always() so a timeout or API failure still SAVES every paid-for page.
+      - name: Commit the pages
+        if: always()
+        run: |
+          git config user.name "coloring-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add media/coloring-${{ inputs.book }} coloring/last_run_summary.txt || true
+          if git diff --cached --quiet; then
+            echo "::error::nothing new to commit"
+            exit 1
+          fi
+          git commit -m "Coloring book ${{ inputs.book }}: generated pages [skip ci]"
+          git pull --rebase --autostash
+          git push
+
+      - name: Report the end state
+        if: always()
+        run: |
+          echo "### Coloring book ${{ inputs.book }}" >> $GITHUB_STEP_SUMMARY
+          cat coloring/last_run_summary.txt >> $GITHUB_STEP_SUMMARY || true
+          ls media/coloring-${{ inputs.book }} >> $GITHUB_STEP_SUMMARY || true
