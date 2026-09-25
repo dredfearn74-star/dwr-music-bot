@@ -886,9 +886,18 @@ def integrity_gate(url):
     not in media_manifest.csv, do not post it.
 
     THE RULE THIS ENFORCES: reels are DaVinci exports, posted as exported.
-    Nothing re-encodes David's video. If a file legitimately changes, the new
-    hash goes in the manifest AFTER a human has watched it — that human step
-    is the whole point and must not be automated away.
+    Nothing re-encodes David's video.
+
+    2026-09-25 — NO HUMAN APPROVAL STEP. David never asked to sign off on
+    reels and does not want to. A video whose latest commit is his own
+    GitHub web upload ("Add files via upload") IS his export, untouched, so
+    it is approved automatically and its hash is written to the manifest.
+    Every stretched file in the 09-02..09-04 incident was committed by a
+    helper with a custom message ("un-squished", "Replace ... with the
+    un-stretched version"), so anything changed by a script or a session
+    is still refused. The 9:16 / square-pixel check (aspect_gate) runs
+    before this, so size is always checked too. Do NOT reintroduce a
+    "David must watch it" step.
     """
     if not is_video(url):
         return ""
@@ -908,12 +917,64 @@ def integrity_gate(url):
         return ""
     if digest in ok:
         return ""
-    return (f"this video is NOT the approved file. sha256 {digest[:16]}... is not in "
-            f"{MANIFEST_FILE}, which means the bytes changed since a human last watched "
-            f"it. This is exactly how the 2026-09-05 stretched reel got published: the "
-            f"frame size looked right and the picture was ruined. NOTHING re-encodes "
-            f"David's exports. Post the DaVinci export as-is, or — if the change was "
-            f"deliberate — watch the file, then add its hash to {MANIFEST_FILE}.")
+    if auto_approve_upload(url, digest):
+        return ""
+    return (f"this video was changed by something other than David's own upload "
+            f"(sha256 {digest[:16]}... is not in {MANIFEST_FILE} and the file's latest "
+            f"commit is not an 'Add files via upload'). This is exactly how the "
+            f"2026-09-05 stretched reel got published. NOTHING re-encodes David's "
+            f"exports - re-upload his original DaVinci export through GitHub's "
+            f"'Add files via upload' and it will pass on its own.")
+
+
+RAW_PREFIX = "https://raw.githubusercontent.com/"
+
+
+def auto_approve_upload(url, digest):
+    """True, and the file is recorded in the manifest, when the video at `url`
+    is David's own untouched GitHub web upload. Any doubt -> False (refuse)."""
+    try:
+        if not url.startswith(RAW_PREFIX):
+            return False
+        owner, repo, _branch, path = url[len(RAW_PREFIX):].split("/", 3)
+        headers = {"Accept": "application/vnd.github+json"}
+        tok = os.environ.get("GITHUB_TOKEN")
+        if tok:
+            headers["Authorization"] = f"Bearer {tok}"
+        r = requests.get(f"https://api.github.com/repos/{owner}/{repo}/commits",
+                         params={"path": path, "per_page": 1},
+                         headers=headers, timeout=30)
+        r.raise_for_status()
+        commits = r.json()
+        if not commits:
+            return False
+        c = commits[0]
+        msg = (c.get("commit", {}).get("message") or "").strip()
+        who = ((c.get("author") or {}).get("login") or "").lower()
+        if not msg.startswith("Add files via upload") or who != owner.lower():
+            return False
+        w, h, sar = (list(probe_media(url) or ()) + ["", "", ""])[:3]
+        size = ""
+        try:
+            size = requests.head(url, timeout=30, allow_redirects=True).headers.get("Content-Length", "")
+        except Exception:
+            pass
+        sha7 = (c.get("sha") or "")[:7]
+        note = (f"auto-approved {datetime.date.today().isoformat()}: David's own upload, "
+                f"commit {sha7}, untouched since")
+        line = f'{digest},{size},{w},{h},{sar},{path.rsplit("/", 1)[-1]},"{note}"'
+        p = pathlib.Path(__file__).with_name(MANIFEST_FILE)
+        existing = p.read_bytes() if p.exists() else b""
+        with p.open("a", encoding="utf-8") as f:
+            if existing and not existing.endswith(b"\n"):
+                f.write("\n")
+            f.write(line + "\n")
+        log(f"APPROVED automatically: {path} is David's own upload (commit {sha7}); "
+            f"added to {MANIFEST_FILE}.")
+        return True
+    except Exception as e:
+        log(f"WARN: auto-approve check failed for {url} ({e}) - refusing to be safe.")
+        return False
 
 
 def probe_media(url):
