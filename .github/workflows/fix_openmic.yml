@@ -38,8 +38,9 @@ jobs:
             ("at the open mic I host at Murph & Mary's in Newton.", "live in Newton this summer."),
             ("I'm still going to be at the open mic. That isn't changing.", "I'm still playing live. That isn't changing."),
             ("at the open mic I host at Murph and Marys in Newton.", "live in Newton this summer."),
+            ("Freaker an open mic Murph and Mary's Pub in Newton.", "Freaker live in Newton this summer."),
           ]
-          BAD = ["open mic I host", "Open mic is TODAY", "next one live at Murph", "Every month, Murph", "still going to be at the open mic"]
+          BAD = ["open mic I host", "Open mic is TODAY", "next one live at Murph", "Every month, Murph", "still going to be at the open mic", "an open mic Murph and Mary's Pub"]
           def fix(t):
               if not t or not any(b in t for b in BAD): return None
               n = t
