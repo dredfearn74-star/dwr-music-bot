@@ -8,7 +8,7 @@ name: MotiveAF daily top-up
 
 on:
   schedule:
-    - cron: '30 14 * * *'   # 14:30 UTC = 9:30 AM US Central, ahead of the 10:00 poster
+    - cron: '17 14 * * *'   # 14:17 UTC = 9:17 AM US Central (CDT), ahead of the 9:47 poster. Off :00/:30 on purpose (GitHub delays runs at the top of the hour). UTC: when CDT ends 1 Nov, subtract 1 hour.
   workflow_dispatch:
 
 permissions:
