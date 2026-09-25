@@ -5,7 +5,7 @@ on:
     - cron: '47 14 * * *'   # 14:47 UTC = 9:47 AM US Central (CDT). Off the top of the hour on purpose: GitHub delays scheduled runs at :00/:30 (they landed 3-4h late 22-25 Sep).
     - cron: '13 15 * * *'   # BACKSTOP 1 = 10:13 AM CDT. GitHub dropped the 10:00 slot on 2026-08-27 and ran it 9h late.
     - cron: '41 15 * * *'   # BACKSTOP 2 = 10:41 AM CDT. Added 2026-09-24: GitHub fired NO cron on this repo that day.
-    - cron: '27 16 * * *'   # BACKSTOP 3 = 11:27 AM CDT. The poster only posts QUEUED rows, so a caught-up day just exits clean. NOTE: UTC — when CDT ends 1 Nov, subtract 1 hour from every slot.
+    - cron: '27 16 * * *'   # BACKSTOP 3 = 11:27 AM CDT. The poster only posts QUEUED rows, so a caught-up day just exits clean. NOTE: UTC — when CDT ends 1 Nov (CST = UTC-6), ADD 1 hour to every UTC slot.
   workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
