@@ -12,12 +12,6 @@ permissions:
   contents: write           # save queue status back to the repo
   issues: write             # open an alert issue when a post fails
 
-# One poster at a time: if GitHub fires a late cron while the outside 10:05 trigger is running,
-# the second run waits, then sees the rows already POSTED. Prevents double posts.
-concurrency:
-  group: dwr-poster
-  cancel-in-progress: false
-
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -84,6 +78,7 @@ jobs:
         id: post
         env:
           META_TOKEN: ${{ secrets.META_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # lets the integrity gate see who last committed a reel
         run: python post.py
 
       # MUST run even when posting failed, or a failure would throw away the
@@ -96,7 +91,7 @@ jobs:
           # Add only the files that exist. `git add` aborts the WHOLE command if any
           # pathspec is missing, and last_failure.txt only exists after a failure —
           # which silently stopped the queue ever being saved (2026-08-17).
-          for f in content_queue.csv autopublish_log.txt last_failure.txt needs_tagging.txt needs_comment.txt; do
+          for f in content_queue.csv autopublish_log.txt last_failure.txt needs_tagging.txt needs_comment.txt media_manifest.csv; do
             git add -A -- "$f" 2>/dev/null || true
           done
           git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
