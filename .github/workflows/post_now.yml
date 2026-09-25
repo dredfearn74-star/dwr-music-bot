@@ -28,6 +28,11 @@ permissions:
   contents: write
   issues: write
 
+# Same group as daily.yml: only one poster runs at a time, so no double posts.
+concurrency:
+  group: dwr-poster
+  cancel-in-progress: false
+
 jobs:
   post:
     runs-on: ubuntu-latest
