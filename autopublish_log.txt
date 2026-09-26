@@ -791,3 +791,19 @@
 [2026-09-25 15:00:25] Nothing due today. Exiting cleanly.
 [2026-09-25 15:26:31] Nothing due today. Exiting cleanly.
 [2026-09-26 12:47:06] TOPUP MotiveAF already has a row for 2026-09-26 (status QUEUED). Standing down.
+[2026-09-26 13:04:23]   first comment for 2026-09-26: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-26 13:04:37]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-26 13:04:38]   no location on this row
+[2026-09-26 13:04:55]   first comment confirmed on Instagram too.
+[2026-09-26 13:04:55] POSTED [MotiveAF] 2026-09-26 both -> FB:122148829917352686, cmt:122148829917352686_947109075129734, IG:18105916937265540, igcmt:18119979164487865
+[2026-09-26 13:04:57]   first comment for 2026-09-26: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-26 13:05:13]   first comment CONFIRMED on the live post: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight
+[2026-09-26 13:05:13] POSTED [DWR Music] 2026-09-26 facebook -> FB:1547207377177883, cmt:1547207377177883_1398386242483804
+[2026-09-26 13:05:14]   no location on this row
+[2026-09-26 13:05:52] POSTED [DWR Music] 2026-09-26 instagram -> IG:18118713514945819
+[2026-09-26 13:05:54]   first comment for 2026-09-26: https://youtu.be/6Lpzx5dK3WM   (using the first_comment cell exactly as written)
+[2026-09-26 13:06:07]   first comment CONFIRMED on the live post: https://youtu.be/6Lpzx5dK3WM
+[2026-09-26 13:06:07]   no location on this row
+[2026-09-26 13:06:50]   first comment confirmed on Instagram too.
+[2026-09-26 13:06:50] POSTED [DWR Music] 2026-09-26 both -> FB:1050632170859895, cmt:1050632170859895_1986439942046277, IG:18090250193270153, igcmt:18074300051721798
+[2026-09-26 13:06:50] Queue updated (4 row(s) changed, 188 rows saved).
