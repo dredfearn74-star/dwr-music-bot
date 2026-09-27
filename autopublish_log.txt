@@ -811,3 +811,16 @@
 [2026-09-26 13:42:53] Nothing due today. Exiting cleanly.
 [2026-09-26 14:18:09] Nothing due today. Exiting cleanly.
 [2026-09-27 13:27:47] TOPUP MotiveAF already has a row for 2026-09-27 (status QUEUED). Standing down.
+[2026-09-27 13:40:28]   first comment for 2026-09-27: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-27 13:40:36]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-27 13:40:37]   no location on this row
+[2026-09-27 13:40:54]   first comment confirmed on Instagram too.
+[2026-09-27 13:40:54] POSTED [MotiveAF] 2026-09-27 both -> FB:122149210173352686, cmt:122149210173352686_1075184252078879, IG:18110809133581824, igcmt:18344028859250105
+[2026-09-27 13:40:56]   first comment for 2026-09-27: https://youtu.be/wJnIn5XAn2s   (using the first_comment cell exactly as written)
+[2026-09-27 13:41:01]   first comment not accepted yet (HTTP 400, post probably still processing) — retrying in 30s
+[2026-09-27 13:41:36]   first comment landed on attempt 2
+[2026-09-27 13:41:36]   first comment CONFIRMED on the live post: https://youtu.be/wJnIn5XAn2s
+[2026-09-27 13:41:36]   no location on this row
+[2026-09-27 13:42:22]   first comment confirmed on Instagram too.
+[2026-09-27 13:42:22] POSTED [DWR Music] 2026-09-27 both -> FB:29353775740885976, cmt:29353775740885976_28649856304654696, IG:18014541446950452, igcmt:18491814799108013
+[2026-09-27 13:42:22] Queue updated (2 row(s) changed, 188 rows saved).
