@@ -847,3 +847,4 @@
 [2026-09-28 12:53:33] POSTED [DWR Music] 2026-09-28 both -> FB:4592806844320778, cmt:4592806844320778_28446232495034797, IG:18187852051407339, igcmt:18009902483974112
 [2026-09-28 12:53:33] Queue updated (5 row(s) changed, 194 rows saved).
 [2026-09-28 15:35:28] TOPUP MotiveAF already has a row for 2026-09-28 (status POSTED). Standing down.
+[2026-09-28 15:51:47] Nothing due today. Exiting cleanly.
