@@ -6,6 +6,8 @@ on:
     - cron: '13 15 * * *'   # BACKSTOP 1 = 10:13 AM CDT. GitHub dropped the 10:00 slot on 2026-08-27 and ran it 9h late.
     - cron: '41 15 * * *'   # BACKSTOP 2 = 10:41 AM CDT. Added 2026-09-24: GitHub fired NO cron on this repo that day.
     - cron: '27 16 * * *'   # BACKSTOP 3 = 11:27 AM CDT. The poster only posts QUEUED rows, so a caught-up day just exits clean. NOTE: UTC — when CDT ends 1 Nov (CST = UTC-6), ADD 1 hour to every UTC slot.
+    - cron: '17 0 * * *'    # EVENING = 7:17 PM CDT (00:17 UTC next day). Only rows with post_after (e.g. 19:00) wait for this. Added 2026-09-28.
+    - cron: '49 0 * * *'    # EVENING BACKSTOP = 7:49 PM CDT. When CDT ends 1 Nov, ADD 1 hour here too.
   workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
@@ -61,16 +63,25 @@ jobs:
           python - <<'PY' > due_before.txt
           import csv, datetime
           from zoneinfo import ZoneInfo
-          today = datetime.datetime.now(ZoneInfo("America/Chicago")).date()
-          for r in csv.DictReader(open('content_queue.csv', encoding='utf-8')):
+          now = datetime.datetime.now(ZoneInfo("America/Chicago"))
+          today = now.date()
+          for i, r in enumerate(csv.DictReader(open('content_queue.csv', encoding='utf-8'))):
               st = (r.get('status') or '').strip().upper()
               try:
                   due = datetime.datetime.strptime(r['date'].strip(), '%Y-%m-%d').date()
               except Exception:
                   continue
               att = int((r.get('attempts') or '0').strip() or 0)
+              pa = (r.get('post_after') or '').strip()
+              if pa and due == today:
+                  try:
+                      hh, mm = (int(x) for x in pa.split(':')[:2])
+                      if now.time() < datetime.time(hh, mm):
+                          continue   # evening row, not open yet on this run
+                  except Exception:
+                      pass
               if due <= today and (st == 'QUEUED' or st == '' or (st == 'FAILED' and att < 3)):
-                  print(r['date'].strip())
+                  print(f"{i}|{r['date'].strip()}")
           PY
           echo "Due at the start of this run:"; cat due_before.txt || true
 
@@ -116,7 +127,13 @@ jobs:
           due = []
           if os.path.exists('due_before.txt'):
               due = [l.strip() for l in open('due_before.txt', encoding='utf-8') if l.strip()]
-          rows = {r['date'].strip(): r for r in csv.DictReader(open('content_queue.csv', encoding='utf-8'))}
+          # Keyed by ROW NUMBER, not date: two rows can share a date (morning + evening).
+          allrows = list(csv.DictReader(open('content_queue.csv', encoding='utf-8')))
+          rows = {}
+          for line in due:
+              idx, _, dt = line.partition('|')
+              r = allrows[int(idx)] if idx.isdigit() and int(idx) < len(allrows) else None
+              rows[line] = r if (r is not None and r['date'].strip() == dt) else None
           print("=" * 62)
           if not due:
               print("END STATE: nothing was due today. Nothing published. This is correct.")
