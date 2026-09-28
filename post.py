@@ -82,6 +82,24 @@ def now_ct():
     return datetime.datetime.now(TZ) if TZ else datetime.datetime.utcnow()
 
 
+def slot_open(row, due, today):
+    """EVENING SLOT (added 2026-09-28, David: "we talked about doing evening ones").
+
+    A row may carry a `post_after` time in US Central, e.g. `19:00`. On its own
+    date it will not post before that time, so the morning run leaves it alone
+    and the evening cron picks it up. Blank = post on the morning run, exactly as
+    before. A row from an EARLIER day always posts (it's overdue).
+    """
+    pa = (row.get("post_after") or "").strip()
+    if not pa or due < today:
+        return True
+    try:
+        hh, mm = (int(x) for x in pa.split(":")[:2])
+    except Exception:
+        return True   # unreadable time -> never block a post over it
+    return now_ct().time() >= datetime.time(hh, mm)
+
+
 def read_env():
     # GitHub Actions secrets arrive as environment variables. A local .env can override for testing.
     e = dict(os.environ)
@@ -1447,6 +1465,8 @@ def main():
             continue
         if due > today:
             continue  # not due yet
+        if not slot_open(row, due, today):
+            continue  # due today, but its evening (post_after) slot hasn't opened yet
         bkey = (row.get("brand") or "").strip().lower()
         cfg = brands.get(bkey)
         if not cfg:
