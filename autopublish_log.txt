@@ -827,3 +827,22 @@
 [2026-09-27 13:58:44] Nothing due today. Exiting cleanly.
 [2026-09-27 14:15:09] Nothing due today. Exiting cleanly.
 [2026-09-27 14:49:47] Nothing due today. Exiting cleanly.
+[2026-09-28 12:50:39]   no location on this row
+[2026-09-28 12:50:51] POSTED [DWR Music] 2026-09-28 both -> FB:1064896853183222, IG:18088913810242503
+[2026-09-28 12:50:52]   first comment for 2026-09-28: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-28 12:51:02]   first comment CONFIRMED on the live post: Shirts: https://motiveaf.printify.me
+[2026-09-28 12:51:03]   no location on this row
+[2026-09-28 12:52:07]   first comment confirmed on Instagram too.
+[2026-09-28 12:52:07] POSTED [MotiveAF] 2026-09-28 both -> FB:2106507000239565, cmt:2106507000239565_1040191669048148, IG:18092394083163585, igcmt:18070042697762729
+[2026-09-28 12:52:08]   first comment for 2026-09-28: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-28 12:52:21]   first comment CONFIRMED on the live post: Save it here → https://distrokid.com/hyperfollow/dwredm/save-tonight
+[2026-09-28 12:52:21] POSTED [DWR Music] 2026-09-28 facebook -> FB:1064898099849764, cmt:1064898099849764_2530262860784313
+[2026-09-28 12:52:22]   no location on this row
+[2026-09-28 12:52:33] POSTED [DWR Music] 2026-09-28 instagram -> IG:18126754027881021
+[2026-09-28 12:52:36] APPROVED automatically: media/live-like-a-warrior-exile-reel-1.mp4 is David's own upload (commit 2132da9); added to media_manifest.csv.
+[2026-09-28 12:52:36]   first comment for 2026-09-28: https://www.youtube.com/@dwredfearnmusic   (using the first_comment cell exactly as written)
+[2026-09-28 12:52:49]   first comment CONFIRMED on the live post: https://www.youtube.com/@dwredfearnmusic
+[2026-09-28 12:52:49]   no location on this row
+[2026-09-28 12:53:33]   first comment confirmed on Instagram too.
+[2026-09-28 12:53:33] POSTED [DWR Music] 2026-09-28 both -> FB:4592806844320778, cmt:4592806844320778_28446232495034797, IG:18187852051407339, igcmt:18009902483974112
+[2026-09-28 12:53:33] Queue updated (5 row(s) changed, 194 rows saved).
