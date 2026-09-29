@@ -410,6 +410,28 @@ def fb_post(ver, pid, tok, cap, media):
     return j.get("id") or j.get("post_id")
 
 
+def make_fb_post(webhook, page_id, media, caption, comment, brand="", due=""):
+    """Hand one Facebook post to the Make.com scenario (public-visible route).
+
+    kind: photo | video | text. Make answers with JSON {"id": "..."} from its
+    Webhook Response module; any non-2xx is a failure (the run goes red and the
+    row retries). The caption here is the plain caption — no link line is
+    added, because Make puts the link in the first comment.
+    """
+    kind = "video" if (media and is_video(media)) else ("photo" if media else "text")
+    payload = {"page_id": page_id, "kind": kind, "media_url": media or "",
+               "caption": caption or "", "comment": comment or "",
+               "brand": brand, "date": due}
+    r = requests.post(webhook, json=payload, timeout=600)
+    if r.status_code >= 300:
+        raise RuntimeError(f"Make.com webhook refused the post: HTTP {r.status_code} {r.text[:300]}")
+    try:
+        j = r.json()
+        return j.get("id") or j.get("post_id") or "accepted"
+    except Exception:
+        return (r.text or "accepted").strip()[:80]
+
+
 # ---------------------------------------------------------------------------
 # STORIES — INSTAGRAM_RULES.md Gap 2, built 2026-09-03.
 #
@@ -1584,7 +1606,20 @@ def main():
         done = done_platforms(row)          # platforms that already succeeded on an earlier attempt
         try:
             if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id") and "FB" not in done:
-                if is_story:
+                _mk = (env.get("MAKE_FB_WEBHOOK") or "").strip()
+                via_make = bool(_mk) and not is_story
+                if via_make:
+                    # PUBLIC ROUTE (2026-09-28). Our own Meta app is stuck in dev
+                    # mode, so anything it posts is admin-only. Make.com's Meta app
+                    # is live, so a post made through the Make connection is public.
+                    # Make publishes the post AND the first comment.
+                    fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, cap, comment_link,
+                                         row.get("brand", ""), str(due))
+                    res.append("FB(make):" + str(fb_id))
+                    mark_done(row, "FB")
+                    log(f"  Facebook post handed to Make.com (public route) for {due}: {fb_id}")
+                    fb_id = None          # Make already did the comment; skip the Graph comment below
+                elif is_story:
                     # A story has no caption, no Page mentions and no comments —
                     # publish it and stop. Nothing below applies.
                     fb_id = fb_story(ver, cfg["fb_page_id"].strip(), fb_tok, media)
@@ -1596,7 +1631,7 @@ def main():
                     fb_id = fb_post(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap, media)
                     res.append("FB:" + str(fb_id))
                     mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
-                wanted = _split_tokens(row.get("fb_page_tags", "")) if not is_story else []
+                wanted = _split_tokens(row.get("fb_page_tags", "")) if (not is_story and not via_make) else []
                 if wanted:
                     stuck = verify_fb_tags(ver, fb_id, fb_tok, wanted)
                     if stuck is False:
