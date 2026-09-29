@@ -1481,6 +1481,22 @@ def main():
         # Posting to a Page needs the PAGE token (not the top-level token) — resolve it, fall back if unavailable.
         page_tok = resolve_page_token(ver, (cfg.get("fb_page_id") or "").strip(), tok) if cfg.get("fb_page_id") else ""
         post_tok = page_tok or tok
+        # FACEBOOK-ONLY PUBLIC TOKEN (2026-09-28). Posts published through the
+        # DWR Social Bot app are visible ONLY to page admins while that app is
+        # Unpublished (Meta's icon uploader is broken, so it cannot go live).
+        # If FB_PUBLIC_TOKEN is set (a user token minted under a LIVE app, e.g.
+        # Graph API Explorer), Facebook posts + comments use it so the public
+        # can see them. Instagram keeps using META_TOKEN.
+        fb_tok = post_tok
+        _ftok = (env.get("FB_PUBLIC_TOKEN") or "").strip()
+        if _ftok and cfg.get("fb_page_id"):
+            _fpt = resolve_page_token(ver, cfg["fb_page_id"].strip(), _ftok)
+            if _fpt:
+                fb_tok = _fpt
+                log(f"  Facebook will publish with FB_PUBLIC_TOKEN (public-visible app).")
+            else:
+                log(f"  FB_PUBLIC_TOKEN set but could not resolve the Page token — falling back to META_TOKEN (posts will be admin-only).")
+                failures.append(f"{row.get('brand')} {due} — FB_PUBLIC_TOKEN did not resolve; Facebook post may be invisible to the public")
         plat = (row.get("platform") or "both").strip().lower()
         cap = row.get("caption", "")
         media = (row.get("media_url") or "").strip()
@@ -1571,18 +1587,18 @@ def main():
                 if is_story:
                     # A story has no caption, no Page mentions and no comments —
                     # publish it and stop. Nothing below applies.
-                    fb_id = fb_story(ver, cfg["fb_page_id"].strip(), post_tok, media)
+                    fb_id = fb_story(ver, cfg["fb_page_id"].strip(), fb_tok, media)
                     res.append("FBstory:" + str(fb_id))
                     mark_done(row, "FB")
                     log(f"  Facebook STORY published for {due} (it disappears after 24 hours).")
                     fb_id = None
                 else:
-                    fb_id = fb_post(ver, cfg["fb_page_id"].strip(), post_tok, fb_cap, media)
+                    fb_id = fb_post(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap, media)
                     res.append("FB:" + str(fb_id))
                     mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
                 wanted = _split_tokens(row.get("fb_page_tags", "")) if not is_story else []
                 if wanted:
-                    stuck = verify_fb_tags(ver, fb_id, post_tok, wanted)
+                    stuck = verify_fb_tags(ver, fb_id, fb_tok, wanted)
                     if stuck is False:
                         link = f"https://www.facebook.com/{cfg['fb_page_id'].strip()}/posts/{str(fb_id).split('_')[-1]}"
                         log(f"  TAGS STRIPPED by Facebook on {due} — add them by hand: {link}")
@@ -1595,9 +1611,9 @@ def main():
                     # are not allowed to say we made.
                     fb_link = f"https://www.facebook.com/{cfg['fb_page_id'].strip()}/posts/{str(fb_id).split('_')[-1]}"
                     try:
-                        cid = fb_comment(ver, fb_id, post_tok, comment_link)
+                        cid = fb_comment(ver, fb_id, fb_tok, comment_link)
                         res.append("cmt:" + str(cid))
-                        ok = verify_fb_comment(ver, fb_id, post_tok, cid, comment_link)
+                        ok = verify_fb_comment(ver, fb_id, fb_tok, cid, comment_link)
                         if ok is True:
                             log(f"  first comment CONFIRMED on the live post: {comment_link}")
                         elif ok is False:
