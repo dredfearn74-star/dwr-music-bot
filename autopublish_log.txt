@@ -877,3 +877,4 @@
 [2026-09-29 11:30:21]   first comment confirmed on Instagram too.
 [2026-09-29 11:30:21] POSTED [DWR Music] 2026-09-29 both -> FB(make):1635748374838167, IG:18089780303220912, igcmt:18033756092667377
 [2026-09-29 11:30:21] Queue updated (4 row(s) changed, 252 rows saved).
+[2026-09-29 12:49:15] Nothing due today. Exiting cleanly.
