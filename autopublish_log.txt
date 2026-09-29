@@ -858,3 +858,22 @@
 [2026-09-28 20:09:46]   first comment confirmed on Instagram too.
 [2026-09-28 20:09:46] POSTED [DWR Music] 2026-09-28 both -> FB:1442165031143570, cmt:1442165031143570_1112512877956248, IG:18142504153596439, igcmt:17987422911105415
 [2026-09-28 20:09:46] Queue updated (1 row(s) changed, 194 rows saved).
+[2026-09-29 11:23:43]   first comment for 2026-09-29: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-29 11:23:48]   Facebook post handed to Make.com (public route) for 2026-09-29: 1179462511909328_122150021415352686
+[2026-09-29 11:23:49]   no location on this row
+[2026-09-29 11:24:10]   first comment confirmed on Instagram too.
+[2026-09-29 11:24:10] POSTED [MotiveAF] 2026-09-29 both -> FB(make):1179462511909328_122150021415352686, IG:18096414755393644, igcmt:17975559668928806
+[2026-09-29 11:24:12]   no location on this row
+[2026-09-29 11:25:58] POSTED [DWR Music] 2026-09-29 instagram -> IG:17981072889120883
+[2026-09-29 11:26:01]   first comment for 2026-09-29: https://youtu.be/6Lpzx5dK3WM   (using the first_comment cell exactly as written)
+[2026-09-29 11:27:16]   Facebook post handed to Make.com (public route) for 2026-09-29: 2397386564002684
+[2026-09-29 11:27:16]   no location on this row
+[2026-09-29 11:28:04]   first comment confirmed on Instagram too.
+[2026-09-29 11:28:04] POSTED [DWR Music] 2026-09-29 both -> FB(make):2397386564002684, IG:18108763298580788, igcmt:17889643788455686
+[2026-09-29 11:28:09] APPROVED automatically: media/live-like-a-warrior-exile-reel-2.mp4 is David's own upload (commit f927486); added to media_manifest.csv.
+[2026-09-29 11:28:09]   first comment for 2026-09-29: https://youtu.be/1CJP08Mfplo   (using the first_comment cell exactly as written)
+[2026-09-29 11:29:32]   Facebook post handed to Make.com (public route) for 2026-09-29: 1635748374838167
+[2026-09-29 11:29:32]   no location on this row
+[2026-09-29 11:30:21]   first comment confirmed on Instagram too.
+[2026-09-29 11:30:21] POSTED [DWR Music] 2026-09-29 both -> FB(make):1635748374838167, IG:18089780303220912, igcmt:18033756092667377
+[2026-09-29 11:30:21] Queue updated (4 row(s) changed, 252 rows saved).
