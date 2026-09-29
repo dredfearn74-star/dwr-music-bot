@@ -19,6 +19,10 @@ import csv, html, re, sys, datetime as dt, urllib.request, urllib.parse
 PLUGIN = "https://www.facebook.com/plugins/page.php?href={}&tabs=timeline&width=500&height=3000"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
 LOOKBACK_DAYS = 2
+# Facebook posts before this date went out through our own dev-mode app and were
+# admin-only by design (fixed 2026-09-29 by routing Facebook through Make.com).
+# Checking them would raise the same known alarm twice a day forever.
+SINCE = dt.date(2026, 9, 29)
 SNIPPET = 28   # chars of caption we look for — short enough to survive Facebook's "See more" truncation
 
 
@@ -51,7 +55,7 @@ def main():
             d = dt.date.fromisoformat(r["date"].strip())
         except Exception:
             continue
-        if d < since or d > today:
+        if d < since or d > today or d < SINCE:
             continue
         cap = norm(r.get("caption", ""))
         if len(cap) < 12:
@@ -75,11 +79,23 @@ def main():
         if page not in raw and "followers" not in body:
             failures.append(f"{brand}: plugin loaded but the page name is missing — Facebook served a login wall or blocked the runner. BLIND.")
             continue
-        for d, snip, cap in items:
-            if snip in body:
-                notes.append(f"OK   {brand} {d}  \"{cap}...\"  is PUBLIC")
-            else:
-                failures.append(f"HIDDEN {brand} {d}  \"{cap}...\"  marked POSTED but NOT visible logged-out")
+        found = [(d, snip, cap) for d, snip, cap in items if snip in body]
+        missing = [(d, snip, cap) for d, snip, cap in items if snip not in body]
+        for d, snip, cap in found:
+            notes.append(f"OK   {brand} {d}  \"{cap}...\"  is PUBLIC")
+        if items and not found:
+            # 2026-09-29: the GitHub runner's IP sometimes gets a plugin page with the
+            # header but NO posts at all, while the same URL in a real browser shows
+            # them. Zero-of-N found is "we could not see", not "they are hidden" —
+            # a red run here was a false alarm three times in one afternoon. Warn,
+            # do not fail; a real HIDDEN needs at least one sibling post visible as
+            # proof the render worked.
+            notes.append(f"BLIND {brand}: plugin rendered no recognisable posts ({len(items)} expected) — "
+                         f"check by hand from a logged-out browser: https://www.facebook.com/{page}")
+            continue
+        for d, snip, cap in missing:
+            failures.append(f"HIDDEN {brand} {d}  \"{cap}...\"  marked POSTED but NOT visible logged-out "
+                            f"(other posts on the same page ARE visible, so this one really is missing)")
 
     print("\n".join(notes) if notes else "(no bot Facebook posts in the last %d days to check)" % LOOKBACK_DAYS)
     if failures:
