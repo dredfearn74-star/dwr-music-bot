@@ -1608,16 +1608,21 @@ def main():
             if plat in ("facebook", "fb", "both") and cfg.get("fb_page_id") and "FB" not in done:
                 _mk = (env.get("MAKE_FB_WEBHOOK") or "").strip()
                 via_make = bool(_mk) and not is_story
+                make_post_id = None
                 if via_make:
                     # PUBLIC ROUTE (2026-09-28). Our own Meta app is stuck in dev
                     # mode, so anything it posts is admin-only. Make.com's Meta app
                     # is live, so a post made through the Make connection is public.
                     # Make publishes the post AND the first comment.
-                    fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, cap, comment_link,
+                    # 2026-09-29: send the caption WITH the @[PageID] mentions. Make's
+                    # Meta app is reviewed, so Page tags may stick where our own app's
+                    # were always stripped. The read-back below tells us either way.
+                    fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, fb_cap, comment_link,
                                          row.get("brand", ""), str(due))
                     res.append("FB(make):" + str(fb_id))
                     mark_done(row, "FB")
                     log(f"  Facebook post handed to Make.com (public route) for {due}: {fb_id}")
+                    make_post_id = fb_id if str(fb_id).replace("_", "").isdigit() else None
                     fb_id = None          # Make already did the comment; skip the Graph comment below
                 elif is_story:
                     # A story has no caption, no Page mentions and no comments —
@@ -1631,11 +1636,12 @@ def main():
                     fb_id = fb_post(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap, media)
                     res.append("FB:" + str(fb_id))
                     mark_done(row, "FB")        # recorded IMMEDIATELY, so a later IG failure can never double-post this
-                wanted = _split_tokens(row.get("fb_page_tags", "")) if (not is_story and not via_make) else []
-                if wanted:
-                    stuck = verify_fb_tags(ver, fb_id, fb_tok, wanted)
+                wanted = _split_tokens(row.get("fb_page_tags", "")) if not is_story else []
+                tag_post_id = fb_id if not via_make else make_post_id
+                if wanted and tag_post_id:
+                    stuck = verify_fb_tags(ver, tag_post_id, fb_tok, wanted)
                     if stuck is False:
-                        link = f"https://www.facebook.com/{cfg['fb_page_id'].strip()}/posts/{str(fb_id).split('_')[-1]}"
+                        link = f"https://www.facebook.com/{cfg['fb_page_id'].strip()}/posts/{str(tag_post_id).split('_')[-1]}"
                         log(f"  TAGS STRIPPED by Facebook on {due} — add them by hand: {link}")
                         needs_tagging.append(f"{due}  {row.get('caption','')[:45]}...  {link}")
                     elif stuck:
