@@ -1,37 +1,18 @@
-name: Post now (manual)
-
-# Runs the queue immediately instead of waiting for the 10:00 AM CT schedule.
-# Use it when something was missed and needs to go out today.
-# It posts exactly what the daily run would post: every QUEUED row dated today
-# or earlier. Nothing dated in the future goes out early.
-#
-# Built 2026-08-17 to get Micah Spurlock's spotlight out after a transient
-# Meta error dropped it — and because the Run workflow dialog on the daily
-# schedule refused to open.
+name: DWR daily post
 
 on:
-  workflow_dispatch:
-    inputs:
-      confirm:
-        description: 'Type yes to actually publish. Anything else does a safe preview only.'
-        required: true
-        default: 'no'
-  # Fallback trigger. GitHub's "Run workflow" dialog sometimes refuses to load
-  # ("Sorry, something went wrong"), which left us unable to run the bot by hand
-  # on 2026-08-17 with a spotlight owed. Committing/touching the file RUN_NOW.txt
-  # fires this workflow immediately, no dialog involved.
-  push:
-    paths:
-      - 'RUN_NOW.txt'
+  schedule:
+    - cron: '47 14 * * *'   # 14:47 UTC = 9:47 AM US Central (CDT). Off the top of the hour on purpose: GitHub delays scheduled runs at :00/:30 (they landed 3-4h late 22-25 Sep).
+    - cron: '13 15 * * *'   # BACKSTOP 1 = 10:13 AM CDT. GitHub dropped the 10:00 slot on 2026-08-27 and ran it 9h late.
+    - cron: '41 15 * * *'   # BACKSTOP 2 = 10:41 AM CDT. Added 2026-09-24: GitHub fired NO cron on this repo that day.
+    - cron: '27 16 * * *'   # BACKSTOP 3 = 11:27 AM CDT. The poster only posts QUEUED rows, so a caught-up day just exits clean. NOTE: UTC — when CDT ends 1 Nov (CST = UTC-6), ADD 1 hour to every UTC slot.
+    - cron: '17 0 * * *'    # EVENING = 7:17 PM CDT (00:17 UTC next day). Only rows with post_after (e.g. 19:00) wait for this. Added 2026-09-28.
+    - cron: '49 0 * * *'    # EVENING BACKSTOP = 7:49 PM CDT. When CDT ends 1 Nov, ADD 1 hour here too.
+  workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
-  contents: write
-  issues: write
-
-# Same group as daily.yml: only one poster runs at a time, so no double posts.
-concurrency:
-  group: dwr-poster
-  cancel-in-progress: false
+  contents: write           # save queue status back to the repo
+  issues: write             # open an alert issue when a post fails
 
 jobs:
   post:
@@ -39,8 +20,9 @@ jobs:
     # A run must never be able to eat a posting window again. The Aug 19
     # scheduled run sat there for 2h15m; GitHub's default lets a job run for
     # SIX HOURS before it is killed. Twenty minutes is far more than posting
-    # ever needs (an Instagram reel polls for at most 5 minutes), so a stuck
-    # run dies loudly while there is still time to fix it by hand.
+    # ever needs (an Instagram reel polls for at most 5 minutes) and well
+    # inside the daily window, so a stuck run dies loudly while there is
+    # still time to fix it by hand.
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -71,32 +53,10 @@ jobs:
           done
           echo "::warning::ffmpeg would not install. Posting anyway; the 9:16 reel aspect gate is skipped for this run."
 
-      - name: Preview what would go out
-        run: |
-          python - <<'PY'
-          import csv, datetime
-          from zoneinfo import ZoneInfo
-          today = datetime.datetime.now(ZoneInfo("America/Chicago")).date()
-          print(f"Today in US Central: {today}")
-          with open('content_queue.csv', encoding='utf-8') as fh:
-              rows = list(csv.DictReader(fh))
-          any_due = False
-          for r in rows:
-              st = (r.get('status') or '').upper()
-              try:
-                  due = datetime.datetime.strptime(r['date'].strip(), '%Y-%m-%d').date()
-              except Exception:
-                  continue
-              att = int(r.get('attempts') or 0)
-              go = (st in ('QUEUED', '') or (st == 'FAILED' and att < 3)) and due <= today
-              if go:
-                  any_due = True
-                  print(f"  WILL POST  {r['date']}  {r.get('platform')}  {r.get('caption','')[:60]}")
-          if not any_due:
-              print("  (nothing is due — this run would post nothing)")
-          PY
-
-
+      # ---- WHAT WAS DUE, RECORDED BEFORE WE TOUCH ANYTHING -----------------
+      # Written BEFORE posting so the end-state check has something honest to
+      # compare against. Without this, a run that publishes nothing looks
+      # identical whether nothing was due or everything silently failed.
       - name: Record what is due before posting
         if: always()
         run: |
@@ -125,13 +85,16 @@ jobs:
           PY
           echo "Due at the start of this run:"; cat due_before.txt || true
 
-      - name: Publish
-        if: ${{ github.event.inputs.confirm == 'yes' || github.event_name == 'push' }}
+      - name: Post what's due today
+        id: post
         env:
           META_TOKEN: ${{ secrets.META_TOKEN }}
           MAKE_FB_WEBHOOK: ${{ secrets.MAKE_FB_WEBHOOK }}   # public Facebook route via Make.com (2026-09-28)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # lets the integrity gate see who last committed a reel
         run: python post.py
 
+      # MUST run even when posting failed, or a failure would throw away the
+      # queue status and the log.
       - name: Save queue status back to the repo
         if: always()
         run: |
@@ -140,8 +103,8 @@ jobs:
           # Add only the files that exist. `git add` aborts the WHOLE command if any
           # pathspec is missing, and last_failure.txt only exists after a failure —
           # which silently stopped the queue ever being saved (2026-08-17).
-          for f in content_queue.csv autopublish_log.txt last_failure.txt needs_tagging.txt needs_comment.txt; do
-            [ -f "$f" ] && git add "$f"
+          for f in content_queue.csv autopublish_log.txt last_failure.txt needs_tagging.txt needs_comment.txt media_manifest.csv; do
+            git add -A -- "$f" 2>/dev/null || true
           done
           git commit -m "post: update queue status [skip ci]" || echo "nothing to commit"
           git push || echo "nothing to push"
@@ -201,7 +164,11 @@ jobs:
           print(f"All {len(due)} post(s) that were due are confirmed POSTED.")
           PY
 
-      - name: Raise the alarm if a post failed
+      # ---- THE ALARM -------------------------------------------------------
+      # Before this existed, a failed post still finished GREEN and nobody was
+      # told — that is how Micah Spurlock's spotlight was silently lost on
+      # 2026-08-17. Now a failure opens an issue, which emails David straight away.
+      - name: Raise the alarm — open an issue so David is told immediately
         if: failure()
         uses: actions/github-script@v7
         with:
@@ -210,15 +177,30 @@ jobs:
             let detail = '(no detail file was written)';
             try { detail = fs.readFileSync('last_failure.txt', 'utf8'); } catch (e) {}
             const when = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            const body = [
+              '## A scheduled post did NOT go out',
+              '',
+              '**What failed**',
+              '```',
+              detail.trim(),
+              '```',
+              '',
+              '**What happens next**',
+              '- The bot retries this row automatically on the next run (up to 3 attempts).',
+              '- Anything already live on Facebook or Instagram is recorded in the queue`s `posted_to` column and will NOT be posted twice.',
+              '',
+              '**If you want to know exactly why Facebook refused it**',
+              'Actions tab → **Diagnose a failed post** → Run workflow → type the row date.',
+              'It asks Facebook directly and publishes nothing.',
+              '',
+              `[Open the full run log](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+              '',
+              `_Raised automatically ${when} UTC._`
+            ].join('\n');
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `🔴 DWR bot: a post failed to go out (${when} UTC)`,
-              body: [
-                '## A post did NOT go out', '',
-                '```', detail.trim(), '```', '',
-                'The bot retries automatically next run (up to 3 attempts). Anything already live is recorded in `posted_to` and will not be posted twice.', '',
-                `[Open the full run log](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
-              ].join('\n'),
+              body,
               labels: ['bot-failure']
             });

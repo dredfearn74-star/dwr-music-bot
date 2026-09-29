@@ -1,0 +1,38 @@
+name: Public visibility check (logged-out Facebook)
+
+# Added 2026-09-28 after a month of Facebook posts that only admins could see.
+# This job looks at each page's PUBLIC timeline the way a stranger does (the
+# Facebook Page Plugin, no login, no token) and confirms every Facebook post the
+# bot marked POSTED in the last 2 days is really there. Missing = red run.
+# It posts nothing and touches no secrets.
+#
+# Runs at 11:55 AM and 8:40 PM Central, i.e. after the morning slots + backstops
+# and after the evening slot. UTC below — when CDT ends 1 Nov, ADD 1 hour.
+
+on:
+  schedule:
+    - cron: '55 16 * * *'   # 11:55 AM CDT
+    - cron: '40 1 * * *'    # 8:40 PM CDT (01:40 UTC next day)
+  workflow_dispatch:
+
+jobs:
+  pubcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check the public timelines
+        run: python pubcheck.py
+      - name: Record the failure in the repo
+        if: failure()
+        run: |
+          git config user.name "dwr-music-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add last_failure.txt || true
+          git commit -m "pubcheck: Facebook post NOT visible to the public [skip ci]" || true
+          git push || true
