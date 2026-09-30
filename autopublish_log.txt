@@ -891,3 +891,24 @@
 [2026-09-29 19:50:31] POSTED [DWR Music] 2026-09-29 both -> FB(make):1992468384773875, IG:18086855456269798, igcmt:17911577010524053
 [2026-09-29 19:50:31] Queue updated (1 row(s) changed, 264 rows saved).
 [2026-09-29 20:48:20] Nothing due today. Exiting cleanly.
+[2026-09-30 00:41:39]   first comment for 2026-09-30: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-30 00:41:54]   Facebook post handed to Make.com (public route) for 2026-09-30: 1179462511909328_122150224941352686
+[2026-09-30 00:41:54]   no location on this row
+[2026-09-30 00:42:20]   first comment confirmed on Instagram too.
+[2026-09-30 00:42:20] POSTED [MotiveAF] 2026-09-30 both -> FB(make):1179462511909328_122150224941352686, IG:18122572663697642, igcmt:18130518583775439
+[2026-09-30 00:42:21]   first comment for 2026-09-30: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-09-30 00:43:25]   Facebook post handed to Make.com (public route) for 2026-09-30: 1086587517113080
+[2026-09-30 00:43:25]   no location on this row
+[2026-09-30 00:44:52]   first comment confirmed on Instagram too.
+[2026-09-30 00:44:52] POSTED [MotiveAF] 2026-09-30 both -> FB(make):1086587517113080, IG:18073611902753572, igcmt:18144080887581704
+[2026-09-30 00:44:54]   no location on this row
+[2026-09-30 00:46:17] POSTED [DWR Music] 2026-09-30 instagram -> IG:17878103388627475
+[2026-09-30 00:46:19] APPROVED automatically: media/live-like-a-warrior-exile-reel-1.mp4 is David's own upload (commit 2132da9); added to media_manifest.csv.
+[2026-09-30 00:46:19]   first comment for 2026-09-30: https://youtu.be/1CJP08Mfplo   (using the first_comment cell exactly as written)
+[2026-09-30 00:46:28] FAILED [DWR Music] 2026-09-30 facebook attempt 1/3: Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
+[2026-09-30 00:46:28] Queue updated (4 row(s) changed, 264 rows saved).
+[2026-09-30 00:46:28] 
+[2026-09-30 00:46:28] ====================================================================
+[2026-09-30 00:46:28] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-09-30 00:46:28]    - DWR Music 2026-09-30 facebook (attempt 1/3) — Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
+[2026-09-30 00:46:28] ====================================================================
