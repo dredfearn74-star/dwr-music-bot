@@ -921,3 +921,8 @@
 [2026-09-30 01:03:03] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-09-30 01:03:03]    - DWR Music 2026-09-30 facebook (attempt 2/3) — Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
 [2026-09-30 01:03:03] ====================================================================
+[2026-09-30 09:50:22] RETRY [DWR Music] 2026-09-30: attempt 3 of 3 (already live on: nothing yet)
+[2026-09-30 09:50:25]   first comment for 2026-09-30: https://youtu.be/1CJP08Mfplo   (using the first_comment cell exactly as written)
+[2026-09-30 09:51:37]   Facebook post handed to Make.com (public route) for 2026-09-30: 1712047343238457
+[2026-09-30 09:51:38] POSTED [DWR Music] 2026-09-30 facebook -> FB(make):1712047343238457
+[2026-09-30 09:51:38] Queue updated (1 row(s) changed, 264 rows saved).
