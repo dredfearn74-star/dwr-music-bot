@@ -927,3 +927,4 @@
 [2026-09-30 09:51:38] POSTED [DWR Music] 2026-09-30 facebook -> FB(make):1712047343238457
 [2026-09-30 09:51:38] Queue updated (1 row(s) changed, 264 rows saved).
 [2026-09-30 10:52:57] Nothing due today. Exiting cleanly.
+[2026-09-30 14:25:26] TOPUP MotiveAF already has a row for 2026-09-30 (status POSTED). Standing down.
