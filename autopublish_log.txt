@@ -883,3 +883,10 @@
 [2026-09-29 14:59:51] Nothing due today. Exiting cleanly.
 [2026-09-29 15:13:30] Nothing due today. Exiting cleanly.
 [2026-09-29 15:58:30] Nothing due today. Exiting cleanly.
+[2026-09-29 19:48:04] APPROVED automatically: media/save-tonight-exile-reel-2.mp4 is David's own upload (commit f927486); added to media_manifest.csv.
+[2026-09-29 19:48:04]   first comment for 2026-09-29: Pre-save the DWR EDM version → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-09-29 19:49:29]   Facebook post handed to Make.com (public route) for 2026-09-29: 1992468384773875
+[2026-09-29 19:49:30]   no location on this row
+[2026-09-29 19:50:31]   first comment confirmed on Instagram too.
+[2026-09-29 19:50:31] POSTED [DWR Music] 2026-09-29 both -> FB(make):1992468384773875, IG:18086855456269798, igcmt:17911577010524053
+[2026-09-29 19:50:31] Queue updated (1 row(s) changed, 264 rows saved).
