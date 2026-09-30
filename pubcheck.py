@@ -39,6 +39,54 @@ def norm(s):
     return s.strip().lower()
 
 
+VIDEO_PLUGIN = "https://www.facebook.com/plugins/video.php?href={}&width=400"
+POST_PLUGIN = "https://www.facebook.com/plugins/post.php?href={}&width=400"
+
+
+def make_ids_from_log(since):
+    """Every Facebook post Make published in the window, from autopublish_log.txt.
+
+    2026-09-30: the timeline plugin only renders the newest handful of posts, so
+    a 29-hour-old post that was perfectly public got reported HIDDEN. Checking
+    each post by its own id through the video/post plugin is exact.
+    """
+    out = []
+    pat = re.compile(r"^\[(\d{4}-\d{2}-\d{2}) [^\]]+\] POSTED \[([^\]]+)\] (\d{4}-\d{2}-\d{2}) \S+ -> .*?FB\(make\):(\S+?)(?:,|$)")
+    try:
+        for line in open("autopublish_log.txt", encoding="utf-8", errors="replace"):
+            m = pat.match(line.strip())
+            if not m:
+                continue
+            logday, brand, due, fid = m.groups()
+            try:
+                if dt.date.fromisoformat(logday) < since:
+                    continue
+            except Exception:
+                continue
+            out.append((brand.strip(), due, fid))
+    except FileNotFoundError:
+        pass
+    return out
+
+
+def check_one(page, fid):
+    """Returns 'OK', 'HIDDEN' or 'BLIND' for one Make-published post id."""
+    if "_" in fid:
+        url = POST_PLUGIN.format(urllib.parse.quote(f"https://www.facebook.com/{page}/posts/{fid.split('_')[-1]}", safe=""))
+    else:
+        url = VIDEO_PLUGIN.format(urllib.parse.quote(f"https://www.facebook.com/reel/{fid}", safe=""))
+    try:
+        raw = fetch(url)
+    except Exception:
+        return "BLIND"
+    body = norm(raw)
+    if "video unavailable" in body or "isn't available" in body or "content isn't available" in body:
+        return "HIDDEN"
+    if "<video" in raw or "fb-video" in raw or "fb-post" in raw or page in raw:
+        return "OK"
+    return "BLIND"
+
+
 def main():
     brands = {r["brand"].strip(): r for r in csv.DictReader(open("brands.csv", encoding="utf-8"))}
     rows = list(csv.DictReader(open("content_queue.csv", encoding="utf-8")))
@@ -63,6 +111,24 @@ def main():
         expected.setdefault(r["brand"].strip(), []).append((d, cap[:SNIPPET], cap[:70]))
 
     failures, notes = [], []
+    # ---- exact per-post check (Make-published posts, by id) -------------------
+    checked_brands = set()
+    for brand, due, fid in make_ids_from_log(since):
+        cfg = brands.get(brand)
+        if not cfg:
+            continue
+        page = cfg["fb_page_id"].strip()
+        verdict = check_one(page, fid)
+        if verdict == "OK":
+            notes.append(f"OK   {brand} {due}  post {fid} is PUBLIC (checked by id)")
+            checked_brands.add(brand)
+        elif verdict == "HIDDEN":
+            failures.append(f"HIDDEN {brand} {due}  post {fid} — Facebook says unavailable to the public")
+            checked_brands.add(brand)
+        else:
+            notes.append(f"BLIND {brand} {due}  post {fid} — plugin gave no answer; check by hand: https://www.facebook.com/{fid.split('_')[-1]}")
+    # ---- timeline check only for brands the id check could not cover ----------
+    expected = {b: i for b, i in expected.items() if b not in checked_brands}
     for brand, items in expected.items():
         cfg = brands.get(brand)
         if not cfg:

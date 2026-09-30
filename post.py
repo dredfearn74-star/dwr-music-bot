@@ -432,6 +432,47 @@ def make_fb_post(webhook, page_id, media, caption, comment, brand="", due=""):
         return (r.text or "accepted").strip()[:80]
 
 
+def make_post_landed(ver, page_id, tok, caption, is_vid, window_min=20):
+    """Did the Make.com post actually reach the Page even though Make said 500?
+
+    2026-09-30: three times in one day Make's "Publish a Reel" module errored
+    AFTER the reel was already live (its status poll hit Facebook a moment too
+    early: "Object with ID ... does not exist"). Make then sent the bot an
+    automatic 500, the bot marked the row FAILED, and the next run posted the
+    same reel again — Live Like a Warrior went up THREE times, a MotiveAF reel
+    twice. So before a Make failure is allowed to become a retry, look at the
+    Page with our own token: a post whose caption starts like ours and was
+    created in the last few minutes means it landed. Returns its id, or None.
+    """
+    if not (page_id and tok and caption):
+        return None
+    want = re.sub(r"\s+", " ", caption).strip().lower()[:40]
+    if len(want) < 12:
+        return None
+    base = f"https://graph.facebook.com/{ver}"
+    cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=window_min)
+    edges = ([("video_reels", "description,updated_time")] if is_vid else []) + \
+            [("published_posts", "message,created_time")]
+    for edge, fields in edges:
+        try:
+            r = requests.get(f"{base}/{page_id}/{edge}",
+                             params={"fields": fields, "limit": 10, "access_token": tok}, timeout=60)
+            if not r.ok:
+                continue
+            for item in (r.json() or {}).get("data", []):
+                text = re.sub(r"\s+", " ", item.get("message") or item.get("description") or "").strip().lower()
+                when = item.get("created_time") or item.get("updated_time") or ""
+                try:
+                    ts = datetime.datetime.strptime(when, "%Y-%m-%dT%H:%M:%S%z")
+                except Exception:
+                    ts = None
+                if text.startswith(want) and (ts is None or ts >= cutoff):
+                    return item.get("id")
+        except Exception:
+            continue
+    return None
+
+
 # ---------------------------------------------------------------------------
 # STORIES — INSTAGRAM_RULES.md Gap 2, built 2026-09-03.
 #
@@ -1617,8 +1658,23 @@ def main():
                     # 2026-09-29: send the caption WITH the @[PageID] mentions. Make's
                     # Meta app is reviewed, so Page tags may stick where our own app's
                     # were always stripped. The read-back below tells us either way.
-                    fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, fb_cap, comment_link,
-                                         row.get("brand", ""), str(due))
+                    try:
+                        fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, fb_cap, comment_link,
+                                             row.get("brand", ""), str(due))
+                    except RuntimeError as mk_err:
+                        # Make said it failed. Before believing it, check the Page —
+                        # see make_post_landed(). If the post is there, it is DONE and
+                        # must never be retried (that is how the triple-post happened).
+                        landed = make_post_landed(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap,
+                                                  bool(media and is_video(media)))
+                        if not landed:
+                            raise
+                        fb_id = landed
+                        log(f"  Make.com reported an error ({str(mk_err)[:80]}) but the post IS on the "
+                            f"Page as {landed} — keeping it, not retrying. Its first comment may be "
+                            f"missing: check {'https://www.facebook.com/' + str(landed).split('_')[-1]}")
+                        needs_comment.append(f"{due}  FB  (Make errored after publish — comment unconfirmed) "
+                                             f"{comment_link}  ->  https://www.facebook.com/{str(landed).split('_')[-1]}")
                     res.append("FB(make):" + str(fb_id))
                     mark_done(row, "FB")
                     log(f"  Facebook post handed to Make.com (public route) for {due}: {fb_id}")
