@@ -972,3 +972,10 @@
 [2026-10-01 01:37:17] Nothing due today. Exiting cleanly.
 [2026-10-01 09:48:22] Nothing due today. Exiting cleanly.
 [2026-10-01 14:35:18] TOPUP MotiveAF already has a row for 2026-10-01 (status POSTED). Standing down.
+[2026-10-01 14:50:18]   first comment for 2026-10-01: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-01 14:50:44]   Facebook post handed to Make.com (public route) for 2026-10-01: 1813443319691421
+[2026-10-01 14:50:44] POSTED [MotiveAF] 2026-10-01 facebook -> FB(make):1813443319691421
+[2026-10-01 14:50:45]   first comment for 2026-10-01: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-10-01 14:50:54]   Facebook post handed to Make.com (public route) for 2026-10-01: 1173427532510546_122147133111341551
+[2026-10-01 14:50:54] POSTED [Midbar Moon] 2026-10-01 facebook -> FB(make):1173427532510546_122147133111341551
+[2026-10-01 14:50:54] Queue updated (2 row(s) changed, 264 rows saved).
