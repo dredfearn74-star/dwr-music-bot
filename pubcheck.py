@@ -80,10 +80,14 @@ def check_one(page, fid):
     except Exception:
         return "BLIND"
     body = norm(raw)
-    if "video unavailable" in body or "isn't available" in body or "content isn't available" in body:
-        return "HIDDEN"
+    # 2026-10-02: a WORKING video plugin page always carries a hidden "Video
+    # unavailable / Sorry, this..." error template in its HTML. Checking for that
+    # text first flagged every public reel as HIDDEN (9 false alarms Sep 30-Oct 2,
+    # all confirmed public from a logged-out browser). A playable <video> tag wins.
     if "<video" in raw or "fb-video" in raw or "fb-post" in raw or page in raw:
         return "OK"
+    if "video unavailable" in body or "isn't available" in body or "content isn't available" in body:
+        return "HIDDEN"
     return "BLIND"
 
 
