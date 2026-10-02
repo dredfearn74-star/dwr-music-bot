@@ -991,3 +991,12 @@
 [2026-10-01 19:48:12] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-10-01 19:48:12]    - DWR Music 2026-10-01 both (attempt 1/3) — Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
 [2026-10-01 19:48:12] ====================================================================
+[2026-10-01 20:48:21] RETRY [DWR Music] 2026-10-01: attempt 2 of 3 (already live on: nothing yet)
+[2026-10-01 20:48:28]   first comment for 2026-10-01: Pre-save the DWR EDM version → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-10-01 20:48:39] FAILED [DWR Music] 2026-10-01 both attempt 2/3: Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
+[2026-10-01 20:48:39] Queue updated (1 row(s) changed, 264 rows saved).
+[2026-10-01 20:48:39] 
+[2026-10-01 20:48:39] ====================================================================
+[2026-10-01 20:48:39] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-10-01 20:48:39]    - DWR Music 2026-10-01 both (attempt 2/3) — Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
+[2026-10-01 20:48:39] ====================================================================
