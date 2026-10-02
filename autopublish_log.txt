@@ -1000,3 +1000,22 @@
 [2026-10-01 20:48:39] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-10-01 20:48:39]    - DWR Music 2026-10-01 both (attempt 2/3) — Make.com webhook refused the post: HTTP 500 Scenario failed to complete.
 [2026-10-01 20:48:39] ====================================================================
+[2026-10-02 00:49:57]   first comment for 2026-10-02: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-02 00:50:01]   Facebook post handed to Make.com (public route) for 2026-10-02: 1179462511909328_122150893449352686
+[2026-10-02 00:50:02]   no location on this row
+[2026-10-02 00:50:28]   first comment confirmed on Instagram too.
+[2026-10-02 00:50:28] POSTED [MotiveAF] 2026-10-02 both -> FB(make):1179462511909328_122150893449352686, IG:18071988086727875, igcmt:18115650041519119
+[2026-10-02 00:50:32]   no location on this row
+[2026-10-02 00:51:47] POSTED [DWR Music] 2026-10-02 instagram -> IG:18026308262909643
+[2026-10-02 00:51:49]   first comment for 2026-10-02: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-02 00:52:19]   Facebook post handed to Make.com (public route) for 2026-10-02: 1882987702873278
+[2026-10-02 00:52:20]   no location on this row
+[2026-10-02 00:52:56]   first comment confirmed on Instagram too.
+[2026-10-02 00:52:56] POSTED [MotiveAF] 2026-10-02 both -> FB(make):1882987702873278, IG:18027893411912979, igcmt:18105872111249092
+[2026-10-02 00:52:56] RETRY [DWR Music] 2026-10-01: attempt 3 of 3 (already live on: nothing yet)
+[2026-10-02 00:52:59]   first comment for 2026-10-01: Pre-save the DWR EDM version → https://distrokid.com/hyperfollow/dwredm/save-tonight   (using the first_comment cell exactly as written)
+[2026-10-02 00:54:00]   Facebook post handed to Make.com (public route) for 2026-10-01: 1709285900839034
+[2026-10-02 00:54:01]   no location on this row
+[2026-10-02 00:54:45]   first comment confirmed on Instagram too.
+[2026-10-02 00:54:45] POSTED [DWR Music] 2026-10-01 both -> FB(make):1709285900839034, IG:18446936236124160, igcmt:17862296061696701
+[2026-10-02 00:54:45] Queue updated (4 row(s) changed, 264 rows saved).
