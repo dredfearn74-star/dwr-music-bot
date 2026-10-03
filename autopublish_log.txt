@@ -1048,3 +1048,4 @@
 [2026-10-03 00:28:25]   no location on this row
 [2026-10-03 00:29:02] POSTED [DWR Music] 2026-10-03 instagram -> IG:18085025468695584
 [2026-10-03 00:29:02] Queue updated (3 row(s) changed, 271 rows saved).
+[2026-10-03 00:50:27] Nothing due today. Exiting cleanly.
