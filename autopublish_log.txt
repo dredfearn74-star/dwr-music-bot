@@ -1051,3 +1051,4 @@
 [2026-10-03 00:50:27] Nothing due today. Exiting cleanly.
 [2026-10-03 09:48:20] Nothing due today. Exiting cleanly.
 [2026-10-03 10:48:10] Nothing due today. Exiting cleanly.
+[2026-10-03 12:59:18] TOPUP MotiveAF already has a row for 2026-10-03 (status POSTED). Standing down.
