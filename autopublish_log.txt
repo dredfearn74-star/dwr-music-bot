@@ -1127,3 +1127,19 @@
 [2026-10-04 20:48:20] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-10-04 20:48:20]    - MotiveAF 2026-10-04 — REFUSED: this video was changed by something other than David's own upload (sha256 6878d7dccb38a2c9... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-10-04 20:48:20] ====================================================================
+[2026-10-05 00:53:01]   Facebook post handed to Make.com (public route) for 2026-10-05: 113416904992248_1071190595887181
+[2026-10-05 00:53:01]   no location on this row
+[2026-10-05 00:53:24] POSTED [DWR Music] 2026-10-05 both -> FB(make):113416904992248_1071190595887181, IG:18069846740498579
+[2026-10-05 00:53:25]   first comment for 2026-10-05: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-05 00:53:29]   Facebook post handed to Make.com (public route) for 2026-10-05: 1179462511909328_122151892791352686
+[2026-10-05 00:53:30]   no location on this row
+[2026-10-05 00:53:55]   first comment confirmed on Instagram too.
+[2026-10-05 00:53:55] POSTED [MotiveAF] 2026-10-05 both -> FB(make):1179462511909328_122151892791352686, IG:17881150542628205, igcmt:17932629540404445
+[2026-10-05 00:53:55] RETRY [MotiveAF] 2026-10-04: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-05 00:53:57] REFUSED [MotiveAF] 2026-10-04 facebook: this video was changed by something other than David's own upload (sha256 6878d7dccb38a2c9... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-10-05 00:53:57] Queue updated (3 row(s) changed, 271 rows saved).
+[2026-10-05 00:53:57] 
+[2026-10-05 00:53:57] ====================================================================
+[2026-10-05 00:53:57] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-10-05 00:53:57]    - MotiveAF 2026-10-04 — REFUSED: this video was changed by something other than David's own upload (sha256 6878d7dccb38a2c9... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-10-05 00:53:57] ====================================================================
