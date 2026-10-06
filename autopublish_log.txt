@@ -1227,3 +1227,30 @@
 [2026-10-05 20:48:20]    - DWR Music 2026-10-05 — REFUSED: this video was changed by something other than David's own upload (sha256 5f6b47f011d5b03b... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-10-05 20:48:20]    - MotiveAF 2026-10-04 — REFUSED: this video was changed by something other than David's own upload (sha256 6878d7dccb38a2c9... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-10-05 20:48:20] ====================================================================
+[2026-10-06 01:32:12]   first comment for 2026-10-06: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-06 01:32:16]   Facebook post handed to Make.com (public route) for 2026-10-06: 1179462511909328_122152237911352686
+[2026-10-06 01:32:17]   no location on this row
+[2026-10-06 01:32:37]   first comment confirmed on Instagram too.
+[2026-10-06 01:32:37] POSTED [MotiveAF] 2026-10-06 both -> FB(make):1179462511909328_122152237911352686, IG:18460670494184274, igcmt:17983204893089159
+[2026-10-06 01:32:39]   first comment for 2026-10-06: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-06 01:33:31]   Facebook post handed to Make.com (public route) for 2026-10-06: 1777571970184394
+[2026-10-06 01:33:32]   no location on this row
+[2026-10-06 01:34:36]   first comment confirmed on Instagram too.
+[2026-10-06 01:34:36] POSTED [MotiveAF] 2026-10-06 both -> FB(make):1777571970184394, IG:18122612899879381, igcmt:18089631098234929
+[2026-10-06 01:34:38] APPROVED automatically: freaker-reel-4.mp4 is David's own upload (commit 6f8e03f); added to media_manifest.csv.
+[2026-10-06 01:34:38]   first comment for 2026-10-06: https://youtu.be/6Lpzx5dK3WM   (using the first_comment cell exactly as written)
+[2026-10-06 01:35:40]   Facebook post handed to Make.com (public route) for 2026-10-06: 1645145196962539
+[2026-10-06 01:35:40]   no location on this row
+[2026-10-06 01:36:34]   first comment confirmed on Instagram too.
+[2026-10-06 01:36:34] POSTED [DWR Music] 2026-10-06 both -> FB(make):1645145196962539, IG:17893860537610737, igcmt:17912121333550968
+[2026-10-06 01:36:34] RETRY [DWR Music] 2026-10-05: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-06 01:36:36] REFUSED [DWR Music] 2026-10-05 facebook: this video was changed by something other than David's own upload (sha256 5f6b47f011d5b03b... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-10-06 01:36:36] RETRY [MotiveAF] 2026-10-04: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-06 01:36:38] REFUSED [MotiveAF] 2026-10-04 facebook: this video was changed by something other than David's own upload (sha256 6878d7dccb38a2c9... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-10-06 01:36:38] Queue updated (5 row(s) changed, 271 rows saved).
+[2026-10-06 01:36:38] 
+[2026-10-06 01:36:38] ====================================================================
+[2026-10-06 01:36:38] !! 2 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-10-06 01:36:38]    - DWR Music 2026-10-05 — REFUSED: this video was changed by something other than David's own upload (sha256 5f6b47f011d5b03b... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-10-06 01:36:38]    - MotiveAF 2026-10-04 — REFUSED: this video was changed by something other than David's own upload (sha256 6878d7dccb38a2c9... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-10-06 01:36:38] ====================================================================
