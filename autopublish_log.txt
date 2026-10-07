@@ -1439,3 +1439,22 @@
 [2026-10-07 10:48:23]    - MotiveAF 2026-10-06 — REFUSED: this video was changed by something other than David's own upload (sha256 6a139514ad65e536... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-10-07 10:48:23] ====================================================================
 [2026-10-07 15:01:00] TOPUP MotiveAF already has a row for 2026-10-07 (status POSTED). Standing down.
+[2026-10-07 15:12:11] RETRY [DWR Music] 2026-10-05: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-07 15:12:12]   first comment for 2026-10-05: https://youtu.be/zHuzzCme-OE   (using the first_comment cell exactly as written)
+[2026-10-07 15:13:03]   Facebook post handed to Make.com (public route) for 2026-10-05: 1572375697996664
+[2026-10-07 15:13:03] POSTED [DWR Music] 2026-10-05 facebook -> FB(make):1572375697996664
+[2026-10-07 15:13:03] RETRY [MotiveAF] 2026-10-04: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-07 15:13:05]   first comment for 2026-10-04: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-07 15:13:45]   Facebook post handed to Make.com (public route) for 2026-10-04: 1099626902481761
+[2026-10-07 15:13:45] POSTED [MotiveAF] 2026-10-04 facebook -> FB(make):1099626902481761
+[2026-10-07 15:13:45] RETRY [MotiveAF] 2026-10-06: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-07 15:13:47]   first comment for 2026-10-06: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-07 15:14:16]   Facebook post handed to Make.com (public route) for 2026-10-06: 1667694814786574
+[2026-10-07 15:14:16] POSTED [MotiveAF] 2026-10-06 facebook -> FB(make):1667694814786574
+[2026-10-07 15:14:17]   first comment for 2026-10-07: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-07 15:14:46]   Facebook post handed to Make.com (public route) for 2026-10-07: 1111432974581295
+[2026-10-07 15:14:46] POSTED [MotiveAF] 2026-10-07 facebook -> FB(make):1111432974581295
+[2026-10-07 15:14:47]   first comment for 2026-10-07: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-10-07 15:14:53]   Facebook post handed to Make.com (public route) for 2026-10-07: 1173427532510546_122149717641341551
+[2026-10-07 15:14:53] POSTED [Midbar Moon] 2026-10-07 facebook -> FB(make):1173427532510546_122149717641341551
+[2026-10-07 15:14:53] Queue updated (5 row(s) changed, 274 rows saved).
