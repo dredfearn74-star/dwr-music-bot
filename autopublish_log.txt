@@ -1466,3 +1466,12 @@
 [2026-10-07 19:49:13] POSTED [DWR Music] 2026-10-07 facebook -> FB(make):2020012528663779
 [2026-10-07 19:49:13] Queue updated (1 row(s) changed, 274 rows saved).
 [2026-10-07 20:48:05] Nothing due today. Exiting cleanly.
+[2026-10-08 01:16:20]   Facebook post handed to Make.com (public route) for 2026-10-08: 113416904992248_1073933102279597
+[2026-10-08 01:16:20]   no location on this row
+[2026-10-08 01:16:29] POSTED [DWR Music] 2026-10-08 both -> FB(make):113416904992248_1073933102279597, IG:18116516419967396
+[2026-10-08 01:16:30]   first comment for 2026-10-08: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-08 01:16:35]   Facebook post handed to Make.com (public route) for 2026-10-08: 1179462511909328_122153143119352686
+[2026-10-08 01:16:36]   no location on this row
+[2026-10-08 01:16:50]   first comment confirmed on Instagram too.
+[2026-10-08 01:16:50] POSTED [MotiveAF] 2026-10-08 both -> FB(make):1179462511909328_122153143119352686, IG:18130477993829708, igcmt:18142786339595843
+[2026-10-08 01:16:50] Queue updated (2 row(s) changed, 274 rows saved).
