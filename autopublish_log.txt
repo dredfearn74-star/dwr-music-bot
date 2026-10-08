@@ -1461,3 +1461,7 @@
 [2026-10-07 15:39:37] Nothing due today. Exiting cleanly.
 [2026-10-07 15:52:19] Nothing due today. Exiting cleanly.
 [2026-10-07 16:28:51] Nothing due today. Exiting cleanly.
+[2026-10-07 19:48:14]   first comment for 2026-10-07: https://youtu.be/zHuzzCme-OE   (using the first_comment cell exactly as written)
+[2026-10-07 19:49:13]   Facebook post handed to Make.com (public route) for 2026-10-07: 2020012528663779
+[2026-10-07 19:49:13] POSTED [DWR Music] 2026-10-07 facebook -> FB(make):2020012528663779
+[2026-10-07 19:49:13] Queue updated (1 row(s) changed, 274 rows saved).
