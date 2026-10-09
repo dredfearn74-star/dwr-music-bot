@@ -82,21 +82,42 @@ def now_ct():
     return datetime.datetime.now(TZ) if TZ else datetime.datetime.utcnow()
 
 
+MORNING_FLOOR = datetime.time(8, 0)   # US Central. Added 2026-10-08.
+
+
 def slot_open(row, due, today):
-    """EVENING SLOT (added 2026-09-28, David: "we talked about doing evening ones").
+    """EVENING SLOT (added 2026-09-28) + MORNING FLOOR (added 2026-10-08).
 
     A row may carry a `post_after` time in US Central, e.g. `19:00`. On its own
     date it will not post before that time, so the morning run leaves it alone
-    and the evening cron picks it up. Blank = post on the morning run, exactly as
-    before. A row from an EARLIER day always posts (it's overdue).
+    and the evening cron picks it up. A row from an EARLIER day always posts at
+    any hour (it's overdue).
+
+    MORNING FLOOR: a row with a BLANK post_after will not publish before 8:00 AM
+    US Central on its own date. Before 2026-10-08 a blank post_after meant "post
+    the instant any run wakes up", and that is how 10-01 through 10-08 all went
+    out between 00:50 and 01:36 AM. GitHub delayed the 00:17 UTC evening cron by
+    about six hours; by the time it actually ran, the US Central date had rolled
+    over, so the run picked up the NEXT day's rows and published them overnight.
+    The bot was not broken - it did exactly what it was told, at a terrible hour.
+
+    The floor blocks EARLY only, never LATE. A run at 2:08 PM still posts. The
+    9:47 / 10:13 / 10:41 / 11:27 AM slots all clear the floor, so the intended
+    morning window is unaffected. Overdue rows are never held. If GitHub fires
+    nothing at all between 8 AM and midnight, nothing posts and the 10:22 AM
+    watchdog raises it so post_now.yml can be run by hand.
     """
+    if due < today:
+        return True              # overdue -> go now, whatever time it is
     pa = (row.get("post_after") or "").strip()
-    if not pa or due < today:
-        return True
+    if not pa:
+        return now_ct().time() >= MORNING_FLOOR
     try:
         hh, mm = (int(x) for x in pa.split(":")[:2])
     except Exception:
-        return True   # unreadable time -> never block a post over it
+        # Unreadable time -> don't block the post over the bad value, but still
+        # hold it to the same 8 AM floor as every other row dated today.
+        return now_ct().time() >= MORNING_FLOOR
     return now_ct().time() >= datetime.time(hh, mm)
 
 
