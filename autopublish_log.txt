@@ -1505,3 +1505,4 @@
 [2026-10-09 14:46:32]   Facebook post handed to Make.com (public route) for 2026-10-09: 1173427532510546_122150244465341551
 [2026-10-09 14:46:32] POSTED [Midbar Moon] 2026-10-09 facebook -> FB(make):1173427532510546_122150244465341551
 [2026-10-09 14:46:32] Queue updated (1 row(s) changed, 274 rows saved).
+[2026-10-09 15:07:14] Nothing due today. Exiting cleanly.
