@@ -1486,3 +1486,7 @@
 [2026-10-08 15:42:27] Nothing due today. Exiting cleanly.
 [2026-10-08 15:49:01] Nothing due today. Exiting cleanly.
 [2026-10-08 16:26:46] Nothing due today. Exiting cleanly.
+[2026-10-08 19:48:15]   Facebook post handed to Make.com (public route) for 2026-10-08: 1173427532510546_122149979349341551
+[2026-10-08 19:48:15]   no location on this row
+[2026-10-08 19:48:24] POSTED [Midbar Moon] 2026-10-08 both -> FB(make):1173427532510546_122149979349341551, IG:18034412273848281
+[2026-10-08 19:48:24] Queue updated (1 row(s) changed, 274 rows saved).
