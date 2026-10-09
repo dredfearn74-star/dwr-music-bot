@@ -1211,6 +1211,120 @@ def aspect_gate(url, plat="both", fmt="feed"):
             f"cell to `fb` to post it to Facebook only.")
 
 
+# ---------------------------------------------------------------------------
+# BACKGROUND GATE  (Midbar Moon only)  — added 2026-10-09
+# ---------------------------------------------------------------------------
+# WHY THIS EXISTS. On 2026-10-08 the bot published midbar-31-temple-hour-photo.jpg
+# to the Midbar Moon Page: a soap bar photographed on a BLACK cloth. Every other
+# Midbar image ever posted is either the cream brand card, the deep-navy brand
+# card, or a product with the background removed. David saw it live on the Page
+# on 10-09 and the instruction was: that should never happen again.
+#
+# Two more were already queued behind it (10-09 and 10-10, the Spirit Seekers
+# fair posts), so this is not a one-off bad file — it is a whole photo set
+# (midbar-25..33) shot on black that walked straight through every existing gate.
+# aspect_gate reads SHAPE, integrity_gate reads BYTES. Neither can see COLOUR.
+#
+# HOW IT WORKS. ffmpeg (already installed for the aspect gate) scales the image
+# to 9x9 RGBA and the four corner pixels are read back. The background must be
+# one of these, consistently on all four corners:
+#   - fully transparent  -> the background was removed, which is the house style
+#   - the cream brand card
+#   - the deep-navy brand card
+#   - plain white
+# Anything else is refused and nothing publishes.
+#
+# WHY IT IS MIDBAR-ONLY. MotiveAF's entire look is dark — its memes would all be
+# refused by this. The rule being enforced is Midbar Moon's brand rule, not a
+# fleet-wide one, so it is scoped by brand and no other brand is touched.
+#
+# WHY IT FAILS CLOSED. If ffmpeg is missing, the colour cannot be read, and this
+# gate REFUSES the Midbar row rather than waving it through (the aspect gate does
+# the opposite, on purpose — a missed shape check costs little). Here a missed
+# check is exactly the thing that already went wrong once. A held Midbar post
+# turns the run red and David gets told; a black-background post does not.
+#
+# TO ALLOW A NEW BACKGROUND, add it to APPROVED_BG below. Do not delete the gate.
+
+BG_BRANDS = ("midbar",)          # brand name substring, lower-cased
+BG_TOL = 20                      # per-channel slack, 0-255
+APPROVED_BG = [
+    ("cream", (241, 233, 218)),  # Midbar cream brand card
+    ("cream", (243, 239, 230)),  # Midbar cream brand card, lighter variant
+    ("white", (255, 255, 255)),  # plain white product shot
+    ("navy",  (23, 41, 59)),     # Midbar deep-navy brand card
+    ("navy",  (31, 38, 50)),     # Midbar deep-navy brand card, variant
+]
+
+
+def corner_pixels(url):
+    """Return the four corner pixels of an image as (r,g,b,a), or None.
+
+    The picture is scaled to 9x9 first, so each 'corner pixel' is really the
+    average of the outer ninth of the frame — a single real corner pixel could
+    be a stray speck and tell you nothing about the background.
+    """
+    if not shutil.which("ffmpeg"):
+        return None
+    try:
+        out = subprocess.run(
+            ["ffmpeg", "-v", "error", "-i", url, "-vf", "scale=9:9",
+             "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgba", "-"],
+            capture_output=True, timeout=180)
+        b = out.stdout
+        if len(b) < 9 * 9 * 4:
+            return None
+        at = lambda x, y: tuple(b[(y * 9 + x) * 4:(y * 9 + x) * 4 + 4])
+        return [at(0, 0), at(8, 0), at(0, 8), at(8, 8)]
+    except Exception:
+        return None
+
+
+def background_name(px):
+    """Name the approved background this pixel matches, or None."""
+    for name, ref in APPROVED_BG:
+        if all(abs(px[i] - ref[i]) <= BG_TOL for i in range(3)):
+            return name
+    if min(px[0], px[1], px[2]) >= 228:      # near-white of any warmth
+        return "white"
+    return None
+
+
+def background_gate(url, brand):
+    """Refuse a Midbar Moon still whose background is not the house background.
+
+    Returns '' when the image is fine, or a reason to refuse.
+    """
+    b = (brand or "").strip().lower()
+    if not any(k in b for k in BG_BRANDS):
+        return ""                       # other brands are not gated on colour
+    if is_video(url):
+        return ""                       # this gate is for stills
+
+    corners = corner_pixels(url)
+    if corners is None:
+        return ("could not read this image's background colour (ffmpeg missing or the "
+                "file would not decode). Midbar Moon images are held rather than guessed "
+                "at, because a black-background soap photo published on 2026-10-08 and "
+                "that is not happening twice. Re-run once ffmpeg installs, or post it by "
+                "hand after looking at it.")
+
+    if all(c[3] < 16 for c in corners):
+        return ""                       # background removed — the house style
+
+    names = [background_name(c) for c in corners]
+    if all(n is not None for n in names) and len(set(names)) == 1:
+        return ""                       # a flat, approved brand background
+
+    shown = ", ".join(f"rgb{tuple(c[:3])}" for c in corners)
+    return (f"this Midbar Moon image's background is not the house background. Its four "
+            f"corners read {shown}. Midbar images are the cream card, the deep-navy card, "
+            f"plain white, or the product with the background removed — nothing else. "
+            f"This is the gate added after the black-background soap photo published on "
+            f"2026-10-08. Swap this row's media_url for a cream-card or background-removed "
+            f"version, or re-shoot it on white.")
+
+
 def verify_fb_tags(ver, post_id, tok, wanted_tags):
     """After posting, check whether Facebook actually kept the Page mentions.
 
@@ -1601,6 +1715,10 @@ def main():
             stop = caption_gate(row) or (aspect_gate(media, plat, fmt) if media else "")
         if not stop and media:
             stop = integrity_gate(media)
+        # COLOUR, not shape and not bytes. The black-background soap photo that
+        # published on 2026-10-08 passed both of the gates above.
+        if not stop and media:
+            stop = background_gate(media, row.get("brand"))
         if stop:
             row["status"] = "FAILED"; changed += 1
             log(f"REFUSED [{row.get('brand')}] {due} {plat}: {stop}")
