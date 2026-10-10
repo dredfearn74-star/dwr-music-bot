@@ -1578,3 +1578,4 @@
 [2026-10-10 10:49:50] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-10-10 10:49:50]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
 [2026-10-10 10:49:50] ====================================================================
+[2026-10-10 13:39:58] TOPUP MotiveAF already has a row for 2026-10-10 (status POSTED). Standing down.
