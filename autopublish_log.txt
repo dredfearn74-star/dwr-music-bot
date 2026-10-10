@@ -1518,3 +1518,11 @@
 [2026-10-09 19:48:22] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-10-09 19:48:22]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
 [2026-10-09 19:48:22] ====================================================================
+[2026-10-09 20:48:03] RETRY [DWR Music] 2026-10-09: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-09 20:48:04] REFUSED [DWR Music] 2026-10-09 facebook: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
+[2026-10-09 20:48:04] Queue updated (1 row(s) changed, 274 rows saved).
+[2026-10-09 20:48:04] 
+[2026-10-09 20:48:04] ====================================================================
+[2026-10-09 20:48:04] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-10-09 20:48:04]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
+[2026-10-09 20:48:04] ====================================================================
