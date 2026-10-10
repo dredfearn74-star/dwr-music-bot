@@ -1508,3 +1508,13 @@
 [2026-10-09 15:07:14] Nothing due today. Exiting cleanly.
 [2026-10-09 15:20:08] Nothing due today. Exiting cleanly.
 [2026-10-09 16:06:59] Nothing due today. Exiting cleanly.
+[2026-10-09 19:48:07] REFUSED [DWR Music] 2026-10-09 facebook: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
+[2026-10-09 19:48:13]   Facebook post handed to Make.com (public route) for 2026-10-09: 1173427532510546_122150326785341551
+[2026-10-09 19:48:13]   no location on this row
+[2026-10-09 19:48:22] POSTED [Midbar Moon] 2026-10-09 both -> FB(make):1173427532510546_122150326785341551, IG:18435408214183323
+[2026-10-09 19:48:22] Queue updated (2 row(s) changed, 274 rows saved).
+[2026-10-09 19:48:22] 
+[2026-10-09 19:48:22] ====================================================================
+[2026-10-09 19:48:22] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-10-09 19:48:22]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
+[2026-10-09 19:48:22] ====================================================================
