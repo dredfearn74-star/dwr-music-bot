@@ -1674,3 +1674,11 @@
 [2026-10-11 10:48:01]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
 [2026-10-11 10:48:01] ====================================================================
 [2026-10-11 13:57:39] TOPUP MotiveAF already has a row for 2026-10-11 (status POSTED). Standing down.
+[2026-10-11 14:10:14] RETRY [DWR Music] 2026-10-09: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-11 14:10:16]   first comment for 2026-10-09: https://youtu.be/6Lpzx5dK3WM   (using the first_comment cell exactly as written)
+[2026-10-11 14:11:14]   Facebook post handed to Make.com (public route) for 2026-10-09: 1421802382697193
+[2026-10-11 14:11:14] POSTED [DWR Music] 2026-10-09 facebook -> FB(make):1421802382697193
+[2026-10-11 14:11:16]   first comment for 2026-10-11: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-10-11 14:11:20]   Facebook post handed to Make.com (public route) for 2026-10-11: 1173427532510546_122151449319341551
+[2026-10-11 14:11:20] POSTED [Midbar Moon] 2026-10-11 facebook -> FB(make):1173427532510546_122151449319341551
+[2026-10-11 14:11:20] Queue updated (2 row(s) changed, 274 rows saved).
