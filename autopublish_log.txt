@@ -1614,3 +1614,17 @@
 [2026-10-10 15:14:09] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-10-10 15:14:09]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
 [2026-10-10 15:14:09] ====================================================================
+[2026-10-10 19:48:02] RETRY [DWR Music] 2026-10-09: attempt 1 of 3 (already live on: nothing yet)
+[2026-10-10 19:48:03] REFUSED [DWR Music] 2026-10-09 facebook: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
+[2026-10-10 19:48:06] APPROVED automatically: media/mary-janes-last-dance-exile-reel-1.mp4 is David's own upload (commit 5aaf176); added to media_manifest.csv.
+[2026-10-10 19:48:06]   first comment for 2026-10-10: https://youtu.be/VZah0NDul7w   (using the first_comment cell exactly as written)
+[2026-10-10 19:49:04]   Facebook post handed to Make.com (public route) for 2026-10-10: 2258701091362567
+[2026-10-10 19:49:05]   no location on this row
+[2026-10-10 19:49:51]   first comment confirmed on Instagram too.
+[2026-10-10 19:49:51] POSTED [DWR Music] 2026-10-10 both -> FB(make):2258701091362567, IG:18075072053474553, igcmt:18090390047223482
+[2026-10-10 19:49:51] Queue updated (2 row(s) changed, 274 rows saved).
+[2026-10-10 19:49:51] 
+[2026-10-10 19:49:51] ====================================================================
+[2026-10-10 19:49:51] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-10-10 19:49:51]    - DWR Music 2026-10-09 — REFUSED: caption makes a claim David has RETIRED (open mic I host). As of 2026-09-24 there is no Murph & Mary's open mic and David is not hosting one. Past-tense footage is fine; say it was 'live in Newton this summer' instead. Rewrite the caption cell.
+[2026-10-10 19:49:51] ====================================================================
