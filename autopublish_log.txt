@@ -1746,3 +1746,4 @@
 [2026-10-13 09:48:47]   no location on this row
 [2026-10-13 09:48:57] POSTED [DWR Music] 2026-10-13 both -> FB(make):113416904992248_1079089135097327, IG:18131801648498858
 [2026-10-13 09:48:57] Queue updated (2 row(s) changed, 274 rows saved).
+[2026-10-13 10:47:51] Nothing due today. Exiting cleanly.
