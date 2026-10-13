@@ -472,7 +472,8 @@ def make_post_landed(ver, page_id, tok, caption, is_vid, window_min=20):
         return None
     base = f"https://graph.facebook.com/{ver}"
     cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=window_min)
-    edges = ([("video_reels", "description,updated_time")] if is_vid else []) + \
+    edges = ([("video_reels", "description,updated_time"), ("videos", "description,created_time")]
+             if is_vid else []) + \
             [("published_posts", "message,created_time")]
     for edge, fields in edges:
         try:
@@ -1797,15 +1798,38 @@ def main():
                     # 2026-09-29: send the caption WITH the @[PageID] mentions. Make's
                     # Meta app is reviewed, so Page tags may stick where our own app's
                     # were always stripped. The read-back below tells us either way.
+                    _vid = bool(media and is_video(media))
+                    # 2026-10-13: a RETRY must look at the Page BEFORE sending again.
+                    # On 10-12 Make answered "500" twelve seconds in, the one-shot
+                    # check below ran before the reel had finished publishing, saw
+                    # nothing, and Heart of a Generation reel 1 went up three times.
+                    # Any earlier attempt on this row may have landed late, so look
+                    # back 48 hours for it before Make is called again.
+                    prior = make_post_landed(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap,
+                                             _vid, window_min=48 * 60) if attempts_of(row) > 0 else None
                     try:
-                        fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, fb_cap, comment_link,
-                                             row.get("brand", ""), str(due))
+                        if prior:
+                            log(f"  An earlier attempt DID land on the Page as {prior} — not posting it again.")
+                            needs_comment.append(f"{due}  FB  (earlier Make attempt landed late — comment unconfirmed) "
+                                                 f"{comment_link}  ->  https://www.facebook.com/{str(prior).split('_')[-1]}")
+                            fb_id = prior
+                        else:
+                            fb_id = make_fb_post(_mk, cfg["fb_page_id"].strip(), media, fb_cap, comment_link,
+                                                 row.get("brand", ""), str(due))
                     except RuntimeError as mk_err:
                         # Make said it failed. Before believing it, check the Page —
                         # see make_post_landed(). If the post is there, it is DONE and
                         # must never be retried (that is how the triple-post happened).
-                        landed = make_post_landed(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap,
-                                                  bool(media and is_video(media)))
+                        # Reels finish publishing minutes after Make gives up, so keep
+                        # looking for up to ~6 minutes, not once.
+                        landed = None
+                        for _wait in (0, 30, 60, 90, 90, 90):
+                            if _wait:
+                                time.sleep(_wait)
+                            landed = make_post_landed(ver, cfg["fb_page_id"].strip(), fb_tok, fb_cap,
+                                                      _vid, window_min=30)
+                            if landed:
+                                break
                         if not landed:
                             raise
                         fb_id = landed
