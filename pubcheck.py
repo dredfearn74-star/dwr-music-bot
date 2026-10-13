@@ -51,6 +51,19 @@ def make_ids_from_log(since):
     each post by its own id through the video/post plugin is exact.
     """
     out = []
+    # 2026-10-13: a duplicate left behind by a Make-500 retry (Facebook hides the
+    # second copy of the same video) can be retired with a log line
+    #   [date time] SUPERSEDED FB <hidden_id> -> <public_id> (reason)
+    # The hidden id is then skipped and the public id is checked in its place.
+    sup = {}
+    sup_pat = re.compile(r"^\[[^\]]+\] SUPERSEDED FB (\S+) -> (\S+)")
+    try:
+        for line in open("autopublish_log.txt", encoding="utf-8", errors="replace"):
+            m = sup_pat.match(line.strip())
+            if m:
+                sup[m.group(1)] = m.group(2)
+    except FileNotFoundError:
+        pass
     pat = re.compile(r"^\[(\d{4}-\d{2}-\d{2}) [^\]]+\] POSTED \[([^\]]+)\] (\d{4}-\d{2}-\d{2}) \S+ -> .*?FB\(make\):(\S+?)(?:,|$)")
     try:
         for line in open("autopublish_log.txt", encoding="utf-8", errors="replace"):
@@ -63,7 +76,7 @@ def make_ids_from_log(since):
                     continue
             except Exception:
                 continue
-            out.append((brand.strip(), due, fid))
+            out.append((brand.strip(), due, sup.get(fid, fid)))
     except FileNotFoundError:
         pass
     return out
