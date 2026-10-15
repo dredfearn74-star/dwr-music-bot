@@ -1799,3 +1799,7 @@
 [2026-10-15 09:48:15] Queue updated (1 row(s) changed, 290 rows saved).
 [2026-10-15 10:47:49] Nothing due today. Exiting cleanly.
 [2026-10-15 13:20:12] TOPUP MotiveAF already has a row for 2026-10-15 (status POSTED). Standing down.
+[2026-10-15 13:40:04]   first comment for 2026-10-15: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-10-15 13:40:10]   Facebook post handed to Make.com (public route) for 2026-10-15: 1173427532510546_122153638557341551
+[2026-10-15 13:40:10] POSTED [Midbar Moon] 2026-10-15 facebook -> FB(make):1173427532510546_122153638557341551
+[2026-10-15 13:40:10] Queue updated (1 row(s) changed, 290 rows saved).
