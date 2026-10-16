@@ -844,8 +844,14 @@ BLANK_OK = ("none", "-", "no", "skip", "off", "blank")
 # line the bot legitimately adds is "Full song on YouTube — link in the comments".
 # A naive check for the substring "youtu" would match that and refuse every song
 # reel, killing the exact feature this is meant to protect.
+# 2026-10-16: widened to BARE DOMAINS. Two Insulate Iowa posts went out with
+# "insulateiowallc.com" in the body — no https://, so the old check missed it,
+# but Facebook auto-links a bare domain and throttles the post exactly the same.
+# David: "it's only supposed to be in the comments ... not okay."
 CAPTION_URL_RE = re.compile(
-    r"https?://|\bwww\.[a-z0-9-]|\byoutu\.be/|\byoutube\.com/", re.I)
+    r"https?://|\bwww\.[a-z0-9-]|\byoutu\.be/|\byoutube\.com/"
+    r"|\b[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)*\.(?:com|net|org|co|io|us|biz|info|app|me|ly|gg|tv|fm"
+    r"|shop|store|site|online|dev|link|page)\b", re.I)
 
 
 def caption_has_url(text):
