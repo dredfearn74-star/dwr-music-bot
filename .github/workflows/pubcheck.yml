@@ -13,6 +13,7 @@ on:
   schedule:
     - cron: '55 16 * * *'   # 11:55 AM CDT
     - cron: '40 1 * * *'    # 8:40 PM CDT (01:40 UTC next day)
+    - cron: '40 2 * * *'    # 8:40 PM CST (02:40 UTC). Added 2026-10-16 for the 1 Nov clock change.
   workflow_dispatch:
 
 jobs:

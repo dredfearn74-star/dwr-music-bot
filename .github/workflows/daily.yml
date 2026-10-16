@@ -8,6 +8,8 @@ on:
     - cron: '27 16 * * *'   # BACKSTOP 3 = 11:27 AM CDT. The poster only posts QUEUED rows, so a caught-up day just exits clean. NOTE: UTC — when CDT ends 1 Nov (CST = UTC-6), ADD 1 hour to every UTC slot.
     - cron: '17 0 * * *'    # EVENING = 7:17 PM CDT (00:17 UTC next day). Only rows with post_after (e.g. 19:00) wait for this. Added 2026-09-28.
     - cron: '49 0 * * *'    # EVENING BACKSTOP = 7:49 PM CDT. When CDT ends 1 Nov, ADD 1 hour here too.
+    - cron: '17 1 * * *'    # WINTER EVENING = 7:17 PM CST (01:17 UTC). Added 2026-10-16 so the clock change on 1 Nov needs no edit: in CDT this is 8:17 PM and just exits clean once the 7 PM reel is out.
+    - cron: '49 1 * * *'    # WINTER EVENING BACKSTOP = 7:49 PM CST. Morning slots stay fine in CST (14:47 UTC = 8:47 AM, still past the 8 AM floor).
   workflow_dispatch:        # lets you run it by hand from the Actions tab
 
 permissions:
