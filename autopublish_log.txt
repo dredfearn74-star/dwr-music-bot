@@ -1806,3 +1806,10 @@
 [2026-10-15 14:07:12] Nothing due today. Exiting cleanly.
 [2026-10-15 14:22:32] Nothing due today. Exiting cleanly.
 [2026-10-15 14:59:03] Nothing due today. Exiting cleanly.
+[2026-10-15 19:47:46] APPROVED automatically: media/heart-of-a-generation-exile-reel-2.mp4 is David's own upload (commit 9dd8b2b); added to media_manifest.csv.
+[2026-10-15 19:47:46]   first comment for 2026-10-15: https://youtu.be/eN6iPBKwGzY   (using the first_comment cell exactly as written)
+[2026-10-15 19:48:34]   Facebook post handed to Make.com (public route) for 2026-10-15: 1605597888246211
+[2026-10-15 19:48:35]   no location on this row
+[2026-10-15 19:49:16]   first comment confirmed on Instagram too.
+[2026-10-15 19:49:16] POSTED [DWR Music] 2026-10-15 both -> FB(make):1605597888246211, IG:18192486172398362, igcmt:18376080571211283
+[2026-10-15 19:49:16] Queue updated (1 row(s) changed, 290 rows saved).
