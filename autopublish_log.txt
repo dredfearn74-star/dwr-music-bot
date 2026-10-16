@@ -1829,3 +1829,4 @@
 [2026-10-16 09:48:23] POSTED [Insulate Iowa] 2026-10-16 facebook -> FB(make):1230451456819767_122134280265383638
 [2026-10-16 09:48:23] Queue updated (3 row(s) changed, 290 rows saved).
 [2026-10-16 10:47:35] Nothing due today. Exiting cleanly.
+[2026-10-16 13:05:51] TOPUP MotiveAF already has a row for 2026-10-16 (status POSTED). Standing down.
