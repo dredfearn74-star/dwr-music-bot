@@ -1816,3 +1816,15 @@
 [2026-10-15 20:47:43] Nothing due today. Exiting cleanly.
 [2026-10-15 23:40:42] Nothing due today. Exiting cleanly.
 [2026-10-16 00:09:31] Nothing due today. Exiting cleanly.
+[2026-10-16 09:47:43]   first comment for 2026-10-16: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-16 09:47:48]   Facebook post handed to Make.com (public route) for 2026-10-16: 1179462511909328_122156079825352686
+[2026-10-16 09:47:48]   no location on this row
+[2026-10-16 09:48:02]   first comment confirmed on Instagram too.
+[2026-10-16 09:48:02] POSTED [MotiveAF] 2026-10-16 both -> FB(make):1179462511909328_122156079825352686, IG:17917694223456743, igcmt:17953875642324199
+[2026-10-16 09:48:08]   Facebook post handed to Make.com (public route) for 2026-10-16: 113416904992248_1081992941473613
+[2026-10-16 09:48:08]   no location on this row
+[2026-10-16 09:48:19] POSTED [DWR Music] 2026-10-16 both -> FB(make):113416904992248_1081992941473613, IG:18113811985847846
+[2026-10-16 09:48:19]   first comment for 2026-10-16: Free estimate: https://insulateiowallc.com/?src=facebook#estimate   (using the first_comment cell exactly as written)
+[2026-10-16 09:48:23]   Facebook post handed to Make.com (public route) for 2026-10-16: 1230451456819767_122134280265383638
+[2026-10-16 09:48:23] POSTED [Insulate Iowa] 2026-10-16 facebook -> FB(make):1230451456819767_122134280265383638
+[2026-10-16 09:48:23] Queue updated (3 row(s) changed, 290 rows saved).
