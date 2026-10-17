@@ -1860,3 +1860,7 @@
 [2026-10-17 12:33:37] Nothing due today. Exiting cleanly.
 [2026-10-17 12:52:40] Nothing due today. Exiting cleanly.
 [2026-10-17 12:56:11] Nothing due today. Exiting cleanly.
+[2026-10-17 13:43:10]   first comment for 2026-10-17: https://payhip.com/midbarmoon   (using the brand's default_comment_link from brands.csv)
+[2026-10-17 13:43:16]   Facebook post handed to Make.com (public route) for 2026-10-17: 1173427532510546_122154833637341551
+[2026-10-17 13:43:16] POSTED [Midbar Moon] 2026-10-17 facebook -> FB(make):1173427532510546_122154833637341551
+[2026-10-17 13:43:16] Queue updated (1 row(s) changed, 308 rows saved).
