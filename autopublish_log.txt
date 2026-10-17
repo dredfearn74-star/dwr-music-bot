@@ -1837,3 +1837,10 @@
 [2026-10-16 13:48:48] Nothing due today. Exiting cleanly.
 [2026-10-16 14:00:46] Nothing due today. Exiting cleanly.
 [2026-10-16 14:38:07] Nothing due today. Exiting cleanly.
+[2026-10-16 19:48:12] APPROVED automatically: media/soul-man-reel-1.mp4 is David's own upload (commit 6f1a332); added to media_manifest.csv.
+[2026-10-16 19:48:12]   first comment for 2026-10-16: https://www.youtube.com/@dwredfearnmusic   (using the first_comment cell exactly as written)
+[2026-10-16 19:49:03]   Facebook post handed to Make.com (public route) for 2026-10-16: 1442511271157702
+[2026-10-16 19:49:03]   no location on this row
+[2026-10-16 19:50:35]   first comment confirmed on Instagram too.
+[2026-10-16 19:50:35] POSTED [DWR Music] 2026-10-16 both -> FB(make):1442511271157702, IG:17964406632231385, igcmt:18142084870716675
+[2026-10-16 19:50:35] Queue updated (1 row(s) changed, 308 rows saved).
