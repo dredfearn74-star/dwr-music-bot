@@ -75,13 +75,20 @@ jobs:
                   continue
               att = int((r.get('attempts') or '0').strip() or 0)
               pa = (r.get('post_after') or '').strip()
-              if pa and due == today:
-                  try:
-                      hh, mm = (int(x) for x in pa.split(':')[:2])
-                      if now.time() < datetime.time(hh, mm):
-                          continue   # evening row, not open yet on this run
-                  except Exception:
-                      pass
+              if due == today:
+                  # Mirror post.py is_due(): a row dated today with a blank or
+                  # unreadable post_after does not open before the 8:00 AM CT
+                  # MORNING_FLOOR. Without this, every run between midnight and
+                  # 8 AM CT raised a false "post failed" issue (fixed 2026-10-18).
+                  opens = datetime.time(8, 0)
+                  if pa:
+                      try:
+                          hh, mm = (int(x) for x in pa.split(':')[:2])
+                          opens = datetime.time(hh, mm)
+                      except Exception:
+                          pass
+                  if now.time() < opens:
+                      continue   # not open yet on this run
               if due <= today and (st == 'QUEUED' or st == '' or (st == 'FAILED' and att < 3)):
                   print(f"{i}|{r['date'].strip()}")
           PY
