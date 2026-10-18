@@ -1864,3 +1864,9 @@
 [2026-10-17 13:43:16]   Facebook post handed to Make.com (public route) for 2026-10-17: 1173427532510546_122154833637341551
 [2026-10-17 13:43:16] POSTED [Midbar Moon] 2026-10-17 facebook -> FB(make):1173427532510546_122154833637341551
 [2026-10-17 13:43:16] Queue updated (1 row(s) changed, 308 rows saved).
+[2026-10-17 19:48:13]   first comment for 2026-10-17: https://www.youtube.com/@dwredfearnmusic   (using the first_comment cell exactly as written)
+[2026-10-17 19:49:01]   Facebook post handed to Make.com (public route) for 2026-10-17: 2184380042435230
+[2026-10-17 19:49:02]   no location on this row
+[2026-10-17 19:49:39]   first comment confirmed on Instagram too.
+[2026-10-17 19:49:39] POSTED [DWR Music] 2026-10-17 both -> FB(make):2184380042435230, IG:17991353324858267, igcmt:17914007733282117
+[2026-10-17 19:49:39] Queue updated (1 row(s) changed, 308 rows saved).
