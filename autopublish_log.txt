@@ -1945,3 +1945,9 @@
 [2026-10-20 14:16:38] Nothing due today. Exiting cleanly.
 [2026-10-20 14:34:50] Nothing due today. Exiting cleanly.
 [2026-10-20 15:05:31] Nothing due today. Exiting cleanly.
+[2026-10-20 19:48:26]   first comment for 2026-10-20: https://www.youtube.com/@dwredfearnmusic   (using the first_comment cell exactly as written)
+[2026-10-20 19:49:16]   Facebook post handed to Make.com (public route) for 2026-10-20: 4412343815670386
+[2026-10-20 19:49:16]   no location on this row
+[2026-10-20 19:50:20]   first comment confirmed on Instagram too.
+[2026-10-20 19:50:20] POSTED [DWR Music] 2026-10-20 both -> FB(make):4412343815670386, IG:18119917159995227, igcmt:18132600700760328
+[2026-10-20 19:50:20] Queue updated (1 row(s) changed, 308 rows saved).
