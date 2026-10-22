@@ -1995,3 +1995,4 @@
 [2026-10-22 13:34:46] TOPUP MotiveAF already has a row for 2026-10-22 (status POSTED). Standing down.
 [2026-10-22 13:50:25] Nothing due today. Exiting cleanly.
 [2026-10-22 14:13:49] Nothing due today. Exiting cleanly.
+[2026-10-22 14:28:23] Nothing due today. Exiting cleanly.
