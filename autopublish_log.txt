@@ -2009,3 +2009,13 @@
 [2026-10-23 00:27:36] Nothing due today. Exiting cleanly.
 [2026-10-23 01:04:57] Nothing due today. Exiting cleanly.
 [2026-10-23 01:37:00] Nothing due today. Exiting cleanly.
+[2026-10-23 09:53:21] WARN: could not read the media size for https://raw.githubusercontent.com/dredfearn74-star/dwr-music-bot/main/media/motiveaf-batch3/MotiveAF_071_Organs-Working-Overtime-Least-You-Could-Do-Be-Productive.jpg — posting anyway (aspect gate skipped).
+[2026-10-23 09:53:21]   first comment for 2026-10-23: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-23 09:53:25]   Facebook post handed to Make.com (public route) for 2026-10-23: 1179462511909328_122158153845352686
+[2026-10-23 09:53:26]   no location on this row
+[2026-10-23 09:53:46]   first comment confirmed on Instagram too.
+[2026-10-23 09:53:46] POSTED [MotiveAF] 2026-10-23 both -> FB(make):1179462511909328_122158153845352686, IG:17962010604234726, igcmt:18023439098722409
+[2026-10-23 09:53:46]   first comment for 2026-10-23: Free estimate: https://insulateiowallc.com/?src=facebook#estimate   (using the first_comment cell exactly as written)
+[2026-10-23 09:53:48]   Facebook post handed to Make.com (public route) for 2026-10-23: 1230451456819767_122135570229383638
+[2026-10-23 09:53:48] POSTED [Insulate Iowa] 2026-10-23 facebook -> FB(make):1230451456819767_122135570229383638
+[2026-10-23 09:53:48] Queue updated (2 row(s) changed, 308 rows saved).
