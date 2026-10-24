@@ -2036,3 +2036,9 @@
 [2026-10-24 00:06:46] Nothing due today. Exiting cleanly.
 [2026-10-24 00:57:47] Nothing due today. Exiting cleanly.
 [2026-10-24 01:30:41] Nothing due today. Exiting cleanly.
+[2026-10-24 09:48:16]   first comment for 2026-10-24: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-10-24 09:48:20]   Facebook post handed to Make.com (public route) for 2026-10-24: 1179462511909328_122158426713352686
+[2026-10-24 09:48:21]   no location on this row
+[2026-10-24 09:48:37]   first comment confirmed on Instagram too.
+[2026-10-24 09:48:37] POSTED [MotiveAF] 2026-10-24 both -> FB(make):1179462511909328_122158426713352686, IG:17884666686625498, igcmt:17906448585664279
+[2026-10-24 09:48:37] Queue updated (1 row(s) changed, 308 rows saved).
