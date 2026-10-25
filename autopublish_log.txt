@@ -2069,3 +2069,4 @@
 [2026-10-25 09:48:59] POSTED [DWR Music] 2026-10-25 both -> FB(make):113416904992248_1090533143952926, IG:18114489565865596
 [2026-10-25 09:48:59] Queue updated (2 row(s) changed, 308 rows saved).
 [2026-10-25 10:48:46] Nothing due today. Exiting cleanly.
+[2026-10-25 12:40:33] TOPUP MotiveAF already has a row for 2026-10-25 (status POSTED). Standing down.
