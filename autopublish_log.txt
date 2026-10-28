@@ -2137,3 +2137,4 @@
 [2026-10-27 19:49:46] FIRST COMMENTS: 1 post(s) went out without a confirmed comment.
 [2026-10-27 19:49:46]    The post is live and fine — only the link in the comments is missing.
 [2026-10-27 19:49:46]    - 2026-10-27  FB  (Make errored after publish — comment unconfirmed) https://youtu.be/eN6iPBKwGzY  ->  https://www.facebook.com/1503093211652448
+[2026-10-27 20:48:05] Nothing due today. Exiting cleanly.

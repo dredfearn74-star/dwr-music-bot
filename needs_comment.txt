@@ -1,4 +1,0 @@
-Posts that published but whose first comment is missing or unconfirmed.
-Open each post, paste the link as a comment. Rewritten every run.
-
-2026-10-27  FB  (Make errored after publish — comment unconfirmed) https://youtu.be/eN6iPBKwGzY  ->  https://www.facebook.com/1503093211652448
