@@ -2125,3 +2125,15 @@
 [2026-10-27 15:06:14] Nothing due today. Exiting cleanly.
 [2026-10-27 15:19:41] Nothing due today. Exiting cleanly.
 [2026-10-27 15:50:48] Nothing due today. Exiting cleanly.
+[2026-10-27 19:48:11] APPROVED automatically: media/heart-of-a-generation-exile-reel-3.mp4 is David's own upload (commit df6733a); added to media_manifest.csv.
+[2026-10-27 19:48:11]   first comment for 2026-10-27: https://youtu.be/eN6iPBKwGzY   (using the first_comment cell exactly as written)
+[2026-10-27 19:48:59]   Make.com reported an error (Make.com webhook refused the post: HTTP 500 Scenario failed to complete.) but the post IS on the Page as 1503093211652448 — keeping it, not retrying. Its first comment may be missing: check https://www.facebook.com/1503093211652448
+[2026-10-27 19:48:59]   Facebook post handed to Make.com (public route) for 2026-10-27: 1503093211652448
+[2026-10-27 19:49:01]   no location on this row
+[2026-10-27 19:49:46]   first comment confirmed on Instagram too.
+[2026-10-27 19:49:46] POSTED [DWR Music] 2026-10-27 both -> FB(make):1503093211652448, IG:18636610354050816, igcmt:17976372797942635
+[2026-10-27 19:49:46] Queue updated (1 row(s) changed, 308 rows saved).
+[2026-10-27 19:49:46] 
+[2026-10-27 19:49:46] FIRST COMMENTS: 1 post(s) went out without a confirmed comment.
+[2026-10-27 19:49:46]    The post is live and fine — only the link in the comments is missing.
+[2026-10-27 19:49:46]    - 2026-10-27  FB  (Make errored after publish — comment unconfirmed) https://youtu.be/eN6iPBKwGzY  ->  https://www.facebook.com/1503093211652448
