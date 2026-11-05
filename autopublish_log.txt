@@ -2330,3 +2330,14 @@
 [2026-11-04 15:20:52] Nothing due today. Exiting cleanly.
 [2026-11-04 15:29:47] Nothing due today. Exiting cleanly.
 [2026-11-04 16:03:08] Nothing due today. Exiting cleanly.
+[2026-11-04 19:48:25]   first comment for 2026-11-04: https://youtu.be/1XxqqNdmihs   (using the first_comment cell exactly as written)
+[2026-11-04 19:50:15]   Make.com reported an error (Make.com webhook refused the post: HTTP 500 Scenario failed to complete.) but the post IS on the Page as 1154295380585455 — keeping it, not retrying. Its first comment may be missing: check https://www.facebook.com/1154295380585455
+[2026-11-04 19:50:15]   Facebook post handed to Make.com (public route) for 2026-11-04: 1154295380585455
+[2026-11-04 19:50:16]   no location on this row
+[2026-11-04 19:51:20]   first comment confirmed on Instagram too.
+[2026-11-04 19:51:20] POSTED [DWR Music] 2026-11-04 both -> FB(make):1154295380585455, IG:18121681457059757, igcmt:18134724340753188
+[2026-11-04 19:51:20] Queue updated (1 row(s) changed, 308 rows saved).
+[2026-11-04 19:51:20] 
+[2026-11-04 19:51:20] FIRST COMMENTS: 1 post(s) went out without a confirmed comment.
+[2026-11-04 19:51:20]    The post is live and fine — only the link in the comments is missing.
+[2026-11-04 19:51:20]    - 2026-11-04  FB  (Make errored after publish — comment unconfirmed) https://youtu.be/1XxqqNdmihs  ->  https://www.facebook.com/1154295380585455
