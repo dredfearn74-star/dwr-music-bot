@@ -2358,3 +2358,11 @@
 [2026-11-05 15:29:07] Nothing due today. Exiting cleanly.
 [2026-11-05 15:34:56] Nothing due today. Exiting cleanly.
 [2026-11-05 16:11:17] Nothing due today. Exiting cleanly.
+[2026-11-05 19:53:16] WARN: could not read the media size for https://raw.githubusercontent.com/dredfearn74-star/dwr-music-bot/main/media/heart-of-a-generation-exile-reel-4.mp4 — posting anyway (aspect gate skipped).
+[2026-11-05 19:53:17] APPROVED automatically: media/heart-of-a-generation-exile-reel-4.mp4 is David's own upload (commit df6733a); added to media_manifest.csv.
+[2026-11-05 19:53:17]   first comment for 2026-11-05: https://youtu.be/eN6iPBKwGzY   (using the first_comment cell exactly as written)
+[2026-11-05 19:54:16]   Facebook post handed to Make.com (public route) for 2026-11-05: 963480526475486
+[2026-11-05 19:54:17]   no location on this row
+[2026-11-05 19:56:01]   first comment confirmed on Instagram too.
+[2026-11-05 19:56:01] POSTED [DWR Music] 2026-11-05 both -> FB(make):963480526475486, IG:18082715948550223, igcmt:17910485109591719
+[2026-11-05 19:56:01] Queue updated (1 row(s) changed, 308 rows saved).
