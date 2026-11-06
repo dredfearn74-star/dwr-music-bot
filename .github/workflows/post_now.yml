@@ -43,8 +43,8 @@ jobs:
     # run dies loudly while there is still time to fix it by hand.
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - run: pip install requests
@@ -203,7 +203,7 @@ jobs:
 
       - name: Raise the alarm if a post failed
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
