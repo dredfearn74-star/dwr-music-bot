@@ -2409,3 +2409,14 @@
 [2026-11-07 13:25:45] Nothing due today. Exiting cleanly.
 [2026-11-07 13:36:11] Nothing due today. Exiting cleanly.
 [2026-11-07 14:24:30] Nothing due today. Exiting cleanly.
+[2026-11-07 19:47:40] APPROVED automatically: media/going-home-reel-2.mp4 is David's own upload (commit 3c4e8c3); added to media_manifest.csv.
+[2026-11-07 19:47:40]   first comment for 2026-11-07: https://www.youtube.com/@dwredfearnmusic   (using the first_comment cell exactly as written)
+[2026-11-07 19:49:53]   Facebook post handed to Make.com (public route) for 2026-11-07: 1805278600676814
+[2026-11-07 19:49:53]   no location on this row
+[2026-11-07 19:50:23] FAILED [DWR Music] 2026-11-07 both attempt 1/3 (already live on FB — will NOT be re-posted): Instagram publish -> HTTP 500: An unexpected error has occurred. Please retry your request later. | type=OAuthException | code=2 | fbtrace=A_gLfUdqRVVdHWebEgSiH5H
+[2026-11-07 19:50:23] Queue updated (1 row(s) changed, 308 rows saved).
+[2026-11-07 19:50:23] 
+[2026-11-07 19:50:23] ====================================================================
+[2026-11-07 19:50:23] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-11-07 19:50:23]    - DWR Music 2026-11-07 both (attempt 1/3) — Instagram publish -> HTTP 500: An unexpected error has occurred. Please retry your request later. | type=OAuthException | code=2 | fbtrace=A_gLfUdqRVVdHWebEgSiH5H
+[2026-11-07 19:50:23] ====================================================================
