@@ -619,7 +619,23 @@ def resolve_ig_location(ver, loc, tok):
         return "", f"ig_location_id {loc} could not be checked ({e}); posting untagged."
 
 
-def ig_post(ver, igid, tok, cap, media, location_id=""):
+def ig_user_tags_json(ig_mentions, video):
+    """REAL Instagram tags (2026-11-08, David: "automate the tagging").
+
+    A caption @mention only links the name. `user_tags` puts the account in the
+    post's tagged list and notifies them, the same as tagging by hand in the app.
+    Reels take bare usernames; photos need an x/y spot, so they get the centre.
+    Built from the same ig_mentions cell, so no new column to fill in."""
+    tags, seen = [], set()
+    for h in _split_tokens(ig_mentions or ""):
+        h = h.lstrip("@").strip()
+        if h and h.lower() not in seen:
+            seen.add(h.lower())
+            tags.append({"username": h} if video else {"username": h, "x": 0.5, "y": 0.5})
+    return json.dumps(tags[:20]) if tags else ""
+
+
+def ig_post(ver, igid, tok, cap, media, location_id="", ig_mentions=""):
     if not media:
         raise ValueError("Instagram needs a public image or video URL")
     base = f"https://graph.facebook.com/{ver}"
@@ -628,6 +644,10 @@ def ig_post(ver, igid, tok, cap, media, location_id=""):
         c.update({"media_type": "REELS", "video_url": media})
     else:
         c.update({"image_url": media})
+    ut = ig_user_tags_json(ig_mentions, is_video(media))
+    if ut:
+        c["user_tags"] = ut
+        log(f"  Instagram user tags: {ut}")
     loc, why = resolve_ig_location(ver, location_id, tok)
     log("  " + why)
     if loc:
@@ -639,6 +659,12 @@ def ig_post(ver, igid, tok, cap, media, location_id=""):
         # losing the post.
         log(f"  Instagram refused the location tag ({loc}); retrying untagged so the post still goes out.")
         c.pop("location_id", None)
+        r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
+    if not r.ok and c.get("user_tags"):
+        # Same belt and braces for tags: a handle Instagram won't tag must never
+        # cost the post. The @names are still in the caption either way.
+        log(f"  Instagram refused the user tags ({r.text[:160]}); retrying without them so the post still goes out.")
+        c.pop("user_tags", None)
         r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
     graph_raise(r, "Instagram media container")
     cid = r.json()["id"]
@@ -1902,7 +1928,8 @@ def main():
                     log(f"  Instagram STORY published for {due} (it disappears after 24 hours).")
                 elif igid:
                     ig_media_id = ig_post(ver, igid, post_tok, ig_cap, media,
-                                          row.get("ig_location_id", ""))
+                                          row.get("ig_location_id", ""),
+                                          row.get("ig_mentions", ""))
                     res.append("IG:" + str(ig_media_id))
                     mark_done(row, "IG")
                     if comment_link:
