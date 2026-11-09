@@ -2442,6 +2442,3 @@
 [2026-11-08 13:40:54] Nothing due today. Exiting cleanly.
 [2026-11-08 13:56:27] Nothing due today. Exiting cleanly.
 [2026-11-08 14:40:42] Nothing due today. Exiting cleanly.
-[2026-11-08 18:57:02]   Instagram user tags: [{"username": "localsdsm"}]
-[2026-11-08 18:57:02]   no loc
-[2026-11-08 18:57:02]   Instagram refused the user tags (bad tag); retrying without them so the post still goes out.
