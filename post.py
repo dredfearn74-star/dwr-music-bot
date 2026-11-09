@@ -635,7 +635,7 @@ def ig_user_tags_json(ig_mentions, video):
     return json.dumps(tags[:20]) if tags else ""
 
 
-def ig_post(ver, igid, tok, cap, media, location_id="", ig_mentions=""):
+def ig_post(ver, igid, tok, cap, media, location_id="", ig_mentions="", ig_collaborators=""):
     if not media:
         raise ValueError("Instagram needs a public image or video URL")
     base = f"https://graph.facebook.com/{ver}"
@@ -648,6 +648,16 @@ def ig_post(ver, igid, tok, cap, media, location_id="", ig_mentions=""):
     if ut:
         c["user_tags"] = ut
         log(f"  Instagram user tags: {ut}")
+    # COLLABORATOR INVITES (2026-11-08, David said yes): up to 3 accounts are
+    # invited to co-own the reel. If they accept it shows on THEIR profile too.
+    collab = []
+    for h in _split_tokens(ig_collaborators or ""):
+        h = h.lstrip("@").strip()
+        if h and h.lower() not in [x.lower() for x in collab]:
+            collab.append(h)
+    if collab:
+        c["collaborators"] = json.dumps(collab[:3])
+        log(f"  Instagram collaborator invites: {collab[:3]}")
     loc, why = resolve_ig_location(ver, location_id, tok)
     log("  " + why)
     if loc:
@@ -659,6 +669,10 @@ def ig_post(ver, igid, tok, cap, media, location_id="", ig_mentions=""):
         # losing the post.
         log(f"  Instagram refused the location tag ({loc}); retrying untagged so the post still goes out.")
         c.pop("location_id", None)
+        r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
+    if not r.ok and c.get("collaborators"):
+        log(f"  Instagram refused the collaborator invites ({r.text[:160]}); retrying without them.")
+        c.pop("collaborators", None)
         r = requests.post(f"{base}/{igid}/media", data=c, timeout=300)
     if not r.ok and c.get("user_tags"):
         # Same belt and braces for tags: a handle Instagram won't tag must never
@@ -1663,7 +1677,7 @@ def main():
         log("Queue empty. Nothing to do.")
         return
     fieldnames = list(rows[0].keys())
-    for extra_col in ("first_comment", "ig_location_id", "format", "posted_to", "attempts"):
+    for extra_col in ("first_comment", "ig_location_id", "format", "posted_to", "attempts", "ig_collaborators"):
         if extra_col not in fieldnames:
             fieldnames.insert(len(fieldnames) - 1, extra_col)   # keep `status` last
             for r_ in rows:
@@ -1929,7 +1943,8 @@ def main():
                 elif igid:
                     ig_media_id = ig_post(ver, igid, post_tok, ig_cap, media,
                                           row.get("ig_location_id", ""),
-                                          row.get("ig_mentions", ""))
+                                          row.get("ig_mentions", ""),
+                                          row.get("ig_collaborators", ""))
                     res.append("IG:" + str(ig_media_id))
                     mark_done(row, "IG")
                     if comment_link:
