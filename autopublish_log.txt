@@ -2487,3 +2487,4 @@
 [2026-11-10 09:48:40]   Facebook post handed to Make.com (public route) for 2026-11-10: 1230451456819767_122139225195383638
 [2026-11-10 09:48:40] POSTED [Insulate Iowa] 2026-11-10 facebook -> FB(make):1230451456819767_122139225195383638
 [2026-11-10 09:48:40] Queue updated (2 row(s) changed, 315 rows saved).
+[2026-11-10 10:48:17] Nothing due today. Exiting cleanly.
