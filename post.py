@@ -1911,6 +1911,14 @@ def main():
                         needs_tagging.append(f"{due}  {row.get('caption','')[:45]}...  {link}")
                     elif stuck:
                         log(f"  tags stuck on {due} — Page Mentioning is working now.")
+                    elif via_make:
+                        # PROVEN 2026-11-09 (Locals reel FB 1459003579537836): the Make
+                        # route silently drops @[page] mentions and the read-back can't
+                        # see Make posts, so it came back "unknown". Treat it as stripped
+                        # so David still gets the hand-tag list instead of silence.
+                        link = f"https://www.facebook.com/reel/{str(tag_post_id).split('_')[-1]}"
+                        log(f"  Facebook page tags don't survive the Make route — add them by hand: {link}")
+                        needs_tagging.append(f"{due}  {row.get('caption','')[:45]}...  {link}  tag: {', '.join(wanted)}")
                 if comment_link and fb_id:
                     # Link-in-first-comment (Facebook throttles links in the body),
                     # then READ IT BACK. A comment we never confirmed is a comment we
