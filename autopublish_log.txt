@@ -2493,3 +2493,10 @@
 [2026-11-10 15:18:23] Nothing due today. Exiting cleanly.
 [2026-11-10 15:25:31] Nothing due today. Exiting cleanly.
 [2026-11-10 15:53:17] Nothing due today. Exiting cleanly.
+[2026-11-10 19:48:08] APPROVED automatically: media/we-already-won-reel-3.mp4 is David's own upload (commit f4de38b); added to media_manifest.csv.
+[2026-11-10 19:48:08]   first comment for 2026-11-10: https://www.youtube.com/@dwredfearnmusic   (using the first_comment cell exactly as written)
+[2026-11-10 19:50:18]   Facebook post handed to Make.com (public route) for 2026-11-10: 4185683728391046
+[2026-11-10 19:50:18]   no location on this row
+[2026-11-10 19:51:29]   first comment confirmed on Instagram too.
+[2026-11-10 19:51:29] POSTED [DWR Music] 2026-11-10 both -> FB(make):4185683728391046, IG:18434851645149135, igcmt:18115828838097206
+[2026-11-10 19:51:29] Queue updated (1 row(s) changed, 315 rows saved).
