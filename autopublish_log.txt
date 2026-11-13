@@ -2575,3 +2575,4 @@
 [2026-11-13 15:00:09]   first comment confirmed on Instagram too.
 [2026-11-13 15:00:09] POSTED [MotiveAF] 2026-11-13 both -> FB(make):1179462511909328_122164688637352686, IG:18111724987911838, igcmt:18106334483340181
 [2026-11-13 15:00:09] Queue updated (1 row(s) changed, 318 rows saved).
+[2026-11-13 15:26:11] Nothing due today. Exiting cleanly.
