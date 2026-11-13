@@ -2558,3 +2558,4 @@
 [2026-11-12 19:51:33]    Facebook removes API Page-mentions until the app passes App Review.
 [2026-11-12 19:51:33]    Open each link and tag by hand (about 20 seconds each):
 [2026-11-12 19:51:33]    - 2026-11-12  Last piece of I Miss You from Oktoberfest at ...  https://www.facebook.com/reel/2000797423923119  tag: 100064802553841
+[2026-11-12 20:48:17] Nothing due today. Exiting cleanly.

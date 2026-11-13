@@ -1,4 +1,0 @@
-Posts that went out but had their @ mentions stripped by Facebook.
-Open each and add the tags by hand. This file is rewritten every run.
-
-2026-11-12  Last piece of I Miss You from Oktoberfest at ...  https://www.facebook.com/reel/2000797423923119  tag: 100064802553841
