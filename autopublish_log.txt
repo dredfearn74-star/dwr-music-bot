@@ -2568,3 +2568,4 @@
 [2026-11-13 09:48:16] POSTED [Insulate Iowa] 2026-11-13 facebook -> FB(make):1230451456819767_122139855489383638
 [2026-11-13 09:48:16] Queue updated (1 row(s) changed, 317 rows saved).
 [2026-11-13 10:48:00] Nothing due today. Exiting cleanly.
+[2026-11-13 14:55:22] TOPUP queue was dry for 2026-11-13 — recycled motiveaf_not-chasing-the-dream-building-it.jpg (first ran 2026-08-30, 75 days ago). 66 posts in the rotation.
