@@ -2578,3 +2578,17 @@
 [2026-11-13 15:26:11] Nothing due today. Exiting cleanly.
 [2026-11-13 15:36:56] Nothing due today. Exiting cleanly.
 [2026-11-13 16:05:40] Nothing due today. Exiting cleanly.
+[2026-11-13 19:48:12]   first comment for 2026-11-13: https://youtu.be/JAv9wIRTHwU   (using the first_comment cell exactly as written)
+[2026-11-13 19:50:33]   Facebook post handed to Make.com (public route) for 2026-11-13: 1015743220776078
+[2026-11-13 19:50:34]   Facebook page tags don't survive the Make route — add them by hand: https://www.facebook.com/reel/1015743220776078
+[2026-11-13 19:50:34]   Instagram user tags: [{"username": "localsdsm"}]
+[2026-11-13 19:50:34]   Instagram collaborator invites: ['localsdsm']
+[2026-11-13 19:50:34]   no location on this row
+[2026-11-13 19:52:28]   first comment confirmed on Instagram too.
+[2026-11-13 19:52:28] POSTED [DWR Music] 2026-11-13 both -> FB(make):1015743220776078, IG:17899402395683029, igcmt:17994114236858453
+[2026-11-13 19:52:28] Queue updated (1 row(s) changed, 318 rows saved).
+[2026-11-13 19:52:28] 
+[2026-11-13 19:52:28] @ MENTIONS: 1 post(s) went out with the tags stripped by Facebook.
+[2026-11-13 19:52:28]    Facebook removes API Page-mentions until the app passes App Review.
+[2026-11-13 19:52:28]    Open each link and tag by hand (about 20 seconds each):
+[2026-11-13 19:52:28]    - 2026-11-13  More Get On Up and Get Down from the open mic...  https://www.facebook.com/reel/1015743220776078  tag: 61579051274463
