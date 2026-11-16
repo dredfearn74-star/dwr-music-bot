@@ -2650,3 +2650,4 @@
 [2026-11-16 02:02:31] Nothing due today. Exiting cleanly.
 [2026-11-16 02:37:44] Nothing due today. Exiting cleanly.
 [2026-11-16 09:47:55] Nothing due today. Exiting cleanly.
+[2026-11-16 10:07:15] TOPUP queue was dry for 2026-11-16 — recycled motiveaf_inner-voice-needs-new-management.jpg (first ran 2026-08-31, 77 days ago). 64 posts in the rotation.
