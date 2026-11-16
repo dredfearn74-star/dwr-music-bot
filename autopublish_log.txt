@@ -2658,3 +2658,4 @@
 [2026-11-16 10:48:51] POSTED [MotiveAF] 2026-11-16 both -> FB(make):1179462511909328_122165512965352686, IG:18134444698826494, igcmt:17999697455833900
 [2026-11-16 10:48:51] Queue updated (1 row(s) changed, 321 rows saved).
 [2026-11-16 17:25:09] TOPUP MotiveAF already has a row for 2026-11-16 (status POSTED). Standing down.
+[2026-11-16 17:31:38] Nothing due today. Exiting cleanly.
