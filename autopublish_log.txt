@@ -2632,3 +2632,15 @@
 [2026-11-15 14:24:16] Nothing due today. Exiting cleanly.
 [2026-11-15 14:33:16] Nothing due today. Exiting cleanly.
 [2026-11-15 15:10:01] Nothing due today. Exiting cleanly.
+[2026-11-15 19:48:02]   first comment for 2026-11-15: https://youtu.be/2sKD-1588dI   (using the first_comment cell exactly as written)
+[2026-11-15 19:49:16]   Facebook post handed to Make.com (public route) for 2026-11-15: 1752929369137114
+[2026-11-15 19:49:17]   Facebook page tags don't survive the Make route — add them by hand: https://www.facebook.com/reel/1752929369137114
+[2026-11-15 19:49:17]   no location on this row
+[2026-11-15 19:50:01]   first comment confirmed on Instagram too.
+[2026-11-15 19:50:01] POSTED [DWR Music] 2026-11-15 both -> FB(make):1752929369137114, IG:18154313125556348, igcmt:17981461154924955
+[2026-11-15 19:50:01] Queue updated (1 row(s) changed, 320 rows saved).
+[2026-11-15 19:50:01] 
+[2026-11-15 19:50:01] @ MENTIONS: 1 post(s) went out with the tags stripped by Facebook.
+[2026-11-15 19:50:01]    Facebook removes API Page-mentions until the app passes App Review.
+[2026-11-15 19:50:01]    Open each link and tag by hand (about 20 seconds each):
+[2026-11-15 19:50:01]    - 2026-11-15  More of Green from the songwriters' round at ...  https://www.facebook.com/reel/1752929369137114  tag: 100063105555934, 61576707766244, 100090279583998
