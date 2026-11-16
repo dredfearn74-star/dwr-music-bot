@@ -136,9 +136,32 @@ def main():
         return 1  # go red; silence must never be quiet
 
     # 3. Least-recently-used wins, so the rotation is even.
-    def last_used(r):
+    # FIX 2026-11-16: "last used" is per IMAGE, not per row. Recycled copies are new
+    # rows, so the old per-row date kept picking the same original row and posted
+    # "Not Chasing The Dream" five days running (11-15 Nov). Use the newest date any
+    # row with that image ran, and keep one candidate per image.
+    latest = {}
+    for r in rows:
+        if (r.get("brand") or "").strip() != BRAND:
+            continue
+        m = (r.get("media_url") or "").strip()
         d = date_of(r)
-        return d or datetime.date(2000, 1, 1)
+        if m and d and (m not in latest or d > latest[m]):
+            latest[m] = d
+
+    def last_used(r):
+        m = (r.get("media_url") or "").strip()
+        return latest.get(m) or date_of(r) or datetime.date(2000, 1, 1)
+
+    seen = set()
+    uniq = []
+    for r in pool:
+        m = (r.get("media_url") or "").strip()
+        if m in seen:
+            continue
+        seen.add(m)
+        uniq.append(r)
+    pool = uniq
 
     pool.sort(key=last_used)
     oldest = last_used(pool[0])
