@@ -2676,3 +2676,4 @@
 [2026-11-17 09:48:30] POSTED [Insulate Iowa] 2026-11-17 facebook -> FB(make):1230451456819767_122140716183383638
 [2026-11-17 09:48:30] Queue updated (1 row(s) changed, 321 rows saved).
 [2026-11-17 10:48:14] Nothing due today. Exiting cleanly.
+[2026-11-17 16:26:42] TOPUP queue was dry for 2026-11-17 — recycled motiveaf_this-moment-s-energy-is-yours-grab-it.jpg (first ran 2026-09-01, 77 days ago). 64 posts in the rotation.
