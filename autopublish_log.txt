@@ -2677,3 +2677,10 @@
 [2026-11-17 09:48:30] Queue updated (1 row(s) changed, 321 rows saved).
 [2026-11-17 10:48:14] Nothing due today. Exiting cleanly.
 [2026-11-17 16:26:42] TOPUP queue was dry for 2026-11-17 — recycled motiveaf_this-moment-s-energy-is-yours-grab-it.jpg (first ran 2026-09-01, 77 days ago). 64 posts in the rotation.
+[2026-11-17 16:44:47] WARN: could not read the media size for https://raw.githubusercontent.com/dredfearn74-star/dwr-music-bot/main/media/motiveaf/motiveaf_this-moment-s-energy-is-yours-grab-it.jpg — posting anyway (aspect gate skipped).
+[2026-11-17 16:44:47]   first comment for 2026-11-17: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-11-17 16:44:53]   Facebook post handed to Make.com (public route) for 2026-11-17: 1179462511909328_122165894427352686
+[2026-11-17 16:44:53]   no location on this row
+[2026-11-17 16:45:09]   first comment confirmed on Instagram too.
+[2026-11-17 16:45:09] POSTED [MotiveAF] 2026-11-17 both -> FB(make):1179462511909328_122165894427352686, IG:17964702608999063, igcmt:17938214325410693
+[2026-11-17 16:45:09] Queue updated (1 row(s) changed, 322 rows saved).
