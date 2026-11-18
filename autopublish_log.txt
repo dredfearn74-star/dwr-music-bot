@@ -2701,3 +2701,4 @@
 [2026-11-17 19:49:49]    Facebook removes API Page-mentions until the app passes App Review.
 [2026-11-17 19:49:49]    Open each link and tag by hand (about 20 seconds each):
 [2026-11-17 19:49:49]    - 2026-11-17  Last piece of Get On Up and Get Down, live at...  https://www.facebook.com/reel/2396810684184575  tag: 61579051274463
+[2026-11-17 20:48:00] Nothing due today. Exiting cleanly.

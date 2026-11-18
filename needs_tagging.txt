@@ -1,4 +1,0 @@
-Posts that went out but had their @ mentions stripped by Facebook.
-Open each and add the tags by hand. This file is rewritten every run.
-
-2026-11-17  Last piece of Get On Up and Get Down, live at...  https://www.facebook.com/reel/2396810684184575  tag: 61579051274463
