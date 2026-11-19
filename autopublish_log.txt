@@ -2732,3 +2732,9 @@
 [2026-11-19 09:47:57] Nothing due today. Exiting cleanly.
 [2026-11-19 10:48:06] Nothing due today. Exiting cleanly.
 [2026-11-19 16:11:24] TOPUP queue was dry for 2026-11-19 — recycled motiveaf_achievement-unlocked-woke-up-now-unlock-the-rest.jpg (first ran 2026-09-03, 77 days ago). 64 posts in the rotation.
+[2026-11-19 16:27:43]   first comment for 2026-11-19: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-11-19 16:27:47]   Facebook post handed to Make.com (public route) for 2026-11-19: 1179462511909328_122166500283352686
+[2026-11-19 16:27:47]   no location on this row
+[2026-11-19 16:27:57]   first comment confirmed on Instagram too.
+[2026-11-19 16:27:57] POSTED [MotiveAF] 2026-11-19 both -> FB(make):1179462511909328_122166500283352686, IG:18133299340877215, igcmt:18073929746788016
+[2026-11-19 16:27:57] Queue updated (1 row(s) changed, 324 rows saved).
