@@ -2752,3 +2752,4 @@
 [2026-11-20 09:49:05] POSTED [Insulate Iowa] 2026-11-20 facebook -> FB(make):1230451456819767_122141348007383638
 [2026-11-20 09:49:05] Queue updated (1 row(s) changed, 324 rows saved).
 [2026-11-20 10:48:57] Nothing due today. Exiting cleanly.
+[2026-11-20 15:51:16] TOPUP queue was dry for 2026-11-20 — recycled motiveaf_dreams-without-deadlines-are-hobbies.jpg (first ran 2026-09-04, 77 days ago). 64 posts in the rotation.
