@@ -2778,3 +2778,4 @@
 [2026-11-21 14:40:48] POSTED [MotiveAF] 2026-11-21 both -> FB(make):1179462511909328_122167106697352686, IG:17916081930559693, igcmt:17931304026427740
 [2026-11-21 14:40:48] Queue updated (1 row(s) changed, 326 rows saved).
 [2026-11-21 14:54:30] Nothing due today. Exiting cleanly.
+[2026-11-21 15:07:04] Nothing due today. Exiting cleanly.
