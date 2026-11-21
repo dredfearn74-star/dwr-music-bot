@@ -2771,3 +2771,9 @@
 [2026-11-21 09:47:48] Nothing due today. Exiting cleanly.
 [2026-11-21 10:47:52] Nothing due today. Exiting cleanly.
 [2026-11-21 14:33:38] TOPUP queue was dry for 2026-11-21 — recycled motiveaf_biggest-problem-isn-t-the-market-it-s-the-mirror.jpg (first ran 2026-09-05, 77 days ago). 64 posts in the rotation.
+[2026-11-21 14:40:27]   first comment for 2026-11-21: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-11-21 14:40:33]   Facebook post handed to Make.com (public route) for 2026-11-21: 1179462511909328_122167106697352686
+[2026-11-21 14:40:33]   no location on this row
+[2026-11-21 14:40:48]   first comment confirmed on Instagram too.
+[2026-11-21 14:40:48] POSTED [MotiveAF] 2026-11-21 both -> FB(make):1179462511909328_122167106697352686, IG:17916081930559693, igcmt:17931304026427740
+[2026-11-21 14:40:48] Queue updated (1 row(s) changed, 326 rows saved).
