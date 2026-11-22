@@ -2788,3 +2788,4 @@
 [2026-11-22 02:53:31] Nothing due today. Exiting cleanly.
 [2026-11-22 09:48:10] Nothing due today. Exiting cleanly.
 [2026-11-22 10:47:56] Nothing due today. Exiting cleanly.
+[2026-11-22 14:45:21] TOPUP queue was dry for 2026-11-22 — recycled motiveaf_best-investment-the-you-you-re-building.jpg (first ran 2026-09-06, 77 days ago). 64 posts in the rotation.
