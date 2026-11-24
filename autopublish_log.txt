@@ -2829,3 +2829,9 @@
 [2026-11-24 09:52:26] Queue updated (1 row(s) changed, 331 rows saved).
 [2026-11-24 10:49:08] Nothing due today. Exiting cleanly.
 [2026-11-24 17:30:03] TOPUP queue was dry for 2026-11-24 — recycled motiveaf_soon-expired-today-now.jpg (first ran 2026-09-08, 77 days ago). 64 posts in the rotation.
+[2026-11-24 17:38:59]   first comment for 2026-11-24: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-11-24 17:39:04]   Facebook post handed to Make.com (public route) for 2026-11-24: 1179462511909328_122168179461352686
+[2026-11-24 17:39:05]   no location on this row
+[2026-11-24 17:39:16]   first comment confirmed on Instagram too.
+[2026-11-24 17:39:16] POSTED [MotiveAF] 2026-11-24 both -> FB(make):1179462511909328_122168179461352686, IG:18069758432789485, igcmt:18040652279853946
+[2026-11-24 17:39:16] Queue updated (1 row(s) changed, 332 rows saved).
