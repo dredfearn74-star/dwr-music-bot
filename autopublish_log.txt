@@ -2807,3 +2807,4 @@
 [2026-11-23 09:48:38] Nothing due today. Exiting cleanly.
 [2026-11-23 10:50:18] Nothing due today. Exiting cleanly.
 [2026-11-23 16:07:31] TOPUP queue was dry for 2026-11-23 — recycled motiveaf_no-excuses-version-wins.jpg (first ran 2026-09-07, 77 days ago). 64 posts in the rotation.
+[2026-11-23 19:42:13] TOPUP MotiveAF already has a row for 2026-11-23 (status QUEUED). Standing down.
