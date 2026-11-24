@@ -2808,3 +2808,9 @@
 [2026-11-23 10:50:18] Nothing due today. Exiting cleanly.
 [2026-11-23 16:07:31] TOPUP queue was dry for 2026-11-23 — recycled motiveaf_no-excuses-version-wins.jpg (first ran 2026-09-07, 77 days ago). 64 posts in the rotation.
 [2026-11-23 19:42:13] TOPUP MotiveAF already has a row for 2026-11-23 (status QUEUED). Standing down.
+[2026-11-23 19:47:59]   first comment for 2026-11-23: Shirts: https://motiveaf.printify.me   (using the first_comment cell exactly as written)
+[2026-11-23 19:48:05]   Facebook post handed to Make.com (public route) for 2026-11-23: 1179462511909328_122167815849352686
+[2026-11-23 19:48:06]   no location on this row
+[2026-11-23 19:48:15]   first comment confirmed on Instagram too.
+[2026-11-23 19:48:15] POSTED [MotiveAF] 2026-11-23 both -> FB(make):1179462511909328_122167815849352686, IG:18136171687826965, igcmt:18348239905252936
+[2026-11-23 19:48:15] Queue updated (1 row(s) changed, 331 rows saved).
