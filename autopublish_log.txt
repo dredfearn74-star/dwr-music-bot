@@ -2823,3 +2823,7 @@
 [2026-11-24 04:30:04] Nothing due today. Exiting cleanly.
 [2026-11-24 05:00:25] Nothing due today. Exiting cleanly.
 [2026-11-24 05:39:28] Nothing due today. Exiting cleanly.
+[2026-11-24 09:52:22]   first comment for 2026-11-24: Free estimate: https://insulateiowallc.com/?src=facebook#estimate   (using the first_comment cell exactly as written)
+[2026-11-24 09:52:26]   Facebook post handed to Make.com (public route) for 2026-11-24: 1230451456819767_122142090417383638
+[2026-11-24 09:52:26] POSTED [Insulate Iowa] 2026-11-24 facebook -> FB(make):1230451456819767_122142090417383638
+[2026-11-24 09:52:26] Queue updated (1 row(s) changed, 331 rows saved).
