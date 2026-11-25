@@ -2846,3 +2846,4 @@
 [2026-11-25 04:31:45] Nothing due today. Exiting cleanly.
 [2026-11-25 09:48:31] Nothing due today. Exiting cleanly.
 [2026-11-25 10:48:01] Nothing due today. Exiting cleanly.
+[2026-11-25 17:07:56] TOPUP queue was dry for 2026-11-25 — recycled motiveaf_build-the-finishing-habit-start-today.jpg (first ran 2026-09-09, 77 days ago). 64 posts in the rotation.
