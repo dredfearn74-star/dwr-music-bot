@@ -2921,3 +2921,4 @@
 [2026-11-26 10:48:17] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-11-26 10:48:17]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-11-26 10:48:17] ====================================================================
+[2026-11-26 17:00:55] TOPUP queue was dry for 2026-11-26 — recycled motiveaf_only-person-who-can-fix-this-you.jpg (first ran 2026-09-10, 77 days ago). 64 posts in the rotation.
