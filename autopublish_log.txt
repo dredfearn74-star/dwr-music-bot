@@ -2896,3 +2896,12 @@
 [2026-11-26 03:40:39] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-11-26 03:40:39]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-11-26 03:40:39] ====================================================================
+[2026-11-26 04:09:35] RETRY [DWR Music] 2026-11-25: attempt 1 of 3 (already live on: nothing yet)
+[2026-11-26 04:09:36] WARN: could not read the media size for https://raw.githubusercontent.com/dredfearn74-star/dwr-music-bot/main/media/wagon-wheel-abby-pleasant-hill-reel-1.mp4 — posting anyway (aspect gate skipped).
+[2026-11-26 04:09:36] REFUSED [DWR Music] 2026-11-25 both: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-11-26 04:09:36] Queue updated (1 row(s) changed, 333 rows saved).
+[2026-11-26 04:09:36] 
+[2026-11-26 04:09:36] ====================================================================
+[2026-11-26 04:09:36] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-11-26 04:09:36]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-11-26 04:09:36] ====================================================================
