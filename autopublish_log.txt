@@ -3007,3 +3007,14 @@
 [2026-11-27 04:10:01] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-11-27 04:10:01]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-11-27 04:10:01] ====================================================================
+[2026-11-27 09:48:27]   first comment for 2026-11-27: Free estimate: https://insulateiowallc.com/?src=facebook#estimate   (using the first_comment cell exactly as written)
+[2026-11-27 09:48:32]   Facebook post handed to Make.com (public route) for 2026-11-27: 1230451456819767_122142705171383638
+[2026-11-27 09:48:32] POSTED [Insulate Iowa] 2026-11-27 facebook -> FB(make):1230451456819767_122142705171383638
+[2026-11-27 09:48:32] RETRY [DWR Music] 2026-11-25: attempt 1 of 3 (already live on: nothing yet)
+[2026-11-27 09:48:34] REFUSED [DWR Music] 2026-11-25 both: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-11-27 09:48:34] Queue updated (2 row(s) changed, 334 rows saved).
+[2026-11-27 09:48:34] 
+[2026-11-27 09:48:34] ====================================================================
+[2026-11-27 09:48:34] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-11-27 09:48:34]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-11-27 09:48:34] ====================================================================
