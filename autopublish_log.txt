@@ -2951,3 +2951,11 @@
 [2026-11-26 17:59:41] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
 [2026-11-26 17:59:41]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
 [2026-11-26 17:59:41] ====================================================================
+[2026-11-26 18:44:05] RETRY [DWR Music] 2026-11-25: attempt 1 of 3 (already live on: nothing yet)
+[2026-11-26 18:44:07] REFUSED [DWR Music] 2026-11-25 both: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-11-26 18:44:07] Queue updated (1 row(s) changed, 334 rows saved).
+[2026-11-26 18:44:07] 
+[2026-11-26 18:44:07] ====================================================================
+[2026-11-26 18:44:07] !! 1 POST(S) FAILED THIS RUN — this run is being marked FAILED on purpose
+[2026-11-26 18:44:07]    - DWR Music 2026-11-25 — REFUSED: this video was changed by something other than David's own upload (sha256 6bc679f5c813d73e... is not in media_manifest.csv and the file's latest commit is not an 'Add files via upload'). This is exactly how the 2026-09-05 stretched reel got published. NOTHING re-encodes David's exports - re-upload his original DaVinci export through GitHub's 'Add files via upload' and it will pass on its own.
+[2026-11-26 18:44:07] ====================================================================
